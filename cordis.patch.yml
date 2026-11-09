@@ -1,0 +1,3 @@
+- insert:
+    - id: drone-planner
+      name: '@local/drone-planner'

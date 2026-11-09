@@ -1,0 +1,6 @@
+{
+  "meta": {
+    "title": "Drone route lab",
+    "description": "Opens the drone-planner frustum route demo as a central Harness panel: the local HTML runs in full, so you can draw targets, generate routes, inspect 3D frustums, and export the plan as JSON."
+  }
+}
