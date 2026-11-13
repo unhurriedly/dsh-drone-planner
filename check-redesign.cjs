@@ -12,10 +12,10 @@ const context = { document: {}, console, setTimeout };
 vm.createContext(context);
 vm.runInContext(
   source.split('let screen=')[0] +
-    '\nglobalThis.api={fov,geometry,basis,insideFov,validateTarget,directionOK,effYawTarget,segYawOf,toLatLon,state,area,spacingAllowed,slopeAB,groundZfn,riskInfo,ACTION_DEFS,NO_STAY_OK,samples};',
+    '\nglobalThis.api={fov,geometry,basis,insideFov,validateTarget,directionOK,effYawTarget,segYawOf,toLatLon,state,area,spacingAllowed,slopeAB,groundZfn,riskInfo,ACTION_DEFS,NO_STAY_OK,samples,cylinderOf,spiralWaypoints,lineWaypoints,greedyWaypoints};',
   context,
 );
-const { fov, geometry, basis, insideFov, validateTarget, directionOK, effYawTarget, segYawOf, toLatLon, state, area, spacingAllowed, slopeAB, groundZfn, riskInfo, ACTION_DEFS, NO_STAY_OK, samples } = context.api;
+const { fov, geometry, basis, insideFov, validateTarget, directionOK, effYawTarget, segYawOf, toLatLon, state, area, spacingAllowed, slopeAB, groundZfn, riskInfo, ACTION_DEFS, NO_STAY_OK, samples, cylinderOf, spiralWaypoints, lineWaypoints } = context.api;
 
 let checks = 0;
 function test(name, fn) { fn(); checks++; console.log('PASS ' + name); }
@@ -175,6 +175,47 @@ test('Inline hint paragraphs removed, content kept in tooltips', () => {
   assert.ok(page.includes('id="executeNow"'), 'execute button missing');
   assert.ok(/立即执行/.test(page), 'execute button label missing');
   assert.ok(!/执行飞行|上传航线|下发任务/.test(page), 'execute button must stay a placeholder');
+});
+
+test('Cylinder: centroid/radius from polygon, sampling on top and sides', () => {
+  state.config = { type: 'solid', solidTop: 30, height: 110, zoom: 1, distance: 210, spacing: 0 };
+  state.target = Array.from({ length: 24 }, (_, k) => [Math.cos(k * Math.PI / 12) * 100, Math.sin(k * Math.PI / 12) * 100]);
+  const cyl = cylinderOf(state.config);
+  assert.ok(Math.abs(cyl.cx) < 1e-9 && Math.abs(cyl.cy) < 1e-9 && Math.abs(cyl.rad - 100) < 1e-6 && cyl.top === 30);
+  const pts = samples(state.config);
+  assert.ok(pts.some(p => Math.abs(p[2] - 30) < 1e-9), 'missing top samples');
+  assert.ok(pts.some(p => p[2] > 0 && p[2] < 30), 'missing side samples');
+  assert.ok(pts.every(p => Math.hypot(p[0], p[1]) <= 100 + 1e-6));
+});
+
+test('Spiral waypoints ring the cylinder and climb', () => {
+  state.config = { type: 'solid', solidTop: 30, height: 110, zoom: 1, distance: 210, spacing: 0, yawMode: 'along', bodyYaw: null };
+  const pts = spiralWaypoints(state.config);
+  assert.ok(pts.length >= 8 && pts.length <= 80);
+  const radii = pts.map(p => Math.hypot(p.x, p.y));
+  assert.ok(radii.every(r => r > 100 && r < 260), 'waypoints should orbit outside the cylinder');
+  const heights = pts.map(p => p.height);
+  assert.ok(Math.max(...heights) > Math.min(...heights), 'spiral should climb');
+  // heading points inward at the cylinder axis
+  for (const p of pts) {
+    const toCenter = Math.atan2(-p.x, -p.y) * 180 / Math.PI;
+    assert.ok(Math.abs(((p.yaw - toCenter + 540) % 360) - 180) < 1, 'yaw should face the axis');
+  }
+  assert.ok(pts.every(p => p.pitch <= 0));
+});
+
+test('Line waypoints distributed along the route, not offset', () => {
+  state.config = { type: 'line', height: 110, zoom: 1, distance: 210, spacing: 0, pitch: -60, lineWidth: 20 };
+  state.target = [[-230, -100], [-110, -70], [-30, 10], [100, 70], [220, 95]];
+  const pts = lineWaypoints(state.config);
+  assert.ok(pts.length >= 4);
+  const onLine = p => state.target.some((a, i) => i && segDistLocal(p, state.target[i - 1], a) < 1e-6);
+  assert.ok(pts.every(onLine), 'every waypoint should sit on the route');
+  function segDistLocal(p, a, b) {
+    const dx = b[0] - a[0], dy = b[1] - a[1], d = dx * dx + dy * dy;
+    const t = d ? Math.max(0, Math.min(1, ((p.x - a[0]) * dx + (p.y - a[1]) * dy) / d)) : 0;
+    return Math.hypot(p.x - a[0] - t * dx, p.y - a[1] - t * dy);
+  }
 });
 
 console.log(`${checks} redesign checks passed.`);
