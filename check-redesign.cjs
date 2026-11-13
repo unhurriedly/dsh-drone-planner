@@ -12,10 +12,10 @@ const context = { document: {}, console, setTimeout };
 vm.createContext(context);
 vm.runInContext(
   source.split('let screen=')[0] +
-    '\nglobalThis.api={fov,geometry,basis,insideFov,validateTarget,directionOK,effYawTarget,segYawOf,toLatLon,state,area,spacingAllowed};',
+    '\nglobalThis.api={fov,geometry,basis,insideFov,validateTarget,directionOK,effYawTarget,segYawOf,toLatLon,state,area,spacingAllowed,slopeAB,groundZfn,riskInfo,ACTION_DEFS,NO_STAY_OK,samples};',
   context,
 );
-const { fov, geometry, basis, insideFov, validateTarget, directionOK, effYawTarget, segYawOf, toLatLon, state, area, spacingAllowed } = context.api;
+const { fov, geometry, basis, insideFov, validateTarget, directionOK, effYawTarget, segYawOf, toLatLon, state, area, spacingAllowed, slopeAB, groundZfn, riskInfo, ACTION_DEFS, NO_STAY_OK, samples } = context.api;
 
 let checks = 0;
 function test(name, fn) { fn(); checks++; console.log('PASS ' + name); }
@@ -87,6 +87,70 @@ test('New preset ids present exactly once in the page', () => {
   for (const gone of ['id="task"', 'id="parseTask"', 'id="directionMode"', 'id="basePitch"', 'id="baseLens"', 'id="strategy"', 'id="export"', 'id="reset"', 'id="clipDemo"', 'id="addPoint"', 'id="pointLens"']) {
     assert.ok(!page.includes(gone), 'unexpected id ' + gone);
   }
+});
+
+test('Slope nadir area matches independent numeric integration', () => {
+  const c = { type: 'slope', slopeAngle: 15, slopeAspect: 180, distance: 1000, zoom: 1 };
+  const [A, Bc] = slopeAB(c);
+  assert.ok(Math.abs(A) < 1e-12 && Math.abs(Bc + Math.tan(15 * Math.PI / 180)) < 1e-12);
+  const g = geometry({ x: 0, y: 0, yaw: 0, pitch: -90, zoom: 1, height: 110 }, c);
+  // Independent check: nadir frustum on plane z=tan15*y, camera (0,0,110):
+  // |x| <= (110 - tan15*y)*tan32 and |y| <= (110 - tan15*y)*tan22; surface area scales by 1/cos15.
+  const t15 = Math.tan(15 * Math.PI / 180), t32 = Math.tan(32 * Math.PI / 180), t22 = Math.tan(22 * Math.PI / 180);
+  const ymax = 110 * t22 / (1 + t15 * t22), ymin = -110 * t22 / (1 - t15 * t22);
+  const cell = 0.2; let count = 0;
+  for (let y = ymin + cell / 2; y < ymax; y += cell) {
+    const xr = (110 - t15 * y) * t32;
+    for (let x = -xr + cell / 2; x < xr; x += cell) count++;
+  }
+  const expected = count * cell * cell / Math.cos(15 * Math.PI / 180);
+  assert.ok(Math.abs(g.rawArea - expected) / expected < 0.02, `impl ${g.rawArea} vs mc ${expected}`);
+  assert.ok(g.raw.every(v => v.length === 3));
+});
+
+test('Slope range cut: every effective vertex within slant distance', () => {
+  const c = { type: 'slope', slopeAngle: 15, slopeAspect: 180, distance: 250, zoom: 1 };
+  const w = { x: 0, y: 0, yaw: 0, pitch: -35, zoom: 1, height: 110 };
+  const g = geometry(w, c);
+  assert.ok(g.cut > 0 && g.validArea > 0);
+  const C = [0, 0, 110];
+  for (const v of g.effective) assert.ok(Math.hypot(v[0] - C[0], v[1] - C[1], v[2] - C[2]) <= 250 + 1e-6);
+});
+
+test('insideFov on slope uses ground-relative camera altitude', () => {
+  const c = { type: 'slope', slopeAngle: 15, slopeAspect: 180, distance: 1000, zoom: 1 };
+  const w = { x: 0, y: 0, yaw: 0, pitch: -90, zoom: 1, height: 110 };
+  const b = basis(w, c);
+  assert.ok(insideFov([0, 0, groundZfn(c)(0, 0)], w, c, b));           // point directly below
+  assert.ok(!insideFov([500, 500, groundZfn(c)(500, 500)], w, c, b));  // far outside
+});
+
+test('Solid sampling produces 3D samples on top and sides', () => {
+  state.target = [[-120, -80], [120, -80], [120, 80], [-120, 80]];
+  const c = { type: 'solid', solidTop: 30, height: 110, zoom: 1, distance: 210 };
+  const pts = samples(c);
+  assert.ok(pts.length > 10 && pts.every(p => p.length === 3));
+  assert.ok(pts.some(p => Math.abs(p[2] - 30) < 1e-9));
+  assert.ok(pts.some(p => p[2] < 30));
+});
+
+test('No-stay action whitelist excludes gimbal/payload/standard AI photo', () => {
+  assert.ok(NO_STAY_OK.has('photo') && NO_STAY_OK.has('rec_start') && NO_STAY_OK.has('rec_stop') && NO_STAY_OK.has('wait') && NO_STAY_OK.has('ai_photo_fast'));
+  assert.ok(!NO_STAY_OK.has('ai_photo') && !NO_STAY_OK.has('gimbal_pitch') && !NO_STAY_OK.has('gimbal_zoom') && !NO_STAY_OK.has('payload_custom'));
+  for (const k of Object.keys(ACTION_DEFS)) assert.ok(ACTION_DEFS[k].group && ACTION_DEFS[k].label);
+});
+
+test('riskInfo: travel + waits + return vs endurance budget', () => {
+  state.points = [
+    { x: 0, y: 0, height: 100, actions: [{ type: 'wait', params: { sec: 60 } }] },
+    { x: 100, y: 0, height: 100, actions: [] },
+  ];
+  const c = { speed: 5, endAction: 'rth' };
+  const r = riskInfo(c, 25, 80);           // travel 20 + wait 60 + return 20 = 100s
+  assert.ok(Math.abs(r.time - 100) < 1e-9 && !r.over);
+  const r2 = riskInfo(c, 1, 100);          // budget 60s < 100s
+  assert.ok(r2.over);
+  state.points = [];
 });
 
 console.log(`${checks} redesign checks passed.`);
