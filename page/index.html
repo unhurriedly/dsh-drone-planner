@@ -94,16 +94,16 @@
 </label>
 <div id="fixedPoseFields">
 <label class="field">
-<span>机身角度 / °（不填 = 沿航线方向）<i class="fi" tabindex="0" data-tip="不填＝沿航线方向。填写后航点水平角固定为该角度；手动偏离有效航向的航点不计入任务覆盖。">!</i></span>
+<span>机身角度 / °<i class="fi" tabindex="0" data-tip="不填＝沿航线方向。填写后航点水平角固定为该角度；手动偏离有效航向的航点不计入任务覆盖。">!</i></span>
 <input id="bodyYaw" type="number" min="-180" max="180" step="1" placeholder="沿航线方向">
 </label>
 <div class="pair">
 <label class="field">
-<span>云台俯仰角 / °（不填 = 0°朝前）<i class="fi" tabindex="0" data-tip="不填＝云台 0° 朝前；−90° 垂直向下。0° 朝前且裁切距离较近时，可能无有效覆盖。">!</i></span>
+<span>云台俯仰角 / °<i class="fi" tabindex="0" data-tip="不填＝云台 0° 朝前；−90° 垂直向下。0° 朝前且裁切距离较近时，可能无有效覆盖。">!</i></span>
 <input id="gimbalPitch" type="number" min="-90" max="90" step="1" value="-60" placeholder="0">
 </label>
 <label class="field">
-<span>云台变焦倍数（不填 = 默认 1×）<i class="fi" tabindex="0" data-tip="不填＝默认 1×（基准视场 64°×44°）。视场按 FOV(z)＝2·atan(tan(FOV₀/2)/z) 收窄，不代表真实光学分辨率。">!</i></span>
+<span>云台变焦倍数<i class="fi" tabindex="0" data-tip="不填＝默认 1×（基准视场 64°×44°）。视场按 FOV(z)＝2·atan(tan(FOV₀/2)/z) 收窄，不代表真实光学分辨率。">!</i></span>
 <input id="zoom" type="number" min="1" max="200" step="1" placeholder="1">
 </label>
 </div>
@@ -363,7 +363,7 @@ const $=id=>document.getElementById(id), R=Math.PI/180, B={xmin:-400,xmax:400,ym
 const state={target:[[-160,-110],[170,-110],[205,40],[90,140],[-150,115]],points:[],selected:-1,view:'top',drawing:false,draft:[],samples:[],coverage:[],step:8,coarse:false,dirty:false,drag:null,config:null,geoms:[],source:[],busy:false,overlaps:[],hitCounts:[],spacingViolations:[],segYaw:[],resume:false,nfzAck:false};
 const configIds=['height','cutDistance','speed','yawMode','bodyYaw','gimbalPitch','zoom','spacing','heightMode','groundElevation','stay','endAction','homeLat','homeLon','lineWidth','slopeAngle','slopeAspect','solidTop','enduranceMin','safetyPct'];
 function config(){const num=id=>{const v=$(id).value.trim();return v===''?null:+v};return {spacing:+$('spacing').value||0,height:+$('height').value,distance:+$('cutDistance').value,yawMode:$('yawMode').value,bodyYaw:num('bodyYaw'),pitch:num('gimbalPitch')??0,zoom:num('zoom')??1,speed:+$('speed').value||5,heightMode:$('heightMode').value,groundElevation:+$('groundElevation').value||0,stay:$('stay').value==='yes',endAction:$('endAction').value,home:{lat:+$('homeLat').value||0,lon:+$('homeLon').value||0},lineWidth:+$('lineWidth').value,slopeAngle:+$('slopeAngle').value||0,slopeAspect:+$('slopeAspect').value||0,solidTop:+$('solidTop').value||30,type:$('targetType').value};}
-function validConfig(){for(const id of configIds){const el=$(id);if(el.type!=='number'||el.value==='')continue;if(!el.checkValidity()){$('validation').textContent='请检查参数：'+(el.parentElement.querySelector('span').textContent||el.id);return false;}}$('validation').textContent='';return true;}
+function validConfig(){for(const id of configIds){const el=$(id);if(el.type!=='number'||el.value==='')continue;if(!el.checkValidity()){$('validation').textContent='请检查参数：'+((el.parentElement.querySelector('span').textContent||el.id).replace(/!$/,''));return false;}}$('validation').textContent='';return true;}
 const dot=(a,b)=>a.reduce((s,v,i)=>s+v*b[i],0),dist=(a,b)=>Math.hypot(a[0]-b[0],a[1]-b[1]);
 const area=p=>p.length<3?0:Math.abs(p.reduce((s,a,i)=>{let b=p[(i+1)%p.length];return s+a[0]*b[1]-a[1]*b[0]},0))/2;
 function clip(poly,fn){if(!poly.length)return [];const out=[];for(let i=0;i<poly.length;i++){let a=poly[i],b=poly[(i+1)%poly.length],fa=fn(a),fb=fn(b),ia=fa>=-1e-8,ib=fb>=-1e-8;if(ia)out.push(a);if(ia!==ib){let t=fa/(fa-fb);out.push([a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t]);}}return out;}
