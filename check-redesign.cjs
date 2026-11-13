@@ -81,10 +81,10 @@ test('Removed UI surface: no parseTask/strategy/lens/export/reset/addPoint/clipD
 
 test('New preset ids present exactly once in the page', () => {
   const page = fs.readFileSync(__dirname + '/page/index.html', 'utf8');
-  for (const id of ['heightMode', 'groundElevation', 'speed', 'yawMode', 'bodyYaw', 'gimbalPitch', 'zoom', 'cutDistance', 'stay', 'endAction', 'homeLat', 'homeLon', 'spacingStat', 'pointLatlon', 'pointHeight', 'riskBar', 'energyItem', 'energyTime', 'energyBudget', 'nfzItem', 'altItem', 'spaceItem', 'resumeRow']) {
+  for (const id of ['heightMode', 'groundElevation', 'speed', 'yawMode', 'bodyYaw', 'gimbalPitch', 'zoom', 'cutDistance', 'stay', 'endAction', 'homeLat', 'homeLon', 'spacingStat', 'pointLatlon', 'pointHeight', 'riskBar', 'energyItem', 'energyTime', 'energyBudget', 'altItem', 'spaceItem', 'resumeRow']) {
     assert.ok(page.includes(`id="${id}"`), 'missing id ' + id);
   }
-  for (const gone of ['id="task"', 'id="parseTask"', 'id="directionMode"', 'id="basePitch"', 'id="baseLens"', 'id="strategy"', 'id="export"', 'id="reset"', 'id="clipDemo"', 'id="addPoint"', 'id="pointLens"', 'id="resultNote"', 'id="sampleCount"', 'id="sampleSpacing"', 'id="missCount"', 'id="overlapRate"', 'class="panel risk-panel"']) {
+  for (const gone of ['id="task"', 'id="parseTask"', 'id="directionMode"', 'id="basePitch"', 'id="baseLens"', 'id="strategy"', 'id="export"', 'id="reset"', 'id="clipDemo"', 'id="addPoint"', 'id="pointLens"', 'id="resultNote"', 'id="sampleCount"', 'id="sampleSpacing"', 'id="missCount"', 'id="overlapRate"', 'class="panel risk-panel"', 'id="nfzItem"', 'id="nfzAck"']) {
     assert.ok(!page.includes(gone), 'unexpected id ' + gone);
   }
 });
@@ -170,6 +170,8 @@ test('Inline hint paragraphs removed, content kept in tooltips', () => {
   assert.ok(!page.includes('不填 = 沿航线方向）'), 'default-value suffix still in a label');
   const tip = page.match(/data-tip="停留＝是：支持全部动作[^"]*"/);
   assert.ok(tip && /智拍固定第一/.test(tip[0]) && /1s/.test(tip[0]), 'actions tooltip lost content');
+  assert.ok(!/地图管理未设置禁飞区/.test(page), 'no-fly-zone assessment still present');
+  assert.ok(!page.includes('nfz'), 'nfz identifiers still present');
 });
 
 console.log(`${checks} redesign checks passed.`);

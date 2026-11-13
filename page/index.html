@@ -214,7 +214,6 @@
 </div>
 </div>
 <div class="risk-bar" id="riskBar" role="status">
-<span class="risk-item warn" id="nfzItem" hidden>⚠ 地图管理未设置禁飞区<label class="check"><input id="nfzAck" type="checkbox">已知悉</label></span>
 <span class="risk-item warn" id="altItem" hidden>⚠ 飞行高度 <b id="altMinH">—</b> m 低于 100 m，注意高度检查</span>
 <span class="risk-item warn" id="spaceItem" hidden>⚠ <b id="spaceCount">0</b> 对航点小于最小间距</span>
 <span class="risk-item" id="energyItem">能耗<i class="fi" tabindex="0" data-tip="预计＝航程÷速度＋等待＋返航；可用＝续航×安全余量。匀速估算，未含起降、风阻与真实电池曲线。">!</i>：预计 <b id="energyTime">—</b> min / 可用 <b id="energyBudget">—</b> min<span id="energyState" class="risk-tag">—</span><label class="check" id="resumeRow" hidden><input id="resume" type="checkbox">自动断点续飞</label></span>
@@ -351,14 +350,14 @@
 </aside>
 </div>
 <div class="help">
-<strong>模拟范围与计算口径</strong>　平坦地面或单斜面假设（斜面由坡度与坡向定义；几何体为拉伸多面体，未做遮挡剔除）；所有航点位于矩形模拟作业范围内。飞行途中偏航沿航线方向时，覆盖在航线排序后按航段方向复核；机身角度、云台俯仰角、变焦倍数未填写时分别取沿航线方向、0°朝前、默认 1×。超视距裁切按相机到目标点的三维斜距计算，斜面面积为坡面真实面积；焦距为 35mm 等效口径，经纬度由起飞点原点换算（等距圆柱近似）。采样覆盖率是估计值，非连续面积的完整覆盖证明；重复采样比例仅统计满足方向约束的目标采样。航点动作按停留模式门控，不停留仅低延迟动作（延迟 <1s 为真机验收项）；能耗评估为匀速估算（航程/速度 + 等待 + 返航），未含起降、风阻与真实电池曲线。禁飞区提醒依赖地图管理，本 Demo 未接入；未计算真实 DEM、遮挡、空域与机体动力学。</div>
+<strong>模拟范围与计算口径</strong>　平坦地面或单斜面假设（斜面由坡度与坡向定义；几何体为拉伸多面体，未做遮挡剔除）；所有航点位于矩形模拟作业范围内。飞行途中偏航沿航线方向时，覆盖在航线排序后按航段方向复核；机身角度、云台俯仰角、变焦倍数未填写时分别取沿航线方向、0°朝前、默认 1×。超视距裁切按相机到目标点的三维斜距计算，斜面面积为坡面真实面积；焦距为 35mm 等效口径，经纬度由起飞点原点换算（等距圆柱近似）。采样覆盖率是估计值，非连续面积的完整覆盖证明；重复采样比例仅统计满足方向约束的目标采样。航点动作按停留模式门控，不停留仅低延迟动作（延迟 <1s 为真机验收项）；能耗评估为匀速估算（航程/速度 + 等待 + 返航），未含起降、风阻与真实电池曲线。未计算真实 DEM、遮挡、空域（禁飞区）与机体动力学。</div>
 <div id="toast" role="status" hidden>
 </div>
 </main>
 <script>
 'use strict';
 const $=id=>document.getElementById(id), R=Math.PI/180, B={xmin:-400,xmax:400,ymin:-300,ymax:300};
-const state={target:[[-160,-110],[170,-110],[205,40],[90,140],[-150,115]],points:[],selected:-1,view:'top',drawing:false,draft:[],samples:[],coverage:[],step:8,coarse:false,dirty:false,drag:null,config:null,geoms:[],source:[],busy:false,overlaps:[],hitCounts:[],spacingViolations:[],segYaw:[],resume:false,nfzAck:false};
+const state={target:[[-160,-110],[170,-110],[205,40],[90,140],[-150,115]],points:[],selected:-1,view:'top',drawing:false,draft:[],samples:[],coverage:[],step:8,coarse:false,dirty:false,drag:null,config:null,geoms:[],source:[],busy:false,overlaps:[],hitCounts:[],spacingViolations:[],segYaw:[],resume:false};
 const configIds=['height','cutDistance','speed','yawMode','bodyYaw','gimbalPitch','zoom','spacing','heightMode','groundElevation','stay','endAction','homeLat','homeLon','lineWidth','slopeAngle','slopeAspect','solidTop','enduranceMin','safetyPct'];
 function config(){const num=id=>{const v=$(id).value.trim();return v===''?null:+v};return {spacing:+$('spacing').value||0,height:+$('height').value,distance:+$('cutDistance').value,yawMode:$('yawMode').value,bodyYaw:num('bodyYaw'),pitch:num('gimbalPitch')??0,zoom:num('zoom')??1,speed:+$('speed').value||5,heightMode:$('heightMode').value,groundElevation:+$('groundElevation').value||0,stay:$('stay').value==='yes',endAction:$('endAction').value,home:{lat:+$('homeLat').value||0,lon:+$('homeLon').value||0},lineWidth:+$('lineWidth').value,slopeAngle:+$('slopeAngle').value||0,slopeAspect:+$('slopeAspect').value||0,solidTop:+$('solidTop').value||30,type:$('targetType').value};}
 function validConfig(){for(const id of configIds){const el=$(id);if(el.type!=='number'||el.value==='')continue;if(!el.checkValidity()){$('validation').textContent='请检查参数：'+((el.parentElement.querySelector('span').textContent||el.id).replace(/!$/,''));return false;}}$('validation').textContent='';return true;}
@@ -443,7 +442,6 @@ $('waypointTable').innerHTML=state.points.length?state.points.map((w,i)=>{const 
 function riskInfo(c,endMin=25,safePct=80){const waits=state.points.reduce((s,w)=>s+(w.actions||[]).reduce((t,a)=>t+(a.type==='wait'&&a.params&&Number.isFinite(+a.params.sec)?Math.max(0,+a.params.sec):0),0),0);const v=Math.max(.1,c.speed);const travel=routeLength()/v;const ret=c.endAction==='rth'&&state.points.length?Math.hypot(state.points[state.points.length-1].x,state.points[state.points.length-1].y)/v:0;const time=travel+waits+ret;const budget=endMin*60*(safePct/100);return {waits,travel,ret,time,budget,over:time>budget};}
 function renderRisk(){const c=state.config;if(!c)return;const minH=state.points.length?Math.min(...state.points.map(w=>Number.isFinite(w.height)?w.height:c.height)):null;
  const showAlt=minH!=null&&minH<100;$('altItem').hidden=!showAlt;if(showAlt)$('altMinH').textContent=format(minH,0);
- $('nfzItem').hidden=!!state.nfzAck;
  const sv=state.spacingViolations.length;$('spaceItem').hidden=!sv;if(sv)$('spaceCount').textContent=sv;
  const r=riskInfo(c,+$('enduranceMin').value||25,(+$('safetyPct').value)||80);
  $('energyTime').textContent=format(r.time/60,1);$('energyBudget').textContent=format(r.budget/60,1);
@@ -492,7 +490,6 @@ $('restorePoint').onclick=()=>{if(state.selected<0)return;const src=state.source
 $('actionList').addEventListener('change',e=>{const w=state.points[state.selected];if(!w||!e.target.dataset.i)return;const i=+e.target.dataset.i;if(!(w.actions&&w.actions[i]))return;if(e.target.classList.contains('act-type')){const t=e.target.value,def=ACTION_DEFS[t];w.actions[i].type=t;w.actions[i].params=def.param?{[def.param.key]:def.param.def}:{};recalc();}else if(e.target.classList.contains('act-param')){const def=ACTION_DEFS[w.actions[i].type];if(def&&def.param)w.actions[i].params[def.param.key]=def.param.type==='number'?+e.target.value:e.target.value;renderRisk();}});
 $('actionList').addEventListener('click',e=>{const b=e.target.closest('button[data-act]');if(!b||b.disabled)return;const w=state.points[state.selected];if(!w)return;const i=+b.dataset.i,a=w.actions;if(!a||!a[i])return;if(b.dataset.act==='del')a.splice(i,1);if(b.dataset.act==='up'&&i>0)[a[i-1],a[i]]=[a[i],a[i-1]];if(b.dataset.act==='down'&&i<a.length-1)[a[i+1],a[i]]=[a[i],a[i+1]];recalc();});
 $('addAction').onclick=()=>{const w=state.points[state.selected];if(!w)return toast('请先选择航点');w.actions=w.actions||[];if(w.actions.length>=20)return toast('单航点最多 20 个动作');w.actions.push({id:'a'+Date.now().toString(36),type:'photo',params:{}});recalc();};
-$('nfzAck').onchange=()=>{state.nfzAck=$('nfzAck').checked;renderRisk();};
 $('resume').onchange=()=>{state.resume=$('resume').checked;renderRisk();};
 const fieldTip=document.createElement('div');fieldTip.id='fieldTip';document.body.appendChild(fieldTip);
 function showTip(t){const r=t.getBoundingClientRect();fieldTip.textContent=t.dataset.tip;fieldTip.classList.add('show');const w=fieldTip.offsetWidth,h=fieldTip.offsetHeight;let x=r.left+r.width/2-w/2;x=Math.max(8,Math.min(x,window.innerWidth-w-8));let y=r.top-h-8;if(y<8)y=r.bottom+8;fieldTip.style.left=x+'px';fieldTip.style.top=y+'px';}
