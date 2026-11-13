@@ -15,6 +15,8 @@
     "client.js",
     "cordis.patch.yml",
     "page/index.html",
+    "check-redesign.cjs",
+    "preview-redesign.png",
     "locale/*.json",
     "icon.svg",
     "README.md"
