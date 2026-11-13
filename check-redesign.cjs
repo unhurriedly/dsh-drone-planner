@@ -172,6 +172,9 @@ test('Inline hint paragraphs removed, content kept in tooltips', () => {
   assert.ok(tip && /智拍固定第一/.test(tip[0]) && /1s/.test(tip[0]), 'actions tooltip lost content');
   assert.ok(!/地图管理未设置禁飞区/.test(page), 'no-fly-zone assessment still present');
   assert.ok(!page.includes('nfz'), 'nfz identifiers still present');
+  assert.ok(page.includes('id="executeNow"'), 'execute button missing');
+  assert.ok(/立即执行/.test(page), 'execute button label missing');
+  assert.ok(!/执行飞行|上传航线|下发任务/.test(page), 'execute button must stay a placeholder');
 });
 
 console.log(`${checks} redesign checks passed.`);
