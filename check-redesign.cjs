@@ -81,10 +81,10 @@ test('Removed UI surface: no parseTask/strategy/lens/export/reset/addPoint/clipD
 
 test('New preset ids present exactly once in the page', () => {
   const page = fs.readFileSync(__dirname + '/page/index.html', 'utf8');
-  for (const id of ['heightMode', 'groundElevation', 'speed', 'yawMode', 'bodyYaw', 'gimbalPitch', 'zoom', 'cutDistance', 'stay', 'endAction', 'homeLat', 'homeLon', 'spacingStat', 'sampleCount', 'sampleSpacing', 'pointLatlon', 'pointHeight']) {
+  for (const id of ['heightMode', 'groundElevation', 'speed', 'yawMode', 'bodyYaw', 'gimbalPitch', 'zoom', 'cutDistance', 'stay', 'endAction', 'homeLat', 'homeLon', 'spacingStat', 'pointLatlon', 'pointHeight', 'riskBar', 'energyItem', 'energyTime', 'energyBudget', 'nfzItem', 'altItem', 'spaceItem', 'resumeRow']) {
     assert.ok(page.includes(`id="${id}"`), 'missing id ' + id);
   }
-  for (const gone of ['id="task"', 'id="parseTask"', 'id="directionMode"', 'id="basePitch"', 'id="baseLens"', 'id="strategy"', 'id="export"', 'id="reset"', 'id="clipDemo"', 'id="addPoint"', 'id="pointLens"']) {
+  for (const gone of ['id="task"', 'id="parseTask"', 'id="directionMode"', 'id="basePitch"', 'id="baseLens"', 'id="strategy"', 'id="export"', 'id="reset"', 'id="clipDemo"', 'id="addPoint"', 'id="pointLens"', 'id="resultNote"', 'id="sampleCount"', 'id="sampleSpacing"', 'id="missCount"', 'id="overlapRate"', 'class="panel risk-panel"']) {
     assert.ok(!page.includes(gone), 'unexpected id ' + gone);
   }
 });

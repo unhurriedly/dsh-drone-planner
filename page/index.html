@@ -7,6 +7,7 @@
 :root{--ink:#172b59;--muted:#667798;--line:#e3e9f3;--blue:#4459f5;--soft:#eef0ff;--bg:#f7f9fd;--green:#159b79;--orange:#dc8b27;--red:#d74e66}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC",sans-serif}button,input,select,textarea{font:inherit}button{cursor:pointer}button:disabled{cursor:default;opacity:.45}button,input,select,textarea{border:1px solid var(--line);border-radius:7px}button{background:white;color:var(--ink);padding:8px 12px;font-weight:550}button:hover:not(:disabled){border-color:#8997fc;background:#f2f4ff}button.active{color:var(--blue);background:var(--soft);border-color:#a6b0ff}button.primary{color:white;background:var(--blue);border-color:var(--blue)}button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid #abb5ff;outline-offset:2px}input,select,textarea{background:#fff;color:var(--ink);width:100%;padding:8px 10px}input[type=range]{padding:0;accent-color:var(--blue)}input[type=checkbox]{width:auto;accent-color:var(--blue)}input[readonly]{background:#f2f5fa;color:#73809a}textarea{resize:vertical;min-height:74px;line-height:1.6}header{background:white;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;padding:17px 26px;gap:20px}.brand{font-size:21px;font-weight:750;letter-spacing:-.6px}.brand span{color:var(--blue)}.header-title{border-left:1px solid var(--line);padding-left:22px;margin-left:22px;letter-spacing:0;font-size:15px;font-weight:500}.tag{font-size:11px;background:var(--soft);color:var(--blue);padding:4px 9px;border-radius:20px;white-space:nowrap}.header-actions,.row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}main{max-width:1900px;margin:auto;padding:22px 24px 30px}.heading{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:18px;gap:16px}.heading h1{font-size:24px;margin:0 0 4px;letter-spacing:-.6px}.heading p{margin:0;color:var(--muted);font-size:13px}.workspace{display:grid;grid-template-columns:285px minmax(400px,1fr) 286px;gap:16px;align-items:start}.panel{background:#fff;border:1px solid var(--line);border-radius:11px;overflow:hidden}.section{padding:17px;border-bottom:1px solid var(--line)}.section:last-child{border:0}h2{font-size:15px;margin:0 0 13px}h3{font-size:13px;margin:12px 0 8px}.number{color:var(--blue);font-size:11px;margin-right:8px}.field{display:block;margin:10px 0}.field>span,.field-title{display:block;font-size:12px;color:var(--muted);margin-bottom:5px}.pair{display:grid;grid-template-columns:1fr 1fr;gap:9px}.pair .field{min-width:0}.hint{font-size:11px;color:var(--muted);line-height:1.65;margin:8px 0 0}.notice{font-size:12px;background:#f5f7ff;padding:10px 12px;border-radius:7px;line-height:1.7;color:#596a90;overflow-wrap:anywhere}.warning{color:#925a16;background:#fff7e9}.error{color:#ae3450;background:#fff0f3}.full{width:100%}.toolbar{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 14px;border-bottom:1px solid var(--line);flex-wrap:wrap}.toolbar button{font-size:12px;padding:6px 10px}.view-shell{position:relative;overflow:hidden;background:#f4f7fc}#scene{display:block;width:100%;height:520px;touch-action:none}.view-label{position:absolute;top:15px;left:16px;font-size:11px;color:#6c7c99;pointer-events:none}.compass{position:absolute;top:16px;right:18px;font-size:12px;color:#465986;pointer-events:none}.canvas-bottom{padding:10px 15px;border-top:1px solid var(--line);display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font-size:11px;color:var(--muted)}.legend{display:flex;gap:12px;flex-wrap:wrap}.key:before{content:"";display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:5px;background:var(--key)}.stats{display:grid;grid-template-columns:repeat(4,1fr);padding:17px 8px;border-bottom:1px solid var(--line)}.stat{padding:0 12px;border-right:1px solid var(--line)}.stat:last-child{border:0}.stat small{display:block;color:var(--muted);font-size:11px}.stat strong{display:block;font-size:22px;font-weight:650;margin-top:3px;font-variant-numeric:tabular-nums}.stat strong em{font-size:12px;font-style:normal;color:var(--muted);margin-left:4px}.result-note{padding:12px 15px;font-size:12px;color:var(--muted);line-height:1.7}.point-heading{display:flex;align-items:center;justify-content:space-between}.point-heading .pill{background:var(--soft);color:var(--blue);padding:4px 8px;border-radius:5px;font-size:12px}.range-line{display:grid;grid-template-columns:1fr 78px;gap:10px;align-items:center}.range-line input[type=number]{padding:6px}.results{display:grid;grid-template-columns:1fr auto;gap:9px 12px;font-size:12px}.results dt{color:var(--muted)}.results dd{margin:0;text-align:right;font-variant-numeric:tabular-nums}.result-status{margin:12px 0 0;font-size:12px;padding:9px 10px;background:#edf9f4;color:#287961;border-radius:6px}.table-panel{margin-top:16px}.table-wrap{overflow:auto;max-height:300px}table{border-collapse:collapse;width:100%;white-space:nowrap;font-size:12px}th,td{padding:11px 16px;text-align:left;border-bottom:1px solid var(--line);font-variant-numeric:tabular-nums}th{font-weight:500;color:var(--muted);background:#fafbfe;position:sticky;top:0;z-index:1}tbody tr{cursor:pointer}tbody tr:hover{background:#f7f8ff}tbody tr.selected{background:var(--soft)}td button{padding:3px 8px;font-size:12px;border:0;color:var(--blue);background:transparent}.tiny{font-size:11px;color:var(--muted)}details summary{cursor:pointer;color:var(--muted);font-size:12px}details[open] summary{margin-bottom:10px}.empty{padding:30px 16px;text-align:center;color:var(--muted)}.check{font-size:12px;display:flex;align-items:center;gap:5px}.help{margin-top:16px;padding:14px 18px;background:#eef2fa;color:#60708f;font-size:12px;line-height:1.8;border-radius:9px}.help strong{color:#405578}#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1f335d;color:white;padding:12px 20px;border-radius:9px;box-shadow:0 8px 25px #172b5920;max-width:90vw;z-index:5}#toast[hidden]{display:none}.dirty{color:#ad6516!important}.coordinates{font-family:ui-monospace,monospace;font-size:12px}.small-button{font-size:12px;padding:6px 9px}.divider-label{font-size:11px;letter-spacing:1px;color:var(--muted);margin-bottom:8px}.canvas-actions{padding:10px 14px;border-top:1px solid var(--line);display:flex;gap:14px;flex-wrap:wrap;align-items:center}#profile{height:150px;width:100%;display:block;margin-top:12px;background:#f7f9fd;border-radius:7px}#drawBar{padding:10px 14px;background:#eef0ff;display:flex;align-items:center;gap:8px;flex-wrap:wrap}#drawBar[hidden]{display:none}#drawBar span{font-size:12px;margin-right:auto}.validation{font-size:12px;color:var(--red);margin-top:8px;min-height:18px}@media(min-width:1500px){#scene{height:610px}.workspace{grid-template-columns:300px minmax(450px,1fr) 310px}}@media(max-width:1150px){.workspace{grid-template-columns:260px minmax(350px,1fr)}.inspector{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr}.inspector .section{border-bottom:0}.inspector .section:first-child{border-right:1px solid var(--line)}}@media(max-width:720px){main{padding:15px 12px}header{padding:14px 15px;flex-wrap:wrap}.header-title{display:none}.workspace{grid-template-columns:1fr}.planner{order:1}.center{order:0}.inspector{order:2;display:block}.inspector .section:first-child{border-right:0;border-bottom:1px solid var(--line)}#scene{height:380px}.heading{align-items:start;flex-direction:column}.heading h1{font-size:21px}.stat{padding:0 7px}.stat strong{font-size:19px}.stats{padding:13px 5px}.header-actions{margin-left:auto}.header-actions button{font-size:12px;padding:6px 9px}}
 .overlap-summary{display:flex;gap:14px;align-items:center;flex-wrap:wrap;padding:12px 16px;border-bottom:1px solid var(--line);font-size:12px;color:var(--muted)}.overlap-summary strong{color:#8a40ab;font-variant-numeric:tabular-nums}.spacing-conflict{color:var(--red)}[hidden]{display:none!important}.center,.planner,.inspector{min-width:0}.result-status.warning{background:#fff7e9;color:#925a16}.result-status.error{background:#fff0f3;color:#ae3450}
 .risk-body{padding:4px 0}.risk-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:10px 15px;border-bottom:1px solid var(--line);font-size:12px;color:var(--muted)}.risk-row:last-child{border:0}.risk-tag{padding:2px 8px;border-radius:999px;font-size:11px;white-space:nowrap}.risk-warn{color:#925a16;background:#fff7e9}.risk-ok{color:#287961;background:#edf9f4}.risk-details{padding:6px 15px 10px}.risk-details .pair{padding-top:4px}.act-row{display:grid;grid-template-columns:minmax(0,1fr) 86px auto auto auto;gap:6px;align-items:center;margin-bottom:7px}.act-row[data-blocked="1"]{opacity:.55}.act-row select,.act-row input{padding:6px 8px;font-size:12px}.act-noparam{text-align:center;color:var(--muted)}
+.risk-bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:10px 15px;font-size:12px;color:var(--muted)}.risk-item{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:7px;background:var(--soft);color:#4a5b86}.risk-item.warn{background:#fde8ed;border:1px solid #f4b8c6;color:#c0324d;font-weight:600}.risk-item b{font-variant-numeric:tabular-nums}.risk-bar .risk-details{margin-left:auto}.risk-bar .risk-details[open]{width:100%}.risk-bar .risk-details .pair{max-width:420px;padding-top:6px}
 </style>
 </head>
 <body><body>
@@ -212,17 +213,24 @@
 <strong id="spacingStat">—</strong>
 </div>
 </div>
-<div class="overlap-summary">
-<span>采样点数量 <strong id="sampleCount">—</strong>
-</span>
-<span>采样点间距 <strong id="sampleSpacing">—</strong>
-</span>
-<span>未覆盖采样点数量 <strong id="missCount">—</strong>
-</span>
-<span>重复采样比例 <strong id="overlapRate">—</strong>
-</span>
+<div class="risk-bar" id="riskBar" role="status">
+<span class="risk-item warn" id="nfzItem" hidden>⚠ 地图管理未设置禁飞区<label class="check"><input id="nfzAck" type="checkbox">已知悉</label></span>
+<span class="risk-item warn" id="altItem" hidden>⚠ 飞行高度 <b id="altMinH">—</b> m 低于 100 m，注意高度检查</span>
+<span class="risk-item warn" id="spaceItem" hidden>⚠ <b id="spaceCount">0</b> 对航点小于最小间距</span>
+<span class="risk-item" id="energyItem">能耗：预计 <b id="energyTime">—</b> min / 可用 <b id="energyBudget">—</b> min<span id="energyState" class="risk-tag">—</span><label class="check" id="resumeRow" hidden><input id="resume" type="checkbox">自动断点续飞</label></span>
+<details class="risk-details">
+<summary>能耗参数</summary>
+<div class="pair">
+<label class="field">
+<span>续航时间 / min</span>
+<input id="enduranceMin" type="number" min="5" max="120" step="1" value="25">
+</label>
+<label class="field">
+<span>安全余量 / %</span>
+<input id="safetyPct" type="number" min="10" max="100" step="5" value="80">
+</label>
 </div>
-<div class="result-note" id="resultNote" role="status">
+</details>
 </div>
 </div>
 <div class="panel table-panel">
@@ -248,41 +256,6 @@
 </table>
 </div>
 <p class="hint" style="padding:0 15px 10px">* 距机身超视距裁切距离（三维斜距）以外的地面投影不计入有效数据；焦距为 35mm 等效口径；高度按预设高度模式显示。面积与裁切比例按模拟作业范围内的地面投影计算，不代表图像像素比例。</p>
-</div>
-<div class="panel risk-panel">
-<div class="toolbar">
-<strong style="font-size:14px">风险评估</strong>
-<span class="tiny">能耗与提醒为估算口径，真机执行前需复核</span>
-</div>
-<div class="risk-body">
-<div class="risk-row" id="nfzRow">
-<span>⚠ 地图管理未设置禁飞区，请在执行前确认空域与限制</span>
-<label class="check" style="margin-left:auto">
-<input id="nfzAck" type="checkbox">已知悉</label>
-</div>
-<div class="risk-row" id="altRow" hidden>
-<span id="altText">飞行高度低于 100 m，注意飞行高度检查</span>
-</div>
-<div class="risk-row">
-<span id="energyText">—</span>
-<span id="energyState" class="risk-tag">—</span>
-<label class="check" id="resumeRow" hidden style="margin-left:auto">
-<input id="resume" type="checkbox">自动断点续飞</label>
-</div>
-<details class="risk-details">
-<summary>能耗参数</summary>
-<div class="pair" style="padding:8px 0">
-<label class="field">
-<span>续航时间 / min</span>
-<input id="enduranceMin" type="number" min="5" max="120" step="1" value="25">
-</label>
-<label class="field">
-<span>安全余量 / %</span>
-<input id="safetyPct" type="number" min="10" max="100" step="5" value="80">
-</label>
-</div>
-</details>
-</div>
 </div>
 </section>
 <aside class="panel inspector">
@@ -465,12 +438,19 @@ function routeLength(){let s=0;for(let i=1;i<state.points.length;i++)s+=Math.hyp
 function syncEditor(){const w=state.points[state.selected],g=state.geoms[state.selected],c=state.config; $('pointEditor').hidden=!w;$('emptyInspector').hidden=!!w;$('selectedName').textContent=w?'WP '+String(state.selected+1).padStart(2,'0'):'—';if(!w){for(const id of ['fovValue','groundValue','slantValue','radiusValue','rawAreaValue','validAreaValue','cutAreaValue'])$(id).textContent='—';$('pointLatlon').value='';renderActions();drawProfile();return;}
 for(const [id,key] of [['pointX','x'],['pointY','y'],['pointYaw','yaw'],['yawSlider','yaw'],['pointPitch','pitch'],['pitchSlider','pitch'],['pointZoom','zoom'],['zoomSlider','zoom'],['pointHeight','height']])$(id).value=w[key];$('pointLatlon').value=fmtLatLon(toLatLon(w.x,w.y));const wh=Number.isFinite(w.height)?w.height:c.height;$('fovValue').textContent=g.fov.map(v=>format(v,2)+'°').join(' × ');$('groundValue').textContent=w.pitch<-.001?format(wh/Math.tan(-w.pitch*R))+' m':'光轴不落地';$('slantValue').textContent=w.pitch<-.001?format(wh/Math.sin(-w.pitch*R))+' m':'光轴不落地';$('radiusValue').textContent=c.distance>=wh?format(g.radius)+' m':'斜距小于高度';$('rawAreaValue').textContent=format(g.rawArea,0)+' m²';$('validAreaValue').textContent=format(g.validArea,0)+' m²';$('cutAreaValue').textContent=format(g.cut,0)+' m²';const warnings=[];if(!directionOK(w,c,state.segYaw[state.selected]))warnings.push('机身水平角偏离有效航向（沿航线方向或固定机身角度），此点不计入任务覆盖');if(!g.raw.length)warnings.push('视锥与作业范围内地面无交集');else if(!g.validArea)warnings.push('观察距离内无有效地面覆盖');if(g.unbounded)warnings.push('部分视线不落地，原始投影仅显示作业范围内部分');if(g.cut>.1)warnings.push(`超视距裁切 ${format(g.cut/g.rawArea*100)}%`);$('pointStatus').textContent=warnings.join('；')||'此点视锥在距离限制内，有效覆盖已更新';$('pointStatus').className='result-status'+(warnings.length?' warning':'');renderActions();drawProfile();}
 function render(){const n=state.samples.length,covered=state.coverage.filter(Boolean).length,c=state.config; $('coverage').textContent=n?format(covered/n*100,1)+'%':'—';$('pointCount').textContent=state.points.length;$('routeLength').innerHTML=format(routeLength(),0)+'<em>m</em>';let minSpacing=Infinity;for(let i=0;i<state.points.length;i++)for(let j=i+1;j<state.points.length;j++)minSpacing=Math.min(minSpacing,Math.hypot(state.points[i].x-state.points[j].x,state.points[i].y-state.points[j].y));$('spacingStat').textContent=Number.isFinite(minSpacing)?format(minSpacing,1)+' m':'—';$('targetSummary').textContent=(c.type==='area'||c.type==='slope'||c.type==='solid')?format(area(state.target),0)+' m² 目标区域':c.type==='line'?format(state.target.slice(1).reduce((s,p,i)=>s+dist(p,state.target[i]),0),0)+' m 目标路线':state.target.length+' 个目标点';$('planState').textContent=state.dirty?'任务参数已变更 · 当前航点已重算，需重新规划以优化':'当前航点实时计算';$('planState').className='tiny'+(state.dirty?' dirty':'');
-let note=c.type==='points'?`${n} 个指定点位逐一检查。`:`${n} 个内部与边界采样，间距约 ${format(state.step)} m。覆盖率为采样估计，非连续面积比。`;if(effYawTarget(c)==null)note+=' 偏航沿航线方向：覆盖按航段方向复核。';if(state.coarse)note+=' 高变焦下采样已限流，微小缺口可能未检出。';if(c.distance<c.height)note+=' 超视距裁切距离小于任务高度，远距目标不可达。';if(state.points.length>=80&&covered<n)note+=' 已达到 80 个航点上限。';if(covered<n)note+=` 仍有 ${n-covered} 个采样未满足距离、视角或方向约束。`;else if(n)note+=' 当前采样均满足约束；区域边界仍需精确几何验证。';if(c.spacing>0&&covered<n)note+=' 最小航点间距是硬约束，可能限制补点；可减小间距后重新生成。';if(state.spacingViolations.length)note+=` ${state.spacingViolations.length} 对航点小于 ${c.spacing} m 间距。`;$('resultNote').textContent=note;
-$('sampleCount').textContent=n;$('sampleSpacing').textContent=n?format(state.step)+' m':'—';$('missCount').textContent=n-covered;const repeated=state.hitCounts.filter(v=>v>=2).length;$('overlapRate').textContent=n?`${format(repeated/n*100)}%（${repeated}/${n}）`:'—';
+
 
 $('waypointTable').innerHTML=state.points.length?state.points.map((w,i)=>{const g=state.geoms[i],ll=toLatLon(w.x,w.y),hdisp=c.heightMode==='amsl'?w.height+c.groundElevation:w.height,feq=18/Math.tan(g.fov[0]*R/2);return `<tr class="${i===state.selected?'selected':''}" data-index="${i}"><td><button aria-label="选择航点 ${i+1}">WP ${String(i+1).padStart(2,'0')}</button></td><td>${ll[0].toFixed(5)}, ${ll[1].toFixed(5)}</td><td>${format(hdisp)} m</td><td>${format(w.yaw)}° / ${format(w.pitch)}°</td><td>${format(feq,1)} mm</td><td>${format(g.validArea,0)} m²</td><td>${g.rawArea?format(g.cut/g.rawArea*100)+'%':'—'}</td></tr>`}).join(''):'<tr><td colspan="7" class="empty">暂无观察航点 · 设置飞行区域后生成</td></tr>';syncEditor();renderRisk();draw();}
 function riskInfo(c,endMin=25,safePct=80){const waits=state.points.reduce((s,w)=>s+(w.actions||[]).reduce((t,a)=>t+(a.type==='wait'&&a.params&&Number.isFinite(+a.params.sec)?Math.max(0,+a.params.sec):0),0),0);const v=Math.max(.1,c.speed);const travel=routeLength()/v;const ret=c.endAction==='rth'&&state.points.length?Math.hypot(state.points[state.points.length-1].x,state.points[state.points.length-1].y)/v:0;const time=travel+waits+ret;const budget=endMin*60*(safePct/100);return {waits,travel,ret,time,budget,over:time>budget};}
-function renderRisk(){const c=state.config;if(!c)return;const minH=state.points.length?Math.min(...state.points.map(w=>Number.isFinite(w.height)?w.height:c.height)):null;$('altRow').hidden=!(minH!=null&&minH<100);if(minH!=null&&minH<100)$('altText').textContent=`⚠ 飞行高度 ${format(minH,0)} m 低于 100 m，注意飞行高度检查`;$('nfzRow').hidden=!!state.nfzAck;const r=riskInfo(c,+$('enduranceMin').value||25,(+$('safetyPct').value)||80);$('energyText').textContent=`能耗评估：预计飞行 ${format(r.time/60,1)} min（飞行 ${format(r.travel/60,1)}${r.waits?` + 等待 ${format(r.waits/60,1)}`:''}${r.ret?` + 返航 ${format(r.ret/60,1)}`:''}）/ 可用 ${format(r.budget/60,1)} min`;$('energyState').textContent=r.over?(state.resume?'⚠ 无法飞完全程 · 已启用断点续飞':'⚠ 航线过长，无法飞完全程'):'电量满足全程';$('energyState').className='risk-tag '+(r.over?'risk-warn':'risk-ok');$('resumeRow').hidden=!r.over;}
+function renderRisk(){const c=state.config;if(!c)return;const minH=state.points.length?Math.min(...state.points.map(w=>Number.isFinite(w.height)?w.height:c.height)):null;
+ const showAlt=minH!=null&&minH<100;$('altItem').hidden=!showAlt;if(showAlt)$('altMinH').textContent=format(minH,0);
+ $('nfzItem').hidden=!!state.nfzAck;
+ const sv=state.spacingViolations.length;$('spaceItem').hidden=!sv;if(sv)$('spaceCount').textContent=sv;
+ const r=riskInfo(c,+$('enduranceMin').value||25,(+$('safetyPct').value)||80);
+ $('energyTime').textContent=format(r.time/60,1);$('energyBudget').textContent=format(r.budget/60,1);
+ $('energyState').textContent=r.over?(state.resume?'无法飞完全程 · 断点续飞':'无法飞完全程'):'电量满足全程';
+ $('energyState').className='risk-tag '+(r.over?'risk-warn':'risk-ok');
+ $('energyItem').classList.toggle('warn',r.over);$('resumeRow').hidden=!r.over;}
 function renderActions(){const w=state.points[state.selected],stay=state.config?state.config.stay:true;$('actionCount').textContent=w?(w.actions||[]).length+' 项':'0';if(!w){$('actionList').innerHTML='<p class="hint">生成航线并选择航点后配置动作</p>';return;}const acts=w.actions||[];$('actionList').innerHTML=acts.length?acts.map((a,i)=>{const def=ACTION_DEFS[a.type]||{group:'其他',label:a.type};const blocked=!stay&&!NO_STAY_OK.has(a.type);const groups={};Object.entries(ACTION_DEFS).forEach(([k,d])=>{if(stay||NO_STAY_OK.has(k)||k===a.type)(groups[d.group]=groups[d.group]||[]).push([k,d]);});const sel=`<select data-i="${i}" class="act-type" aria-label="动作类型">${Object.entries(groups).map(([g,items])=>`<optgroup label="${g}">${items.map(([k,d])=>`<option value="${k}"${k===a.type?' selected':''}>${d.label}</option>`).join('')}</optgroup>`).join('')}</select>`;const prm=def.param?`<input data-i="${i}" class="act-param" type="${def.param.type}" value="${a.params&&a.params[def.param.key]!=null?a.params[def.param.key]:def.param.def}"${def.param.type==='number'?` min="${def.param.min}" max="${def.param.max}" step="${def.param.step}"`:''} title="${def.param.label}" aria-label="${def.param.label}">`:'<span class="tiny act-noparam">—</span>';return `<div class="act-row"${blocked?' data-blocked="1"':''}>${sel}${prm}<button class="small-button" data-act="up" data-i="${i}"${stay?'':' disabled'} title="上移">↑</button><button class="small-button" data-act="down" data-i="${i}"${stay?'':' disabled'} title="下移">↓</button><button class="small-button" data-act="del" data-i="${i}" title="删除">删</button>${blocked?'<span class="tiny">停留=否不支持</span>':''}</div>`}).join(''):'<p class="hint">暂无动作，点击下方「新增动作」</p>';}
 let screen={scale:1,cx:0,cy:0},hitPoints=[];
 function canvasSetup(canvas){const rect=canvas.getBoundingClientRect(),dpr=Math.min(window.devicePixelRatio||1,2);canvas.width=Math.round(rect.width*dpr);canvas.height=Math.round(rect.height*dpr);const ctx=canvas.getContext('2d');ctx.scale(dpr,dpr);return {ctx,w:rect.width,h:rect.height};}
