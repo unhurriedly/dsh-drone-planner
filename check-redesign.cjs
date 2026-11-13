@@ -153,4 +153,14 @@ test('riskInfo: travel + waits + return vs endurance budget', () => {
   state.points = [];
 });
 
+test('Field info icons present across all three sections', () => {
+  const page = fs.readFileSync(__dirname + '/page/index.html', 'utf8');
+  const n = (page.match(/class="fi"/g) || []).length;
+  assert.ok(n >= 45, 'expected >=45 info icons, got ' + n);
+  for (const frag of ['data-tip="距机身超过该距离（三维斜距）', 'FOV(z)＝2·atan', '指令延迟需＜1s', '35mm 等效焦距', '等距圆柱近似']) {
+    assert.ok(page.includes(frag), 'missing tip fragment ' + frag);
+  }
+  assert.ok(page.includes('#fieldTip') || page.includes("fieldTip"));
+});
+
 console.log(`${checks} redesign checks passed.`);

@@ -8,6 +8,7 @@
 .overlap-summary{display:flex;gap:14px;align-items:center;flex-wrap:wrap;padding:12px 16px;border-bottom:1px solid var(--line);font-size:12px;color:var(--muted)}.overlap-summary strong{color:#8a40ab;font-variant-numeric:tabular-nums}.spacing-conflict{color:var(--red)}[hidden]{display:none!important}.center,.planner,.inspector{min-width:0}.result-status.warning{background:#fff7e9;color:#925a16}.result-status.error{background:#fff0f3;color:#ae3450}
 .risk-body{padding:4px 0}.risk-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:10px 15px;border-bottom:1px solid var(--line);font-size:12px;color:var(--muted)}.risk-row:last-child{border:0}.risk-tag{padding:2px 8px;border-radius:999px;font-size:11px;white-space:nowrap}.risk-warn{color:#925a16;background:#fff7e9}.risk-ok{color:#287961;background:#edf9f4}.risk-details{padding:6px 15px 10px}.risk-details .pair{padding-top:4px}.act-row{display:grid;grid-template-columns:minmax(0,1fr) 86px auto auto auto;gap:6px;align-items:center;margin-bottom:7px}.act-row[data-blocked="1"]{opacity:.55}.act-row select,.act-row input{padding:6px 8px;font-size:12px}.act-noparam{text-align:center;color:var(--muted)}
 .risk-bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:10px 15px;font-size:12px;color:var(--muted)}.risk-item{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:7px;background:var(--soft);color:#4a5b86}.risk-item.warn{background:#fde8ed;border:1px solid #f4b8c6;color:#c0324d;font-weight:600}.risk-item b{font-variant-numeric:tabular-nums}.risk-bar .risk-details{margin-left:auto}.risk-bar .risk-details[open]{width:100%}.risk-bar .risk-details .pair{max-width:420px;padding-top:6px}
+.fi{display:inline-flex;align-items:center;justify-content:center;width:13px;height:13px;margin-left:5px;border-radius:50%;background:#8a97bd;color:#fff;font-style:normal;font-size:10px;font-weight:700;line-height:1;cursor:help;vertical-align:1px;flex:none}.fi:hover,.fi:focus-visible{background:var(--blue);outline:none}#fieldTip{position:fixed;z-index:80;max-width:300px;padding:8px 11px;border-radius:8px;background:#1f335d;color:#fff;font-size:11.5px;line-height:1.65;box-shadow:0 8px 22px #172b5940;pointer-events:none;display:none}#fieldTip.show{display:block}
 </style>
 </head>
 <body><body>
@@ -17,7 +18,7 @@
 <aside class="panel planner">
 <section class="section">
 <h2><span class="number">01</span>飞行区域</h2>
-<label class="field"><span>飞行区域类型</span>
+<label class="field"><span>飞行区域类型<i class="fi" tabindex="0" data-tip="点：逐点观察；线：折线两侧缓冲带；区域：多边形覆盖；斜面：多边形＋坡度坡向，视锥按坡面计算，面积为坡面真实面积；几何体：底面多边形按顶面高度拉伸，含立面采样、未做遮挡剔除。">!</i></span>
 <select id="targetType">
 <option value="area">区域 · 多边形覆盖</option>
 <option value="line">路线 · 缓冲带覆盖</option>
@@ -31,21 +32,21 @@
 <button id="example" class="small-button">载入此类示例</button>
 </div>
 <label class="field" id="widthField" hidden>
-<span>目标路线宽度 / m</span>
+<span>目标路线宽度 / m<i class="fi" tabindex="0" data-tip="仅线状目标：折线两侧缓冲带宽度（米），采样与覆盖按该宽度计算。">!</i></span>
 <input id="lineWidth" type="number" min="1" max="100" value="20">
 </label>
 <div class="pair" id="slopeFields" hidden>
 <label class="field">
-<span>坡度 / °</span>
+<span>坡度 / °<i class="fi" tabindex="0" data-tip="仅斜面目标：坡面与水平面的夹角（0–45°）；视锥投影在坡面上计算，面积为坡面真实面积。">!</i></span>
 <input id="slopeAngle" type="number" min="0" max="45" step="1" value="15">
 </label>
 <label class="field">
-<span>坡向（下坡方向）/ °</span>
+<span>坡向（下坡方向）/ °<i class="fi" tabindex="0" data-tip="仅斜面目标：下坡方向方位角，0°=北、90°=东；坡面自原点沿该方向下倾，航点高度相对所在点坡面。">!</i></span>
 <input id="slopeAspect" type="number" min="0" max="360" step="1" value="180">
 </label>
 </div>
 <label class="field" id="solidTopField" hidden>
-<span>几何体顶面高度 / m</span>
+<span>几何体顶面高度 / m<i class="fi" tabindex="0" data-tip="仅几何体目标：底面多边形按此高度拉伸；采样包含顶面网格与立面多层高度点。">!</i></span>
 <input id="solidTop" type="number" min="5" max="200" step="1" value="30">
 </label>
 <details style="margin-top:12px">
@@ -63,29 +64,29 @@
 <h2><span class="number">02</span>航线预设</h2>
 <div class="pair">
 <label class="field">
-<span>航点高度模式</span>
+<span>航点高度模式<i class="fi" tabindex="0" data-tip="相对地形高度：以地面模型（平坦或斜面）为基准；海拔高度：显示＝地面基准海拔＋相对高度。Demo 未接入 DEM，两种模式仅基准面不同。">!</i></span>
 <select id="heightMode">
 <option value="agl">相对地形高度</option>
 <option value="amsl">海拔高度</option>
 </select>
 </label>
 <label class="field" id="groundElevationField" hidden>
-<span>地面基准海拔 / m</span>
+<span>地面基准海拔 / m<i class="fi" tabindex="0" data-tip="海拔模式下的地面基准值；表格与显示高度＝基准＋相对高度。">!</i></span>
 <input id="groundElevation" type="number" step="1" value="0">
 </label>
 </div>
 <div class="pair">
 <label class="field">
-<span>任务高度 / m</span>
+<span>任务高度 / m<i class="fi" tabindex="0" data-tip="生成时所有航点的初始相对高度；生成后各航点独立修改，改此值不会移动已有航点，仅重算覆盖。">!</i></span>
 <input id="height" type="number" min="10" max="500" step="1" value="110">
 </label>
 <label class="field">
-<span>全局航线速度 / m/s</span>
+<span>全局航线速度 / m/s<i class="fi" tabindex="0" data-tip="0.1–15 m/s。用于能耗评估（航程÷速度）与返航估算，不改变覆盖几何。">!</i></span>
 <input id="speed" type="number" min="0.1" max="15" step="0.1" value="5">
 </label>
 </div>
 <label class="field">
-<span>飞行途中偏航角模式</span>
+<span>飞行途中偏航角模式<i class="fi" tabindex="0" data-tip="沿航线方向：机头朝下一航点、云台 0° 朝前，覆盖在航线排序后按航段方向复核；固定机身姿态：按下方参数飞行，未填项取默认值。">!</i></span>
 <select id="yawMode">
 <option value="fixed">固定机身姿态</option>
 <option value="along">沿航线方向</option>
@@ -93,41 +94,41 @@
 </label>
 <div id="fixedPoseFields">
 <label class="field">
-<span>机身角度 / °（不填 = 沿航线方向）</span>
+<span>机身角度 / °（不填 = 沿航线方向）<i class="fi" tabindex="0" data-tip="不填＝沿航线方向。填写后航点水平角固定为该角度；手动偏离有效航向的航点不计入任务覆盖。">!</i></span>
 <input id="bodyYaw" type="number" min="-180" max="180" step="1" placeholder="沿航线方向">
 </label>
 <div class="pair">
 <label class="field">
-<span>云台俯仰角 / °（不填 = 0°朝前）</span>
+<span>云台俯仰角 / °（不填 = 0°朝前）<i class="fi" tabindex="0" data-tip="不填＝云台 0° 朝前；−90° 垂直向下。0° 朝前且裁切距离较近时，可能无有效覆盖。">!</i></span>
 <input id="gimbalPitch" type="number" min="-90" max="90" step="1" value="-60" placeholder="0">
 </label>
 <label class="field">
-<span>云台变焦倍数（不填 = 默认 1×）</span>
+<span>云台变焦倍数（不填 = 默认 1×）<i class="fi" tabindex="0" data-tip="不填＝默认 1×（基准视场 64°×44°）。视场按 FOV(z)＝2·atan(tan(FOV₀/2)/z) 收窄，不代表真实光学分辨率。">!</i></span>
 <input id="zoom" type="number" min="1" max="200" step="1" placeholder="1">
 </label>
 </div>
 </div>
 <div class="pair">
 <label class="field">
-<span>超视距裁切距离 / m</span>
+<span>超视距裁切距离 / m<i class="fi" tabindex="0" data-tip="距机身超过该距离（三维斜距）的地面数据不作为有效数据；对应航点表「超视距裁切」列与图中橙色区域。">!</i></span>
 <input id="cutDistance" type="number" min="10" max="1000" step="1" value="210">
 </label>
 <label class="field">
-<span>最小航点间距 / m</span>
+<span>最小航点间距 / m<i class="fi" tabindex="0" data-tip="任意两航点水平距离的硬约束，0＝不限制；与覆盖冲突时保留覆盖缺口，不自动放宽间距。">!</i></span>
 <input id="spacing" type="number" min="0" max="1000" step="1" value="0">
 </label>
 </div>
 <p class="hint">超视距裁切：距机身该距离（三维斜距）以外的数据不作为有效数据。最小航点间距约束任意两航点的水平距离，0 表示不限制；无法同时满足覆盖与间距时保留覆盖缺口。</p>
 <div class="pair">
 <label class="field">
-<span>航点是否停留</span>
+<span>航点是否停留<i class="fi" tabindex="0" data-tip="是：经过航点停留，支持全部动作且顺序可自行排列；否：仅拍照、录像开/关、等待、智拍-快速（结果异步），指令延迟需＜1s（真机验收项）。">!</i></span>
 <select id="stay">
 <option value="yes">是 · 支持全部航点动作</option>
 <option value="no">否 · 仅限低延迟动作</option>
 </select>
 </label>
 <label class="field">
-<span>航线结束动作</span>
+<span>航线结束动作<i class="fi" tabindex="0" data-tip="悬停：航线终点悬停；自动返航：返航至起飞点（原点），返航航程计入能耗评估。">!</i></span>
 <select id="endAction">
 <option value="hover">悬停</option>
 <option value="rth">自动返航</option>
@@ -138,11 +139,11 @@
 <summary>坐标与换算</summary>
 <div class="pair">
 <label class="field">
-<span>起飞点纬度 / °</span>
+<span>起飞点纬度 / °<i class="fi" tabindex="0" data-tip="经纬度换算原点（等距圆柱近似）；画布绘制与坐标输入仍使用局部米制。">!</i></span>
 <input id="homeLat" type="number" step="0.0000001" value="0">
 </label>
 <label class="field">
-<span>起飞点经度 / °</span>
+<span>起飞点经度 / °<i class="fi" tabindex="0" data-tip="经纬度换算原点（等距圆柱近似）；画布绘制与坐标输入仍使用局部米制。">!</i></span>
 <input id="homeLon" type="number" step="0.0000001" value="0">
 </label>
 </div>
@@ -196,20 +197,20 @@
 </div>
 <div class="stats">
 <div class="stat">
-<small>航线覆盖率</small>
+<small>航线覆盖率<i class="fi" tabindex="0" data-tip="被至少一个方向合格航点看到的采样点比例；采样估计，非连续面积的完整覆盖证明。">!</i></small>
 <strong id="coverage">—</strong>
 </div>
 <div class="stat">
-<small>观察航点数量</small>
+<small>观察航点数量<i class="fi" tabindex="0" data-tip="当前航线的观察航点数，上限 80；达到上限仍有缺口时在说明中提示。">!</i></small>
 <strong id="pointCount">0</strong>
 </div>
 <div class="stat">
-<small>连续航程</small>
+<small>连续航程<i class="fi" tabindex="0" data-tip="相邻航点水平距离之和；不含起飞/返航段与转弯冗余。">!</i></small>
 <strong id="routeLength">0<em>m</em>
 </strong>
 </div>
 <div class="stat">
-<small>航点间距</small>
+<small>航点间距<i class="fi" tabindex="0" data-tip="所有航点两两水平距离的最小值；小于最小间距约束时在风险条高亮提示。">!</i></small>
 <strong id="spacingStat">—</strong>
 </div>
 </div>
@@ -217,16 +218,16 @@
 <span class="risk-item warn" id="nfzItem" hidden>⚠ 地图管理未设置禁飞区<label class="check"><input id="nfzAck" type="checkbox">已知悉</label></span>
 <span class="risk-item warn" id="altItem" hidden>⚠ 飞行高度 <b id="altMinH">—</b> m 低于 100 m，注意高度检查</span>
 <span class="risk-item warn" id="spaceItem" hidden>⚠ <b id="spaceCount">0</b> 对航点小于最小间距</span>
-<span class="risk-item" id="energyItem">能耗：预计 <b id="energyTime">—</b> min / 可用 <b id="energyBudget">—</b> min<span id="energyState" class="risk-tag">—</span><label class="check" id="resumeRow" hidden><input id="resume" type="checkbox">自动断点续飞</label></span>
+<span class="risk-item" id="energyItem">能耗<i class="fi" tabindex="0" data-tip="预计＝航程÷速度＋等待＋返航；可用＝续航×安全余量。匀速估算，未含起降、风阻与真实电池曲线。">!</i>：预计 <b id="energyTime">—</b> min / 可用 <b id="energyBudget">—</b> min<span id="energyState" class="risk-tag">—</span><label class="check" id="resumeRow" hidden><input id="resume" type="checkbox">自动断点续飞</label></span>
 <details class="risk-details">
 <summary>能耗参数</summary>
 <div class="pair">
 <label class="field">
-<span>续航时间 / min</span>
+<span>续航时间 / min<i class="fi" tabindex="0" data-tip="整机可用续航（分钟）；可用飞行时间＝续航×安全余量。">!</i></span>
 <input id="enduranceMin" type="number" min="5" max="120" step="1" value="25">
 </label>
 <label class="field">
-<span>安全余量 / %</span>
+<span>安全余量 / %<i class="fi" tabindex="0" data-tip="预留电量比例；可用飞行时间＝续航×余量%，超限将在风险条高亮提示。">!</i></span>
 <input id="safetyPct" type="number" min="10" max="100" step="5" value="80">
 </label>
 </div>
@@ -243,12 +244,12 @@
 <thead>
 <tr>
 <th>航点</th>
-<th>经纬度</th>
-<th>高度</th>
-<th>机身水平角 / 云台俯仰角</th>
-<th>焦距</th>
-<th>有效面积</th>
-<th>超视距裁切*</th>
+<th>经纬度<i class="fi" tabindex="0" data-tip="由起飞点原点换算（等距圆柱近似），保留 5 位小数。">!</i></th>
+<th>高度<i class="fi" tabindex="0" data-tip="按预设高度模式显示：相对地形高度，或海拔＝地面基准海拔＋相对高度。">!</i></th>
+<th>机身水平角 / 云台俯仰角<i class="fi" tabindex="0" data-tip="水平角 0°=北、90°=东；俯仰 −90°～+90°，0° 为水平。">!</i></th>
+<th>焦距<i class="fi" tabindex="0" data-tip="35mm 等效焦距，由当前水平视场反推，非真实镜头参数。">!</i></th>
+<th>有效面积<i class="fi" tabindex="0" data-tip="超视距裁切后、作业范围内的地面（斜面为坡面）投影面积，非图像像素面积。">!</i></th>
+<th>超视距裁切*<i class="fi" tabindex="0" data-tip="被距离约束剔除的面积占原始投影的比例；距机身超过裁切距离（三维斜距）的数据不作为有效数据。">!</i></th>
 </tr>
 </thead>
 <tbody id="waypointTable">
@@ -269,25 +270,25 @@
 <p class="hint">拖动图中航点或输入参数，覆盖实时更新。</p>
 <div class="pair">
 <label class="field">
-<span>东向 X / m</span>
+<span>东向 X / m<i class="fi" tabindex="0" data-tip="局部平面坐标（米），向东为正；可在俯视图中拖动航点修改。">!</i></span>
 <input id="pointX" type="number" min="-400" max="400" step="0.1">
 </label>
 <label class="field">
-<span>北向 Y / m</span>
+<span>北向 Y / m<i class="fi" tabindex="0" data-tip="局部平面坐标（米），向北为正；作业范围 y ±300 m。">!</i></span>
 <input id="pointY" type="number" min="-300" max="300" step="0.1">
 </label>
 </div>
 <label class="field">
-<span>经纬度（换算显示）</span>
+<span>经纬度（换算显示）<i class="fi" tabindex="0" data-tip="由起飞点原点换算显示（等距圆柱近似），只读；修改预设中的起飞点经纬度后自动刷新。">!</i></span>
 <input id="pointLatlon" readonly aria-label="经纬度">
 </label>
 <div class="pair">
 <label class="field">
-<span>高度 / m · 相对地面</span>
+<span>高度 / m · 相对地面<i class="fi" tabindex="0" data-tip="该航点相对地面的高度，逐点独立；斜面模式下相对该点所在坡面。">!</i></span>
 <input id="pointHeight" type="number" min="10" max="500" step="1" aria-label="航点高度">
 </label>
 <label class="field">
-<span>云台变焦倍数 · 1～200×</span>
+<span>云台变焦倍数 · 1～200×<i class="fi" tabindex="0" data-tip="1–200×；视场按倍率收窄，表中焦距为 35mm 等效口径。">!</i></span>
 <span class="range-line">
 <input id="zoomSlider" type="range" min="1" max="200" step="1" aria-label="变焦滑块">
 <input id="pointZoom" type="number" min="1" max="200" step="1" aria-label="变焦倍数">
@@ -295,14 +296,14 @@
 </label>
 </div>
 <label class="field">
-<span>机身水平角 / °</span>
+<span>机身水平角 / °<i class="fi" tabindex="0" data-tip="0°=北、90°=东；沿航线方向模式下偏离航段方向将提示冲突，且该点不计入任务覆盖。">!</i></span>
 <span class="range-line">
 <input id="yawSlider" type="range" min="-180" max="180" step="1" aria-label="机身水平角滑块">
 <input id="pointYaw" type="number" min="-180" max="180" step="1" aria-label="机身水平角">
 </span>
 </label>
 <label class="field">
-<span>云台俯仰角 / °</span>
+<span>云台俯仰角 / °<i class="fi" tabindex="0" data-tip="−90° 垂直向下、0° 水平、+90° 向上；接近水平时部分视线不落地，原始投影仅显示作业范围内部分。">!</i></span>
 <span class="range-line">
 <input id="pitchSlider" type="range" min="-90" max="90" step="1" aria-label="云台俯仰角滑块">
 <input id="pointPitch" type="number" min="-90" max="90" step="1" aria-label="云台俯仰角">
@@ -330,19 +331,19 @@
 <section class="section">
 <h2>视锥计算</h2>
 <dl class="results">
-<dt>水平 × 垂直视场</dt>
+<dt>水平 × 垂直视场<i class="fi" tabindex="0" data-tip="按当前变焦倍数由基准视场换算：FOV(z)＝2·atan(tan(FOV₀/2)/z)。">!</i></dt>
 <dd id="fovValue">—</dd>
-<dt>光轴落地水平距离</dt>
+<dt>光轴落地水平距离<i class="fi" tabindex="0" data-tip="光轴与地面交点到航点的水平距离＝高度÷tan(−俯仰)；俯仰≥0° 时显示不落地。">!</i></dt>
 <dd id="groundValue">—</dd>
-<dt>光轴观察斜距</dt>
+<dt>光轴观察斜距<i class="fi" tabindex="0" data-tip="相机沿光轴到地面落点的三维距离＝高度÷sin(−俯仰)。">!</i></dt>
 <dd id="slantValue">—</dd>
-<dt>距离限制水平半径</dt>
+<dt>距离限制水平半径<i class="fi" tabindex="0" data-tip="√(超视距裁切距离²−高度²)；斜面模式为坡面内切圆半径。">!</i></dt>
 <dd id="radiusValue">—</dd>
-<dt>几何投影面积*</dt>
+<dt>几何投影面积*<i class="fi" tabindex="0" data-tip="仅按视场角与作业边界裁切的原始地面（坡面）投影面积。">!</i></dt>
 <dd id="rawAreaValue">—</dd>
-<dt>有效覆盖面积*</dt>
+<dt>有效覆盖面积*<i class="fi" tabindex="0" data-tip="再按超视距裁切距离裁切后的面积，与航点表「有效面积」同口径。">!</i></dt>
 <dd id="validAreaValue">—</dd>
-<dt>超视距裁切面积*</dt>
+<dt>超视距裁切面积*<i class="fi" tabindex="0" data-tip="原始投影面积−有效覆盖面积，即因超出裁切距离被剔除的部分。">!</i></dt>
 <dd id="cutAreaValue">—</dd>
 </dl>
 <canvas id="profile" role="img" aria-label="所选航点的俯仰与距离限制侧视图">
@@ -495,6 +496,14 @@ $('actionList').addEventListener('click',e=>{const b=e.target.closest('button[da
 $('addAction').onclick=()=>{const w=state.points[state.selected];if(!w)return toast('请先选择航点');w.actions=w.actions||[];if(w.actions.length>=20)return toast('单航点最多 20 个动作');w.actions.push({id:'a'+Date.now().toString(36),type:'photo',params:{}});recalc();};
 $('nfzAck').onchange=()=>{state.nfzAck=$('nfzAck').checked;renderRisk();};
 $('resume').onchange=()=>{state.resume=$('resume').checked;renderRisk();};
+const fieldTip=document.createElement('div');fieldTip.id='fieldTip';document.body.appendChild(fieldTip);
+function showTip(t){const r=t.getBoundingClientRect();fieldTip.textContent=t.dataset.tip;fieldTip.classList.add('show');const w=fieldTip.offsetWidth,h=fieldTip.offsetHeight;let x=r.left+r.width/2-w/2;x=Math.max(8,Math.min(x,window.innerWidth-w-8));let y=r.top-h-8;if(y<8)y=r.bottom+8;fieldTip.style.left=x+'px';fieldTip.style.top=y+'px';}
+function hideTip(){fieldTip.classList.remove('show');}
+document.addEventListener('mouseover',e=>{const t=e.target.closest('.fi');if(t&&t.dataset.tip)showTip(t);});
+document.addEventListener('mouseout',e=>{if(e.target.closest('.fi'))hideTip();});
+document.addEventListener('focusin',e=>{const t=e.target.closest('.fi');if(t&&t.dataset.tip)showTip(t);});
+document.addEventListener('focusout',hideTip);
+window.addEventListener('scroll',hideTip,true);
 window.addEventListener('resize',()=>{draw();drawProfile();});
 // Expose deterministic geometry for local validation; no network or device control.
 window.PlannerDemo={state,config,basis,fov,geometry,geometrySlope,insideFov,area,convexIntersection,spacingAllowed,validateTarget,samples,generate,setTarget,recalc,directionOK,effYawTarget,segYawOf,toLatLon,slopeAB,groundZfn,riskInfo,ACTION_DEFS,NO_STAY_OK};
