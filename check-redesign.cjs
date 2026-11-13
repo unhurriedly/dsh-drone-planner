@@ -163,4 +163,13 @@ test('Field info icons present across all three sections', () => {
   assert.ok(page.includes('#fieldTip') || page.includes("fieldTip"));
 });
 
+test('Inline hint paragraphs removed, content kept in tooltips', () => {
+  const page = fs.readFileSync(__dirname + '/page/index.html', 'utf8');
+  assert.ok(!page.includes('超视距裁切：距机身该距离'), 'cut-distance hint paragraph still visible');
+  assert.ok(!page.includes('停留 = 是：支持全部动作'), 'stay hint paragraph still visible');
+  assert.ok(!page.includes('不填 = 沿航线方向）'), 'default-value suffix still in a label');
+  const tip = page.match(/data-tip="停留＝是：支持全部动作[^"]*"/);
+  assert.ok(tip && /智拍固定第一/.test(tip[0]) && /1s/.test(tip[0]), 'actions tooltip lost content');
+});
+
 console.log(`${checks} redesign checks passed.`);

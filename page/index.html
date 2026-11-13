@@ -118,7 +118,6 @@
 <input id="spacing" type="number" min="0" max="1000" step="1" value="0">
 </label>
 </div>
-<p class="hint">超视距裁切：距机身该距离（三维斜距）以外的数据不作为有效数据。最小航点间距约束任意两航点的水平距离，0 表示不限制；无法同时满足覆盖与间距时保留覆盖缺口。</p>
 <div class="pair">
 <label class="field">
 <span>航点是否停留<i class="fi" tabindex="0" data-tip="是：经过航点停留，支持全部动作且顺序可自行排列；否：仅拍照、录像开/关、等待、智拍-快速（结果异步），指令延迟需＜1s（真机验收项）。">!</i></span>
@@ -319,10 +318,9 @@
 </section>
 <section class="section">
 <div class="point-heading">
-<h2>航点动作</h2>
+<h2>航点动作<i class="fi" tabindex="0" data-tip="停留＝是：支持全部动作，顺序可自行排列（旧版「智拍固定第一」已取消）；停留＝否：仅拍照、录像开/关、等待、智拍-快速（结果异步），指令延迟需＜1s 为真机验收项，本 Demo 不模拟延迟。">!</i></h2>
 <span id="actionCount" class="pill">0</span>
 </div>
-<p class="hint">停留 = 是：支持全部动作，顺序可自行排列（旧版「智拍固定第一」已取消）。停留 = 否：仅拍照、录像开/关、等待、智拍-快速（结果异步）；不停留模式指令延迟 &lt;1s 为真机验收项，本 Demo 不模拟延迟。</p>
 <div id="actionList"></div>
 <div class="row" style="margin-top:8px">
 <button id="addAction" class="small-button">新增动作</button>
