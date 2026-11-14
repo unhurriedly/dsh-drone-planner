@@ -12,10 +12,10 @@ const context = { document: {}, console, setTimeout };
 vm.createContext(context);
 vm.runInContext(
   source.split('let screen=')[0] +
-    '\nglobalThis.api={fov,geometry,basis,insideFov,validateTarget,directionOK,effYawTarget,segYawOf,toLatLon,state,area,spacingAllowed,slopeAB,groundZfn,riskInfo,ACTION_DEFS,NO_STAY_OK,samples,cylinderOf,spiralWaypoints,lineWaypoints,greedyWaypoints};',
+    '\nglobalThis.api={fov,geometry,basis,insideFov,validateTarget,directionOK,effYawTarget,segYawOf,toLatLon,state,area,spacingAllowed,slopeAB,groundZfn,riskInfo,ACTION_DEFS,NO_STAY_OK,samples,cylinderOf,spiralWaypoints,lineWaypoints,greedyWaypoints,scanWaypoints,fillGaps};',
   context,
 );
-const { fov, geometry, basis, insideFov, validateTarget, directionOK, effYawTarget, segYawOf, toLatLon, state, area, spacingAllowed, slopeAB, groundZfn, riskInfo, ACTION_DEFS, NO_STAY_OK, samples, cylinderOf, spiralWaypoints, lineWaypoints } = context.api;
+const { fov, geometry, basis, insideFov, validateTarget, directionOK, effYawTarget, segYawOf, toLatLon, state, area, spacingAllowed, slopeAB, groundZfn, riskInfo, ACTION_DEFS, NO_STAY_OK, samples, cylinderOf, spiralWaypoints, lineWaypoints, scanWaypoints } = context.api;
 
 let checks = 0;
 function test(name, fn) { fn(); checks++; console.log('PASS ' + name); }
@@ -216,6 +216,40 @@ test('Line waypoints distributed along the route, not offset', () => {
     const t = d ? Math.max(0, Math.min(1, ((p.x - a[0]) * dx + (p.y - a[1]) * dy) / d)) : 0;
     return Math.hypot(p.x - a[0] - t * dx, p.y - a[1] - t * dy);
   }
+});
+
+test('Scan pattern is boustrophedon across the target bbox', () => {
+  state.config = { type: 'area', height: 110, zoom: 1, distance: 210, spacing: 0, pitch: -60 };
+  state.target = [[-160, -110], [170, -110], [205, 40], [90, 140], [-150, 115]];
+  const pts = scanWaypoints(state.config);
+  assert.ok(pts.length >= 8, 'expected several scan waypoints');
+  const rows = new Map();
+  for (const p of pts) {
+    const key = p.y.toFixed(3);
+    if (!rows.has(key)) rows.set(key, []);
+    rows.get(key).push(p);
+  }
+  assert.ok(rows.size >= 3, 'expected at least 3 rows');
+  const dirs = [...rows.values()].map(xs => xs[0].x < xs[1].x ? 1 : -1);
+  assert.ok(dirs.includes(1) && dirs.includes(-1), 'rows must alternate direction (boustrophedon)');
+  for (const xs of rows.values()) {
+    assert.ok(Math.abs(xs[0].x - Math.min(...xs.map(p => p.x))) < 1e-9 || Math.abs(xs[0].x - Math.max(...xs.map(p => p.x))) < 1e-9,
+      'each row must start at a bbox edge');
+    assert.ok(xs.every(p => p.heading === p.yaw), 'scan waypoints carry their leg heading');
+  }
+  const xs = pts.map(p => p.x), ys = pts.map(p => p.y);
+  assert.ok(Math.min(...xs) === -160 && Math.max(...xs) === 205, 'scan spans bbox in x');
+  assert.ok(Math.min(...ys) === -110 && Math.max(...ys) === 140, 'scan spans bbox in y');
+});
+
+test('Cylinder default height is 200 m when unset', () => {
+  state.target = Array.from({ length: 24 }, (_, k) => [Math.cos(k * Math.PI / 12) * 100, Math.sin(k * Math.PI / 12) * 100]);
+  const cyl = cylinderOf({ type: 'solid' });
+  assert.equal(cyl.top, 200);
+  const pts = spiralWaypoints({ type: 'solid', solidTop: 200, height: 110, zoom: 1, distance: 210, spacing: 0 });
+  assert.ok(pts.length >= 16 && pts.length <= 80);
+  const hs = pts.map(p => p.height);
+  assert.ok(Math.max(...hs) - Math.min(...hs) > 100, 'spiral must climb across the taller cylinder');
 });
 
 console.log(`${checks} redesign checks passed.`);
