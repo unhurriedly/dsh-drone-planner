@@ -17,6 +17,9 @@ const assert=require('node:assert/strict');
    await page.inputValue('#yawMode')==='along'&&await page.inputValue('#stay')==='yes'&&
    await page.inputValue('#endAction')==='hover');
  check('Along-mode default hides fixed pose fields',await page.locator('#fixedPoseFields').isHidden());
+ check('Page heading uses the new copy',await page.locator('.heading h1').textContent()==='智飞航线规划'&&(await page.locator('.heading p').textContent())==='航线让无人机视野覆盖目标区域');
+ check('Idle planning status is blank after render',(await page.locator('#planState').textContent()).trim()==='');
+ check('Table footnote removed',await page.locator('.table-panel p.hint').count()===0);
  check('Initial plan still generated with along default',(await S()).points.length>0);
  const area=await page.evaluate(()=>{const s=PlannerDemo.state;const rows={};s.points.forEach(p=>{(rows[p.y.toFixed(1)]=rows[p.y.toFixed(1)]||[]).push(p)});const ys=Object.keys(rows).map(Number).sort((a,b)=>a-b);const dirs=ys.map(y=>{const xs=rows[y.toFixed(1)].map(p=>p.x);return xs.length>1?(xs[xs.length-1]>xs[0]?1:-1):0});
    return {cov:s.coverage.filter(Boolean).length,total:s.samples.length,rows:ys.length,alt:dirs.includes(1)&&dirs.includes(-1)};});

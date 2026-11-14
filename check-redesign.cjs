@@ -252,4 +252,13 @@ test('Cylinder default height is 200 m when unset', () => {
   assert.ok(Math.max(...hs) - Math.min(...hs) > 100, 'spiral must climb across the taller cylinder');
 });
 
+test('Page copy follows the 智飞航线规划 wording', () => {
+  const page = fs.readFileSync(__dirname + '/page/index.html', 'utf8');
+  assert.ok(page.includes('<h1>智飞航线规划</h1>'), 'title not renamed');
+  assert.ok(page.includes('航线让无人机视野覆盖目标区域'), 'subtitle not replaced');
+  assert.ok(!page.includes('当前航点实时计算'), 'idle status copy still present');
+  assert.ok(!page.includes('距机身超视距裁切距离（三维斜距）以外的地面投影不计入有效数据'), 'table footnote still present');
+  assert.ok(!page.includes('让视野覆盖目标'), 'old title still present');
+});
+
 console.log(`${checks} redesign checks passed.`);
