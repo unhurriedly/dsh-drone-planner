@@ -22,9 +22,15 @@
 ### 安装
 
 ```bash
+# 方式一：直接按仓库名安装
+dsh plugin --profile web add github:unhurriedly/dsh-drone-planner
+
+# 方式二：本地克隆后用 plugin_manager
 git clone https://github.com/unhurriedly/dsh-drone-planner.git
 plugin_manager install_bundle ./dsh-drone-planner
 ```
+
+包名：`dsh-drone-planner`（公开包名，`package.json` 声明 `dsh.bundle` 与 `cordis.patch.yml`）。
 
 安装后无需重启，侧边栏出现「智飞航线规划」图标（悬停显示名称），点击即在工作台中央面板打开正式页面。
 

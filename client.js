@@ -1,5 +1,5 @@
 window.__ModuleLoader__.load({
-  id: '@local/drone-planner',
+  id: 'dsh-drone-planner',
   factory(require) {
     const React = require('react')
     const h = React.createElement

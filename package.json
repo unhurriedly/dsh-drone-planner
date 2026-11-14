@@ -1,7 +1,6 @@
 {
-  "name": "@local/drone-planner",
+  "name": "dsh-drone-planner",
   "version": "1.1.1",
-  "private": true,
   "type": "module",
   "description": "Drone frustum route lab for the Harness Web UI, with a developer mode page for theme/copy/embed config",
   "exports": {
