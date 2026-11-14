@@ -1,5 +1,5 @@
 /**
- * Host half of the 视锥航线 (drone-planner) panel.
+ * Host half of the 智飞航线规划 (drone-planner) panel.
  *
  * The demo is one self-contained `page/index.html`: no build step, no network
  * access. It is served from the Harness web server as a same-origin page so the

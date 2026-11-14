@@ -10,25 +10,25 @@ window.__ModuleLoader__.load({
     const PAGE_URL = '/dsh-drone-planner/'
 
     const zh = {
-      panel: '视锥航线',
+      panel: '智飞航线规划',
       loading: '正在载入本地航线 Demo…',
       failedTitle: 'Demo 页面没有载入',
       failedBody:
-        '宿主没有在 /dsh-drone-planner 返回页面。请重试；如果仍然失败，确认「视锥航线」插件已启用且 page/index.html 还在插件目录里。',
+        '宿主没有在 /dsh-drone-planner 返回页面。请重试；如果仍然失败，确认「智飞航线规划」插件已启用且 page/index.html 还在插件目录里。',
       retry: '重试',
       openExternal: '在新标签打开',
-      frameTitle: '无人机视锥航线实验室',
+      frameTitle: '智飞航线规划 · 工作台',
     }
 
     const en = {
-      panel: 'Drone route lab',
+      panel: 'Smart flight route planner',
       loading: 'Loading the local route demo…',
       failedTitle: 'The demo page did not load',
       failedBody:
         'The host did not return the page at /dsh-drone-planner. Retry; if it keeps failing, check that the “Drone route lab” plugin is enabled and page/index.html still exists in its package directory.',
       retry: 'Retry',
       openExternal: 'Open in new tab',
-      frameTitle: 'Drone frustum route lab',
+      frameTitle: 'Smart flight route planner',
     }
 
     const CSS = `
