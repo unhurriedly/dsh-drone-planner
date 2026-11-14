@@ -13,7 +13,12 @@
   ```
   GET|HEAD /dsh-drone-planner/            -> page/index.html
   GET|HEAD /dsh-drone-planner/index.html  -> page/index.html
+  GET|HEAD /dsh-drone-planner/dev.html    -> page/dev.html
+  GET|HEAD /dsh-drone-planner/dev         -> page/dev.html
+  GET|HEAD /dsh-drone-planner/api.js      -> page/api.js
   ```
+
+  改 `index.js` 的路由需要重新加载插件；`page/` 下的页面与脚本是逐请求读取，改完刷新即可。
 
   Demo 是单文件、离线、自包含的 HTML（无 CDN、无外部字体、无图片请求），所以宿主只做
   「把这份文件按 `text/html` 发回去」这一件事。文件每次请求时读取，响应带
@@ -39,13 +44,15 @@ Demo 是一套自带配色、画布布局和交互的独立页面（浅色主题
 |---|---|
 | `index.js` | Host：只读 HTML 路由 |
 | `client.js` | Client：侧边栏图标 + 中央面板（iframe + 自检） |
-| `page/index.html` | Demo 页面副本（单文件、离线、自包含） |
+| `page/index.html` | 航线实验室主页面（单文件、离线、自包含） |
+| `page/dev.html` | 开发者模式页：可视化配置 + 实时预览 + 代码接入 |
+| `page/api.js` | 嵌入加载器（`OttoPlexDronePlanner.mount/apply`） |
 | `locale/zh.json`、`locale/en.json` | 插件管理里显示的标题与说明 |
 | `icon.svg` | 侧边栏与详情页图标 |
 
 产品构成分三部分：**航线预设**（高度模式、全局速度、偏航角模式、可选机身姿态、停留、结束动作、超视距裁切距离、间距、起飞点经纬度）、**航线规划**（航线覆盖率、观察航点数量、连续航程、航点间距、采样指标、经纬度航点表、风险评估：禁飞区/低高度提醒与能耗断点续飞）、**航点编辑**（坐标/经纬度、逐点高度、机身水平角、云台俯仰角、变焦、视锥明细、航点动作：智拍/云台/挂载按停留门控）。飞行区域支持点、线、区域、斜面（坡度+坡向）、几何体（圆柱体，默认高 200 m）；区域与斜面生成弓字形（往复扫描）航线并补齐未覆盖采样，路线沿折线等距布点，几何体绕柱螺旋上升。页面不含顶栏。
 
-本仓库包含运行所需的页面、插件代码与 `check-redesign.cjs` 验收脚本（`node check-redesign.cjs`）；Demo 早期的导出 JSON、任务文本解析等能力已按改版规格移除。
+本仓库包含运行所需的页面、插件代码与三套验收脚本（`node check-redesign.cjs`、`check-defaults.cjs`、`check-dev-mode.cjs`）；Demo 早期的导出 JSON、任务文本解析等能力已按改版规格移除。
 
 ## 环境要求
 

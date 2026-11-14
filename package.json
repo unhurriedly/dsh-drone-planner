@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "description": "Drone frustum route lab (drone-planner demo) as a Harness Web UI panel",
+  "description": "Drone frustum route lab for the Harness Web UI, with a developer mode page for theme/copy/embed config",
   "exports": {
     ".": "./index.js",
     "./client": "./client.js",
@@ -15,11 +15,16 @@
     "client.js",
     "cordis.patch.yml",
     "page/index.html",
+    "page/dev.html",
+    "page/api.js",
     "check-redesign.cjs",
+    "check-defaults.cjs",
+    "check-dev-mode.cjs",
     "preview-redesign.png",
     "locale/*.json",
     "icon.svg",
-    "README.md"
+    "README.md",
+    "preview-dev-mode.png"
   ],
   "dsh": {
     "bundle": {

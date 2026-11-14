@@ -6,9 +6,12 @@
  * Client panel can frame it and every demo feature (canvas, pointer editing,
  * Blob download) keeps working exactly as when the file is opened locally.
  *
- * Route:
- *   GET|HEAD /dsh-drone-planner/            -> page/index.html
+ * Two independent pages share the prefix:
+ *   GET|HEAD /dsh-drone-planner/            -> page/index.html  (航线实验室)
  *   GET|HEAD /dsh-drone-planner/index.html  -> page/index.html
+ *   GET|HEAD /dsh-drone-planner/dev.html    -> page/dev.html    (开发者模式)
+ *   GET|HEAD /dsh-drone-planner/dev         -> page/dev.html
+ *   GET|HEAD /dsh-drone-planner/api.js      -> page/api.js      (嵌入加载器)
  *
  * The file is read per request and sent with `cache-control: no-store`, so
  * editing the bundled demo and reloading the panel shows the change without
@@ -20,8 +23,15 @@ import { fileURLToPath } from 'node:url'
 export const inject = ['webServer']
 
 const PREFIX = '/dsh-drone-planner'
-const PAGE_FILE = fileURLToPath(new URL('./page/index.html', import.meta.url))
-const PAGE_PATHS = new Set([PREFIX, `${PREFIX}/index.html`])
+const PAGE_DIR = fileURLToPath(new URL('./page/', import.meta.url))
+/** Exact path -> page file. Anything else under the prefix is a 404. */
+const PAGE_ROUTES = new Map([
+  [PREFIX, 'index.html'],
+  [`${PREFIX}/index.html`, 'index.html'],
+  [`${PREFIX}/dev.html`, 'dev.html'],
+  [`${PREFIX}/dev`, 'dev.html'],
+  [`${PREFIX}/api.js`, 'api.js'],
+])
 
 function sendText(res, status, body, contentType = 'text/plain; charset=utf-8') {
   res.statusCode = status
@@ -49,14 +59,15 @@ export function apply(ctx) {
       sendText(res, 405, 'method not allowed')
       return
     }
-    if (!PAGE_PATHS.has(pathnameOf(req))) {
+    const file = PAGE_ROUTES.get(pathnameOf(req))
+    if (file === undefined) {
       sendText(res, 404, 'not found')
       return
     }
     try {
-      const page = await readFile(PAGE_FILE)
+      const page = await readFile(new URL(file, `file://${PAGE_DIR}`))
       res.statusCode = 200
-      res.setHeader('content-type', 'text/html; charset=utf-8')
+      res.setHeader('content-type', file.endsWith('.js') ? 'text/javascript; charset=utf-8' : 'text/html; charset=utf-8')
       res.setHeader('content-length', String(page.byteLength))
       res.setHeader('cache-control', 'no-store')
       res.setHeader('x-content-type-options', 'nosniff')

@@ -8,12 +8,12 @@
 .overlap-summary{display:flex;gap:14px;align-items:center;flex-wrap:wrap;padding:12px 16px;border-bottom:1px solid var(--line);font-size:12px;color:var(--muted)}.overlap-summary strong{color:#8a40ab;font-variant-numeric:tabular-nums}.spacing-conflict{color:var(--red)}[hidden]{display:none!important}.center,.planner,.inspector{min-width:0}.result-status.warning{background:#fff7e9;color:#925a16}.result-status.error{background:#fff0f3;color:#ae3450}
 .risk-body{padding:4px 0}.risk-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:10px 15px;border-bottom:1px solid var(--line);font-size:12px;color:var(--muted)}.risk-row:last-child{border:0}.risk-tag{padding:2px 8px;border-radius:999px;font-size:11px;white-space:nowrap}.risk-warn{color:#925a16;background:#fff7e9}.risk-ok{color:#287961;background:#edf9f4}.risk-details{padding:6px 15px 10px}.risk-details .pair{padding-top:4px}.act-row{display:grid;grid-template-columns:minmax(0,1fr) 86px auto auto auto;gap:6px;align-items:center;margin-bottom:7px}.act-row[data-blocked="1"]{opacity:.55}.act-row select,.act-row input{padding:6px 8px;font-size:12px}.act-noparam{text-align:center;color:var(--muted)}
 .risk-bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:10px 15px;font-size:12px;color:var(--muted)}.risk-item{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:7px;background:var(--soft);color:#4a5b86}.risk-item.warn{background:#fde8ed;border:1px solid #f4b8c6;color:#c0324d;font-weight:600}.risk-item b{font-variant-numeric:tabular-nums}.risk-bar .risk-details{margin-left:auto}.risk-bar .risk-details[open]{width:100%}.risk-bar .risk-details .pair{max-width:420px;padding-top:6px}
-.heading-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end}.exec-button{display:inline-flex;align-items:center;gap:6px;padding:9px 16px;font-size:13px;font-weight:600;white-space:nowrap}.exec-button svg{display:block;flex:none}@media(max-width:720px){.heading-actions{justify-content:flex-start}}.fi{display:inline-flex;align-items:center;justify-content:center;width:13px;height:13px;margin-left:5px;border-radius:50%;background:#8a97bd;color:#fff;font-style:normal;font-size:10px;font-weight:700;line-height:1;cursor:help;vertical-align:1px;flex:none}.fi:hover,.fi:focus-visible{background:var(--blue);outline:none}#fieldTip{position:fixed;z-index:80;max-width:300px;padding:8px 11px;border-radius:8px;background:#1f335d;color:#fff;font-size:11.5px;line-height:1.65;box-shadow:0 8px 22px #172b5940;pointer-events:none;display:none}#fieldTip.show{display:block}
+.heading-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end}.exec-button{display:inline-flex;align-items:center;gap:6px;padding:9px 16px;font-size:13px;font-weight:600;white-space:nowrap}.exec-button svg{display:block;flex:none}@media(max-width:720px){.heading-actions{justify-content:flex-start}}.dev-link{display:inline-flex;align-items:center;height:34px;padding:0 12px;border:1px solid var(--line);border-radius:7px;background:#fff;color:var(--muted);font-size:12px;text-decoration:none;white-space:nowrap}.dev-link:hover{border-color:#8997fc;background:#f2f4ff;color:var(--blue)}.dev-link:focus-visible{outline:3px solid #abb5ff;outline-offset:2px}.fi{display:inline-flex;align-items:center;justify-content:center;width:13px;height:13px;margin-left:5px;border-radius:50%;background:#8a97bd;color:#fff;font-style:normal;font-size:10px;font-weight:700;line-height:1;cursor:help;vertical-align:1px;flex:none}.fi:hover,.fi:focus-visible{background:var(--blue);outline:none}#fieldTip{position:fixed;z-index:80;max-width:300px;padding:8px 11px;border-radius:8px;background:#1f335d;color:#fff;font-size:11.5px;line-height:1.65;box-shadow:0 8px 22px #172b5940;pointer-events:none;display:none}#fieldTip.show{display:block}
 </style>
 </head>
-<body><body>
+<body>
 <main>
-<div class="heading"><div><h1>让视野覆盖目标</h1><p>航线预设 · 沿线观察 · 逐点编辑 · 超视距实时裁切</p></div><div class="heading-actions"><span class="tiny" id="planState" role="status">准备规划</span><button id="executeNow" type="button" class="primary exec-button" title="示意按钮，不会执行真实飞行"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4.2 2.8 13 8l-8.8 5.2V2.8Z" fill="currentColor"/></svg>立即执行</button></div></div>
+<div class="heading"><div><h1>让视野覆盖目标</h1><p>航线预设 · 沿线观察 · 逐点编辑 · 超视距实时裁切</p></div><div class="heading-actions"><span class="tiny" id="planState" role="status">准备规划</span><button id="executeNow" type="button" class="primary exec-button" title="示意按钮，不会执行真实飞行"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4.2 2.8 13 8l-8.8 5.2V2.8Z" fill="currentColor"/></svg>立即执行</button><a class="dev-link" href="dev.html" title="打开开发者模式（独立页面）：主题、字体、文案、尺寸与代码接入">开发者模式</a></div></div>
 <div class="workspace">
 <aside class="panel planner">
 <section class="section">
@@ -506,6 +506,23 @@ document.addEventListener('focusin',e=>{const t=e.target.closest('.fi');if(t&&t.
 document.addEventListener('focusout',hideTip);
 window.addEventListener('scroll',hideTip,true);
 window.addEventListener('resize',()=>{draw();drawProfile();});
+// Theme / copy overrides from the developer-mode page (URL ?cfg= or postMessage).
+const CFG_DEFAULTS={accent:'#4459f5',ink:'#172b59',bg:'#f7f9fd',font:'',size:14,sceneH:0,title:'',subtitle:''};
+let liveCfg={...CFG_DEFAULTS};
+function decodeCfg(value){try{const raw=atob(String(value).replace(/-/g,'+').replace(/_/g,'/'));const bytes=Uint8Array.from(raw,c=>c.charCodeAt(0));return JSON.parse(new TextDecoder().decode(bytes));}catch{return null;}}
+function applyCfg(cfg){if(!cfg||typeof cfg!=='object')return;const st=document.documentElement.style;
+ if(cfg.accent){st.setProperty('--blue',cfg.accent);st.setProperty('--soft',cfg.accent+'1f');}
+ if(cfg.ink)st.setProperty('--ink',cfg.ink);
+ if(cfg.bg){st.setProperty('--bg',cfg.bg);document.body.style.background=cfg.bg;}
+ if(cfg.font)document.body.style.fontFamily=cfg.font;
+ if(cfg.size)document.body.style.fontSize=(+cfg.size)+'px';
+ if(cfg.sceneH){let tag=document.getElementById('cfgScene');if(!tag){tag=document.createElement('style');tag.id='cfgScene';document.head.appendChild(tag);}tag.textContent='#scene{height:'+(+cfg.sceneH)+'px !important}';requestAnimationFrame(()=>{draw();drawProfile();});}
+ if(cfg.title)document.querySelector('.heading h1').textContent=cfg.title;
+ if(cfg.subtitle)document.querySelector('.heading p').textContent=cfg.subtitle;
+ liveCfg={...liveCfg,...cfg};}
+(function bootCfg(){const q=new URLSearchParams(location.search).get('cfg');const cfg=q?decodeCfg(q):null;if(cfg)applyCfg(cfg);})();
+window.addEventListener('message',e=>{if(e.data&&e.data.type==='otp:config')applyCfg(e.data.cfg);});
+window.OttoPlexDronePlanner={version:'1.0.0',init:applyCfg,apply:applyCfg,getConfig:()=>({...liveCfg}),decodeCfg};
 // Expose deterministic geometry for local validation; no network or device control.
 window.PlannerDemo={state,config,basis,fov,geometry,geometrySlope,insideFov,area,convexIntersection,spacingAllowed,validateTarget,samples,generate,setTarget,recalc,directionOK,effYawTarget,segYawOf,toLatLon,slopeAB,groundZfn,riskInfo,ACTION_DEFS,NO_STAY_OK,cylinderOf,spiralWaypoints,lineWaypoints,greedyWaypoints,scanWaypoints,fillGaps};
 syncControls();setTarget(state.target);generate();
