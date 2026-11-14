@@ -90,7 +90,17 @@ const assert=require('node:assert/strict');
  const [opened]=await Promise.all([ctx.waitForEvent('page'),official.click()]);
  await opened.waitForFunction(()=>window.PlannerDemo||document.querySelector('#executeNow'),null,{timeout:15000});
  check('Official-page button opens index.html in a new tab',/\/dsh-drone-planner\/index\.html$/.test(opened.url())&&opened.url().indexOf('cfg=')===-1);
+ check('Official page really renders the planner',await opened.evaluate(()=>!!document.getElementById('scene')&&!!document.getElementById('executeNow')));
  await opened.close();
+ // sandboxed embed: popups are blocked, so the handler must fall back to in-place navigation
+ const sandboxHost=await ctx.newPage();
+ await sandboxHost.setContent('<iframe sandbox="allow-scripts allow-same-origin" src="'+BASE+'dev.html" style="width:1200px;height:800px;border:0"></iframe>');
+ await sandboxHost.waitForTimeout(800);
+ await sandboxHost.frameLocator('iframe').locator('#openOfficial').click();
+ await sandboxHost.waitForTimeout(1500);
+ const fallbackFrame=sandboxHost.frames().find(fr=>/dsh-drone-planner\/index\.html$/.test(fr.url()));
+ check('Blocked popup falls back to opening the planner',!!fallbackFrame&&await fallbackFrame.evaluate(()=>!!document.getElementById('scene')));
+ await sandboxHost.close();
  // main page has no developer-mode entry
  const main=await ctx.newPage();
  await main.goto(BASE);

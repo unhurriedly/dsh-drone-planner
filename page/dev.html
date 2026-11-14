@@ -61,7 +61,7 @@ pre.code{margin:0;padding:11px 12px;background:#0f1b33;color:#dbe4f7;border-radi
 <div class="brand">智飞航线规划<span>开发者模式</span></div>
 </div>
 <div class="head-actions">
-<a class="btn primary" id="openOfficial" href="index.html" target="_blank" rel="noopener" title="在新标签页打开正式页面 page/index.html">正式页面</a>
+<a class="btn primary" id="openOfficial" href="index.html" target="_blank" rel="noopener" title="在新标签页打开正式页面 page/index.html">正式页面 ↗</a>
 </div>
 </header>
 <nav class="tabs" role="tablist">
@@ -204,6 +204,16 @@ pre.code{margin:0;padding:11px 12px;background:#0f1b33;color:#dbe4f7;border-radi
   document.addEventListener('click',function(e){
     var btn=e.target.closest('[data-copy]');if(!btn)return;
     copyText($(btn.dataset.copy).textContent);
+  });
+  // 「正式页面」：优先新标签打开；被浏览器/沙箱拦截时退化为当前页跳转，绝不让点击静默失效
+  var official=$('openOfficial');
+  official.addEventListener('click',function(e){
+    e.preventDefault();
+    var win=null;
+    try{win=window.open(official.getAttribute('href'),'_blank');}catch(error){win=null;}
+    if(win){try{win.opener=null;}catch(error){}return;}
+    toast('浏览器阻止了新标签页，正在当前页面打开正式页面');
+    setTimeout(function(){location.href=official.getAttribute('href');},500);
   });
   $('cfgCode').value=DEFAULT_CODE;
   renderCode();
