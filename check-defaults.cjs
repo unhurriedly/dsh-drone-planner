@@ -48,6 +48,34 @@ const assert=require('node:assert/strict');
  await page.locator('#generate').click();await ready();
  const onLine=await page.evaluate(()=>{const s=PlannerDemo.state,t=s.target;const sd=(p,a,b)=>{const dx=b[0]-a[0],dy=b[1]-a[1],d=dx*dx+dy*dy;const k=d?Math.max(0,Math.min(1,((p.x-a[0])*dx+(p.y-a[1])*dy)/d)):0;return Math.hypot(p.x-a[0]-k*dx,p.y-a[1]-k*dy);};return s.points.length>2&&s.points.every(p=>t.some((a,i)=>i&&sd(p,t[i-1],a)<0.02));});
  check('Line waypoints sit on the route',onLine);
+ // layout: paired fields must stay aligned and range sliders stay side by side at narrow widths
+ const layout=[];
+ for(const w of [1512,1300,1150,1000,900,800,760,720,600,480,390]){
+   await page.setViewportSize({width:w,height:1200});
+   await page.waitForTimeout(110);
+   layout.push(await page.evaluate(()=>{
+     const bad=[];
+     document.querySelectorAll('.pair').forEach(pair=>{
+       const fs=[...pair.children].filter(el=>el.classList.contains('field')&&el.offsetParent);
+       if(fs.length<2)return;
+       const pick=f=>f.querySelector('input:not([type=range]),select,textarea')||f;
+       const a=pick(fs[0]).getBoundingClientRect().bottom, c=pick(fs[1]).getBoundingClientRect().bottom;
+       if(Math.abs(a-c)>1.2)bad.push('pair:'+Math.round(Math.abs(a-c)));
+     });
+     document.querySelectorAll('.range-line').forEach(rl=>{
+       const s=rl.querySelector('input[type=range]'), n=rl.querySelector('input[type=number]');
+       if(!s||!n||!rl.offsetParent)return;
+       const a=s.getBoundingClientRect(), c=n.getBoundingClientRect();
+       if(c.left<a.right-1)bad.push('range-stacked');
+     });
+     return {w:window.innerWidth,bad,overflow:document.documentElement.scrollWidth-window.innerWidth};
+   }));
+ }
+ const misaligned=layout.filter(r=>r.bad.length);
+ check('Paired fields align at every width',misaligned.length===0);
+ check('Range sliders stay side by side',!layout.some(r=>r.bad.includes('range-stacked')));
+ check('No horizontal overflow while narrowing',layout.every(r=>r.overflow<=1));
+ await page.setViewportSize({width:1512,height:1100});
  check('No browser runtime errors',errors.length===0);
  await browser.close();
  console.log(`${checks.length} browser checks passed.`);
