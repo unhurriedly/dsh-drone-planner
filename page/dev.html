@@ -4,13 +4,13 @@
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>视锥航线 · 开发者模式</title>
 <style>
-:root{--ink:#172b59;--muted:#667798;--line:#e3e9f3;--blue:#4459f5;--soft:#eef0ff;--bg:#f7f9fd;--green:#159b79;--red:#d74e66}
+:root{--ink:#172b59;--muted:#667798;--line:#e3e9f3;--blue:#4459f5;--soft:#eef0ff;--bg:#f7f9fd;--red:#c0324d;--green:#159b79}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC",sans-serif}
 button,input,select,textarea{font:inherit}
 button{cursor:pointer}
 a{color:inherit}
-.dev-head{display:flex;align-items:center;gap:16px;flex-wrap:wrap;padding:16px 24px;background:#fff;border-bottom:1px solid var(--line)}
+.dev-head{display:flex;align-items:center;gap:16px;flex-wrap:wrap;padding:15px 24px;background:#fff;border-bottom:1px solid var(--line)}
 .brand{font-size:18px;font-weight:750;letter-spacing:-.3px}
 .brand span{margin-left:10px;padding-left:12px;border-left:1px solid var(--line);color:var(--blue);font-size:14px;font-weight:600}
 .dev-head p{margin:2px 0 0;color:var(--muted);font-size:12px}
@@ -19,100 +19,88 @@ a{color:inherit}
 .btn:hover{border-color:#8997fc;background:#f2f4ff;color:var(--blue)}
 .btn.primary{background:var(--blue);border-color:var(--blue);color:#fff}
 .btn.primary:hover{filter:brightness(1.06);background:var(--blue);color:#fff}
-.btn:focus-visible,input:focus-visible,select:focus-visible,button:focus-visible{outline:3px solid #abb5ff;outline-offset:2px}
-.dev-main{display:grid;grid-template-columns:minmax(320px,380px) minmax(0,1fr);gap:16px;padding:16px 24px 26px;max-width:1900px;margin:0 auto;align-items:start}
-.card{background:#fff;border:1px solid var(--line);border-radius:11px;overflow:hidden;margin-bottom:16px}
-.card>h2{margin:0;padding:14px 16px;border-bottom:1px solid var(--line);font-size:14px}
-.card-body{padding:14px 16px}
+.btn:focus-visible,button:focus-visible,textarea:focus-visible,a:focus-visible{outline:3px solid #abb5ff;outline-offset:2px}
+.tabs{display:flex;gap:6px;padding:12px 24px 0;max-width:1900px;margin:0 auto}
+.tab{padding:8px 15px;border:1px solid var(--line);border-bottom:0;border-radius:9px 9px 0 0;background:#eef2fa;color:var(--muted);font-size:13px;font-weight:600}
+.tab.active{background:#fff;color:var(--blue);border-color:var(--line);box-shadow:0 -2px 0 var(--blue) inset}
+.tab-panel{display:none;max-width:1900px;margin:0 auto;padding:0 24px 26px}
+.tab-panel.active{display:block}
+.shell{background:#fff;border:1px solid var(--line);border-radius:0 11px 11px 11px;padding:16px}
+.cols{display:grid;grid-template-columns:minmax(340px,1fr) minmax(340px,1fr);gap:16px;align-items:start}
+.card{border:1px solid var(--line);border-radius:10px;overflow:hidden;background:#fff}
+.card>h2{margin:0;padding:13px 15px;border-bottom:1px solid var(--line);font-size:13.5px;display:flex;align-items:center;gap:8px}
+.card>h2 .hint{margin-left:auto;font-weight:400;font-size:11px;color:var(--muted)}
+.card-body{padding:13px 15px}
 .field{display:block;margin:0 0 12px}
 .field>span{display:block;margin-bottom:5px;color:var(--muted);font-size:12px}
-.field input[type=text],.field input[type=number],.field select{width:100%;padding:7px 9px;border:1px solid var(--line);border-radius:7px;background:#fff;color:var(--ink)}
-.row3{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
-.row3 .field{margin-bottom:6px}
-.color-line{display:flex;gap:7px;align-items:center}
-.color-line input[type=color]{width:34px;height:30px;padding:2px;border:1px solid var(--line);border-radius:7px;background:#fff}
-.color-line input[type=text]{flex:1;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px}
-.presets{display:flex;gap:6px;flex-wrap:wrap;margin:2px 0 14px}
-.preset{display:inline-flex;align-items:center;gap:6px;padding:5px 9px;border:1px solid var(--line);border-radius:999px;background:#fff;font-size:12px;color:var(--muted)}
-.preset:hover{border-color:#8997fc;color:var(--blue)}
-.preset i{width:10px;height:10px;border-radius:50%;display:block}
-.slider-line{display:grid;grid-template-columns:1fr 72px;gap:9px;align-items:center}
-.slider-line input[type=range]{padding:0;accent-color:var(--blue)}
-.slider-line input[type=number]{padding:6px 8px}
+#cfgCode{width:100%;min-height:340px;padding:12px;border:1px solid var(--line);border-radius:8px;background:#0f1b33;color:#dbe4f7;font:12px/1.65 ui-monospace,SFMono-Regular,Menlo,monospace;resize:vertical;tab-size:2}
+#cfgStatus{margin:8px 0 0;font-size:11.5px;color:var(--muted)}
+#cfgStatus.bad{color:var(--red);font-weight:600}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
 .code-head{display:flex;align-items:center;gap:8px;margin:14px 0 6px}
+.code-head:first-child{margin-top:0}
 .code-head h3{margin:0;font-size:12.5px;font-weight:600}
-.code-head .hint{margin:0;font-size:11px;color:var(--muted)}
-.code-head button{margin-left:auto}
-pre.code{margin:0;padding:11px 12px;background:#0f1b33;color:#dbe4f7;border-radius:8px;font:11.5px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace;overflow:auto;white-space:pre-wrap;word-break:break-all;max-height:220px}
-.preview-bar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:11px 14px;border-bottom:1px solid var(--line);background:#fff}
+.code-head .hint{margin:0;font-size:11px;color:var(--muted);flex:1;min-width:0}
+pre.code{margin:0;padding:11px 12px;background:#0f1b33;color:#dbe4f7;border-radius:8px;font:11.5px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace;overflow:auto;white-space:pre-wrap;word-break:break-all;max-height:210px}
+.preview-bar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:12px}
 .devices{display:flex;gap:5px}
 .devices button{padding:5px 9px;border:1px solid var(--line);border-radius:7px;background:#fff;font-size:12px;color:var(--muted)}
 .devices button.active{border-color:#a6b0ff;background:var(--soft);color:var(--blue);font-weight:600}
 .preview-note{margin-left:auto;font-size:11.5px;color:var(--muted)}
-.frame-wrap{padding:14px;background:#eef2fa;display:flex;justify-content:center}
-#previewFrame{width:100%;height:min(78vh,860px);border:1px solid var(--line);border-radius:9px;background:#fff;transition:width .18s ease}
+.frame-wrap{background:#eef2fa;border-radius:10px;padding:12px;display:flex;justify-content:center}
+#previewFrame{width:100%;height:min(80vh,900px);border:1px solid var(--line);border-radius:9px;background:#fff}
 #toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%);background:#1f335d;color:#fff;padding:11px 18px;border-radius:9px;font-size:12.5px;box-shadow:0 8px 25px #172b5920;z-index:20}
 #toast[hidden]{display:none}
-@media(max-width:1050px){.dev-main{grid-template-columns:1fr}}
-@media(max-width:560px){.dev-main{padding:12px}.row3{grid-template-columns:1fr}}
+@media(max-width:1080px){.cols{grid-template-columns:1fr}}
+@media(max-width:560px){.dev-head,.tabs,.tab-panel{padding-left:12px;padding-right:12px}}
 </style>
 </head>
 <body>
 <header class="dev-head">
 <div>
 <div class="brand">视锥航线<span>开发者模式</span></div>
-<p>调主题、字体、文案与尺寸，右侧实时预览；下方可直接复制安装、引用与 API 配置。</p>
+<p>用一段前端代码维护主题、字体、文案与尺寸；下方可直接复制安装、引用与 API 配置。</p>
 </div>
 <div class="head-actions">
-<a class="btn" href="index.html">← 返回航线实验室</a>
-<a class="btn primary" id="openPreview" href="index.html" target="_blank" rel="noopener">新标签打开预览</a>
+<a class="btn primary" id="openConfigured" href="index.html" target="_blank" rel="noopener">带配置新标签打开</a>
 </div>
 </header>
-<main class="dev-main">
-<aside>
+<nav class="tabs" role="tablist">
+<button class="tab active" type="button" role="tab" aria-selected="true" data-tab="config">可视化配置 / 代码接入</button>
+<button class="tab" type="button" role="tab" aria-selected="false" data-tab="preview">实时预览</button>
+</nav>
+<section class="tab-panel active" id="panel-config" role="tabpanel">
+<div class="shell">
+<div class="cols">
 <section class="card">
-<h2>可视化配置</h2>
+<h2>可视化配置<span class="hint">前端代码方式维护</span></h2>
 <div class="card-body">
-<div class="row3">
-<label class="field"><span>主题色</span><span class="color-line"><input id="cfgAccent" type="color" value="#4459f5"><input id="cfgAccentHex" type="text" spellcheck="false" value="#4459f5" aria-label="主题色十六进制"></span></label>
-<label class="field"><span>文字色</span><span class="color-line"><input id="cfgInk" type="color" value="#172b59"><input id="cfgInkHex" type="text" spellcheck="false" value="#172b59" aria-label="文字色十六进制"></span></label>
-<label class="field"><span>背景色</span><span class="color-line"><input id="cfgBg" type="color" value="#f7f9fd"><input id="cfgBgHex" type="text" spellcheck="false" value="#f7f9fd" aria-label="背景色十六进制"></span></label>
+<label class="field" style="margin-bottom:0"><span>配置代码（JS 对象，输入即生效）</span>
+<textarea id="cfgCode" spellcheck="false" aria-label="配置代码"></textarea>
+</label>
+<p id="cfgStatus" role="status">已应用</p>
+<div class="row">
+<button class="btn" id="resetConfig" type="button">恢复默认</button>
+<button class="btn" id="copyConfig" type="button">复制配置代码</button>
 </div>
-<div class="presets" id="presets"></div>
-<label class="field"><span>字体</span>
-<select id="cfgFont">
-<option value="">系统默认（-apple-system / PingFang SC）</option>
-<option value="'PingFang SC','Microsoft YaHei',sans-serif">苹方 / 雅黑</option>
-<option value="'Source Han Sans SC','Noto Sans SC',sans-serif">思源黑体</option>
-<option value="'Songti SC',Georgia,serif">宋体 / 衬线</option>
-<option value="ui-monospace,SFMono-Regular,Menlo,monospace">等宽</option>
-</select>
-</label>
-<label class="field"><span>基础字号 / px</span>
-<span class="slider-line"><input id="cfgSizeRange" type="range" min="12" max="18" step="1" value="14" aria-label="基础字号滑块"><input id="cfgSize" type="number" min="12" max="18" step="1" value="14" aria-label="基础字号"></span>
-</label>
-<label class="field"><span>画布高度 / px（尺寸）</span>
-<span class="slider-line"><input id="cfgSceneRange" type="range" min="320" max="760" step="10" value="520" aria-label="画布高度滑块"><input id="cfgScene" type="number" min="320" max="760" step="10" value="520" aria-label="画布高度"></span>
-</label>
-<label class="field"><span>主标题文案</span><input id="cfgTitle" type="text" value="让视野覆盖目标" spellcheck="false"></label>
-<label class="field" style="margin-bottom:0"><span>副标题文案</span><input id="cfgSubtitle" type="text" value="航线预设 · 沿线观察 · 逐点编辑 · 超视距实时裁切" spellcheck="false"></label>
 </div>
 </section>
 <section class="card">
-<h2>代码接入</h2>
+<h2>代码接入<span class="hint">安装 · 引用 · API</span></h2>
 <div class="card-body">
 <div class="code-head"><h3>1. 安装</h3><button class="btn" data-copy="codeInstall" type="button">复制</button></div>
 <pre class="code" id="codeInstall"></pre>
-<div class="code-head"><h3>2. 引用代码</h3><span class="hint">iframe 嵌入，配置已编码进 URL</span><button class="btn" data-copy="codeIframe" type="button">复制</button></div>
+<div class="code-head"><h3>2. 引用代码</h3><span class="hint">iframe，配置已编码进 URL</span><button class="btn" data-copy="codeIframe" type="button">复制</button></div>
 <pre class="code" id="codeIframe"></pre>
-<div class="code-head"><h3>3. API 配置</h3><span class="hint">已有页面内动态应用</span><button class="btn" data-copy="codeApi" type="button">复制</button></div>
+<div class="code-head"><h3>3. API 配置</h3><span class="hint">挂载与热更新</span><button class="btn" data-copy="codeApi" type="button">复制</button></div>
 <pre class="code" id="codeApi"></pre>
-<div class="code-head"><h3>4. 当前配置 JSON</h3><button class="btn" data-copy="codeJson" type="button">复制</button></div>
-<pre class="code" id="codeJson"></pre>
 </div>
 </section>
-</aside>
-<section class="card" style="margin:0">
+</div>
+</div>
+</section>
+<section class="tab-panel" id="panel-preview" role="tabpanel">
+<div class="shell">
 <div class="preview-bar">
 <div class="devices">
 <button data-w="1280" class="active" type="button">桌面 1280</button>
@@ -121,26 +109,35 @@ pre.code{margin:0;padding:11px 12px;background:#0f1b33;color:#dbe4f7;border-radi
 <button data-w="390" type="button">手机 390</button>
 </div>
 <button class="btn" id="reloadPreview" type="button">重新加载</button>
-<a class="btn" id="openConfigured" href="index.html" target="_blank" rel="noopener">带配置新标签打开</a>
-<span class="preview-note" id="previewNote">实时预览 · 与主页面同一份代码</span>
+<span class="preview-note" id="previewNote">切换回预览时自动重绘</span>
 </div>
 <div class="frame-wrap"><iframe id="previewFrame" src="index.html" title="航线实验室预览"></iframe></div>
+</div>
 </section>
-</main>
 <div id="toast" role="status" hidden></div>
 <script>
 (function(){
   'use strict';
   var $=function(id){return document.getElementById(id)};
-  var frame=$('previewFrame'), note=$('previewNote');
-  var cfg={accent:'#4459f5',ink:'#172b59',bg:'#f7f9fd',font:'',size:14,sceneH:520,title:'让视野覆盖目标',subtitle:'航线预设 · 沿线观察 · 逐点编辑 · 超视距实时裁切'};
-  var PRESETS=[
-    {name:'默认蓝',accent:'#4459f5',ink:'#172b59',bg:'#f7f9fd'},
-    {name:'深墨',accent:'#2f6fd0',ink:'#0f1b33',bg:'#eef2f8'},
-    {name:'森林',accent:'#159b79',ink:'#123330',bg:'#f2f8f5'},
-    {name:'莓果',accent:'#a855ce',ink:'#2e1236',bg:'#f9f4fb'},
-    {name:'琥珀',accent:'#c9781f',ink:'#3a2410',bg:'#fdf8f1'}
-  ];
+  var frame=$('previewFrame');
+  var DEFAULTS={accent:'#4459f5',ink:'#172b59',bg:'#f7f9fd',font:'',size:14,sceneH:520,title:'让视野覆盖目标',subtitle:'航线预设 · 沿线观察 · 逐点编辑 · 超视距实时裁切'};
+  var cfg=Object.assign({},DEFAULTS);
+
+  var DEFAULT_CODE=[
+    '// 视锥航线 · 页面配置（可直接维护在你的前端代码里）',
+    '// 修改后即时应用到右侧预览；也可复制到宿主页面调用 OttoPlexDronePlanner.init()',
+    'const config = {',
+    "  accent: '#4459f5',        // 主题色",
+    "  ink: '#172b59',           // 文字色",
+    "  bg: '#f7f9fd',            // 页面背景色",
+    "  font: '',                 // 字体族，留空为系统默认",
+    '  size: 14,                 // 基础字号 px',
+    '  sceneH: 520,              // 画布高度 px（尺寸）',
+    "  title: '让视野覆盖目标',   // 主标题文案",
+    "  subtitle: '航线预设 · 沿线观察 · 逐点编辑 · 超视距实时裁切'",
+    '};'
+  ].join('\n');
+
   function toast(msg){var t=$('toast');t.textContent=msg;t.hidden=false;clearTimeout(toast.timer);toast.timer=setTimeout(function(){t.hidden=true},1800);}
   function b64(obj){
     var bytes=new TextEncoder().encode(JSON.stringify(obj)),bin='';
@@ -148,49 +145,48 @@ pre.code{margin:0;padding:11px 12px;background:#0f1b33;color:#dbe4f7;border-radi
     return btoa(bin).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
   }
   function baseUrl(){return location.origin+location.pathname.replace(/dev\.html?$/,'').replace(/[^/]*$/,'');}
-  function sendCfg(){if(!frame.contentWindow)return;frame.contentWindow.postMessage({type:'otp:config',cfg:cfg},'*');}
-  function hex(id){return ($(id).value||'').trim()}
-  function syncPair(colorId,hexId,key){
-    var c=$(colorId),h=$(hexId);
-    c.addEventListener('input',function(){h.value=c.value;cfg[key]=c.value;update()});
-    h.addEventListener('change',function(){var v=h.value.trim();if(/^#[0-9a-fA-F]{6}$/.test(v)){c.value=v;cfg[key]=v;update();}else{h.value=cfg[key];toast('请输入 #RRGGBB 格式的颜色');}});
+  function parseCode(text){
+    var m=text.match(/\{[\s\S]*\}/);
+    if(!m)throw new Error('未找到配置对象 { … }');
+    var value=new Function('"use strict";return ('+m[0]+');')();
+    if(!value||typeof value!=='object'||Array.isArray(value))throw new Error('配置需要是一个对象');
+    return value;
   }
-  syncPair('cfgAccent','cfgAccentHex','accent');
-  syncPair('cfgInk','cfgInkHex','ink');
-  syncPair('cfgBg','cfgBgHex','bg');
-  $('cfgFont').addEventListener('change',function(){cfg.font=this.value;update()});
-  function linkPair(rangeId,numId,key){
-    var r=$(rangeId),n=$(numId);
-    r.addEventListener('input',function(){n.value=r.value;cfg[key]=+r.value;update()});
-    n.addEventListener('change',function(){var v=Math.max(+n.min,Math.min(+n.max,+n.value||+n.min));n.value=v;r.value=v;cfg[key]=v;update()});
-  }
-  linkPair('cfgSizeRange','cfgSize','size');
-  linkPair('cfgSceneRange','cfgScene','sceneH');
-  $('cfgTitle').addEventListener('input',function(){cfg.title=this.value;update()});
-  $('cfgSubtitle').addEventListener('input',function(){cfg.subtitle=this.value;update()});
-  // preset chips
-  var wrap=$('presets');
-  PRESETS.forEach(function(p){
-    var b=document.createElement('button');b.type='button';b.className='preset';
-    b.innerHTML='<i style="background:'+p.accent+'"></i>'+p.name;
-    b.addEventListener('click',function(){
-      cfg.accent=p.accent;cfg.ink=p.ink;cfg.bg=p.bg;
-      $('cfgAccent').value=p.accent;$('cfgAccentHex').value=p.accent;
-      $('cfgInk').value=p.ink;$('cfgInkHex').value=p.ink;
-      $('cfgBg').value=p.bg;$('cfgBgHex').value=p.bg;
-      update();
-    });
-    wrap.appendChild(b);
-  });
+  function status(text,bad){var el=$('cfgStatus');el.textContent=text;el.className=bad?'bad':'';}
+  function sendCfg(){if(frame.contentWindow)frame.contentWindow.postMessage({type:'otp:config',cfg:cfg},'*');}
   function renderCode(){
     var embed=baseUrl(),url=embed+'?cfg='+b64(cfg);
-    $('codeInstall').textContent='# 方式一：本地目录安装（Harness 插件）\nplugin_manager install_bundle /path/to/dsh-drone-planner\n\n# 方式二：从 GitHub 克隆后安装\ngit clone https://github.com/unhurriedly/dsh-drone-planner.git\nplugin_manager install_bundle ./dsh-drone-planner\n\n# 自检\ncurl -I '+embed;
+    $('codeInstall').textContent='# 方式一：Harness 插件本地目录安装\nplugin_manager install_bundle /path/to/dsh-drone-planner\n\n# 方式二：从 GitHub 克隆后安装\ngit clone https://github.com/unhurriedly/dsh-drone-planner.git\nplugin_manager install_bundle ./dsh-drone-planner\n\n# 自检\ncurl -I '+embed;
     $('codeIframe').textContent='<iframe\n  src="'+url+'"\n  width="100%" height="900"\n  style="border:0"\n  title="视锥航线"></iframe>';
-    $('codeApi').textContent='<script src="'+embed+'api.js"><\/script>\n<script>\n  window.OttoPlexDronePlanner.init('+JSON.stringify(cfg,null,2).replace(/\n/g,'\n  ')+');\n<\/script>\n\n// 已加载页面内动态应用：\n// window.OttoPlexDronePlanner.apply({ accent: "#159b79" });';
-    $('codeJson').textContent=JSON.stringify(cfg,null,2);
+    $('codeApi').textContent='<div id="drone"></div>\n<script src="'+embed+'api.js"><\/script>\n<script>\n  var app = OttoPlexDronePlanner.mount("#drone", '+JSON.stringify(cfg,null,2).replace(/\n/g,'\n  ')+');\n  app.apply({ title: "新的标题" }); // 不重载即可热更新\n<\/script>';
     $('openConfigured').href=url;
   }
-  function update(){sendCfg();renderCode();note.textContent='已应用 · '+new Date().toLocaleTimeString('zh-CN',{hour12:false});}
+  function applyCode(){
+    var text=$('cfgCode').value;
+    try{
+      var parsed=parseCode(text);
+      cfg=Object.assign({},DEFAULTS,parsed);
+      sendCfg();renderCode();
+      status('已应用 · '+new Date().toLocaleTimeString('zh-CN',{hour12:false}));
+    }catch(error){
+      status('解析失败：'+error.message+'（预览保持上一次有效配置）',true);
+    }
+  }
+  var timer=null;
+  $('cfgCode').addEventListener('input',function(){clearTimeout(timer);timer=setTimeout(applyCode,350);});
+  $('resetConfig').addEventListener('click',function(){$('cfgCode').value=DEFAULT_CODE;applyCode();});
+  $('copyConfig').addEventListener('click',function(){copyText($('cfgCode').value);});
+  // tabs
+  document.querySelectorAll('.tab').forEach(function(btn){
+    btn.addEventListener('click',function(){
+      document.querySelectorAll('.tab').forEach(function(b){b.classList.toggle('active',b===btn);b.setAttribute('aria-selected',b===btn?'true':'false');});
+      document.querySelectorAll('.tab-panel').forEach(function(p){p.classList.toggle('active',p.id==='panel-'+(btn.dataset.tab==='preview'?'preview':'config'));});
+      if(btn.dataset.tab==='preview'){
+        try{frame.contentWindow.dispatchEvent(new frame.contentWindow.Event('resize'));}catch(error){}
+        sendCfg();
+      }
+    });
+  });
   frame.addEventListener('load',function(){sendCfg();});
   $('reloadPreview').addEventListener('click',function(){frame.src='index.html?t='+Date.now();});
   document.querySelectorAll('.devices button').forEach(function(b){
@@ -202,15 +198,18 @@ pre.code{margin:0;padding:11px 12px;background:#0f1b33;color:#dbe4f7;border-radi
       frame.style.maxWidth='100%';
     });
   });
-  document.addEventListener('click',function(e){
-    var btn=e.target.closest('[data-copy]');if(!btn)return;
-    var text=$(btn.dataset.copy).textContent;
+  function copyText(text){
     var done=function(){toast('已复制到剪贴板');};
     if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(text).then(done,fallback);}else fallback();
-    function fallback(){var ta=document.createElement('textarea');ta.value=text;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();try{document.execCommand('copy');done();}catch(err){toast('复制失败，请手动选择');}document.body.removeChild(ta);}
+    function fallback(){var ta=document.createElement('textarea');ta.value=text;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();try{document.execCommand('copy');done();}catch(error){toast('复制失败，请手动选择');}document.body.removeChild(ta);}
+  }
+  document.addEventListener('click',function(e){
+    var btn=e.target.closest('[data-copy]');if(!btn)return;
+    copyText($(btn.dataset.copy).textContent);
   });
+  $('cfgCode').value=DEFAULT_CODE;
   renderCode();
-  window.OttoPlexDev={getConfig:function(){return cfg;},apply:function(partial){Object.assign(cfg,partial);update();}};
+  window.OttoPlexDev={getConfig:function(){return cfg;},setCode:function(code){$('cfgCode').value=code;applyCode();},applyCode:applyCode};
 })();
 </script>
 </body>
