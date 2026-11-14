@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>视锥航线 · 开发者模式</title>
+<title>智飞航线规划 · 开发者模式</title>
 <style>
 :root{--ink:#172b59;--muted:#667798;--line:#e3e9f3;--blue:#4459f5;--soft:#eef0ff;--bg:#f7f9fd;--red:#c0324d;--green:#159b79}
 *{box-sizing:border-box}
@@ -58,22 +58,21 @@ pre.code{margin:0;padding:11px 12px;background:#0f1b33;color:#dbe4f7;border-radi
 <body>
 <header class="dev-head">
 <div>
-<div class="brand">视锥航线<span>开发者模式</span></div>
-<p>用一段前端代码维护主题、字体、文案与尺寸；下方可直接复制安装、引用与 API 配置。</p>
+<div class="brand">智飞航线规划<span>开发者模式</span></div>
 </div>
 <div class="head-actions">
-<a class="btn primary" id="openConfigured" href="index.html" target="_blank" rel="noopener">带配置新标签打开</a>
+<a class="btn primary" id="openOfficial" href="index.html" target="_blank" rel="noopener" title="在新标签页打开正式页面 page/index.html">正式页面</a>
 </div>
 </header>
 <nav class="tabs" role="tablist">
-<button class="tab active" type="button" role="tab" aria-selected="true" data-tab="config">可视化配置 / 代码接入</button>
+<button class="tab active" type="button" role="tab" aria-selected="true" data-tab="config">开发配置</button>
 <button class="tab" type="button" role="tab" aria-selected="false" data-tab="preview">实时预览</button>
 </nav>
 <section class="tab-panel active" id="panel-config" role="tabpanel">
 <div class="shell">
 <div class="cols">
 <section class="card">
-<h2>可视化配置<span class="hint">前端代码方式维护</span></h2>
+<h2>开发配置<span class="hint">前端代码方式维护</span></h2>
 <div class="card-body">
 <label class="field" style="margin-bottom:0"><span>配置代码（JS 对象，输入即生效）</span>
 <textarea id="cfgCode" spellcheck="false" aria-label="配置代码"></textarea>
@@ -124,7 +123,7 @@ pre.code{margin:0;padding:11px 12px;background:#0f1b33;color:#dbe4f7;border-radi
   var cfg=Object.assign({},DEFAULTS);
 
   var DEFAULT_CODE=[
-    '// 视锥航线 · 页面配置（可直接维护在你的前端代码里）',
+    '// 智飞航线规划 · 页面配置（可直接维护在你的前端代码里）',
     '// 修改后即时应用到右侧预览；也可复制到宿主页面调用 OttoPlexDronePlanner.init()',
     'const config = {',
     "  accent: '#4459f5',        // 主题色",
@@ -157,9 +156,8 @@ pre.code{margin:0;padding:11px 12px;background:#0f1b33;color:#dbe4f7;border-radi
   function renderCode(){
     var embed=baseUrl(),url=embed+'?cfg='+b64(cfg);
     $('codeInstall').textContent='# 方式一：Harness 插件本地目录安装\nplugin_manager install_bundle /path/to/dsh-drone-planner\n\n# 方式二：从 GitHub 克隆后安装\ngit clone https://github.com/unhurriedly/dsh-drone-planner.git\nplugin_manager install_bundle ./dsh-drone-planner\n\n# 自检\ncurl -I '+embed;
-    $('codeIframe').textContent='<iframe\n  src="'+url+'"\n  width="100%" height="900"\n  style="border:0"\n  title="视锥航线"></iframe>';
+    $('codeIframe').textContent='<iframe\n  src="'+url+'"\n  width="100%" height="900"\n  style="border:0"\n  title="智飞航线规划"></iframe>';
     $('codeApi').textContent='<div id="drone"></div>\n<script src="'+embed+'api.js"><\/script>\n<script>\n  var app = OttoPlexDronePlanner.mount("#drone", '+JSON.stringify(cfg,null,2).replace(/\n/g,'\n  ')+');\n  app.apply({ title: "新的标题" }); // 不重载即可热更新\n<\/script>';
-    $('openConfigured').href=url;
   }
   function applyCode(){
     var text=$('cfgCode').value;

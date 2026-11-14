@@ -15,11 +15,17 @@ const assert=require('node:assert/strict');
  const devState=await page.evaluate(()=>window.OttoPlexDev&&window.OttoPlexDev.getConfig());
  check('Dev page and planner are separate pages',page.url().endsWith('/dev.html'));
  check('No back-to-planner button',await page.locator('a[href="index.html"]:has-text("返回")').count()===0);
+ check('Subtitle paragraph removed',await page.locator('.dev-head>div>p').count()===0);
+ check('Product renamed to 智飞航线规划',/智飞航线规划/.test(await page.locator('.brand').textContent())&&/智飞航线规划/.test(await page.title()));
+ const official=page.locator('#openOfficial');
+ check('Official-page button keeps the new label',/正式页面/.test(await official.textContent()));
+ check('Official-page button targets index.html without config',(await official.getAttribute('href'))==='index.html'&&await official.getAttribute('target')==='_blank');
  check('Config and code cards sit side by side',await page.evaluate(()=>{
    const a=document.querySelector('#panel-config .cols>.card').getBoundingClientRect();
    const b=document.querySelectorAll('#panel-config .cols>.card')[1].getBoundingClientRect();
    return b.left>a.right-1&&Math.abs(a.top-b.top)<2;
  }));
+ check('Config tab is labelled 开发配置',/开发配置/.test(await page.locator('.tab[data-tab="config"]').textContent()));
  check('Tabs switch between config and preview',await page.locator('#panel-config').isVisible()&&await page.locator('#panel-preview').isHidden());
  await page.locator('.tab[data-tab="preview"]').click();
  check('Preview tab reveals the planner frame',await page.locator('#panel-preview').isVisible()&&await page.locator('#panel-config').isHidden());
@@ -72,14 +78,19 @@ const assert=require('node:assert/strict');
  const clip=await page.evaluate(()=>navigator.clipboard.readText());
  check('Copy button copies snippet',clip.trim()===iframeCode.trim());
  check('Copy shows confirmation',/已复制/.test(await page.locator('#toast').textContent()));
- // config in URL renders standalone
- const url=await page.locator('#openConfigured').getAttribute('href');
+ // config in URL renders standalone (from the embed snippet)
+ const url=(iframeCode.match(/src="([^"]+)"/)||[])[1];
  const solo=await ctx.newPage();
  await solo.goto(url);
  await solo.waitForFunction(()=>window.OttoPlexDronePlanner);
  await solo.waitForTimeout(300);
  const soloAccent=await solo.evaluate(()=>getComputedStyle(document.documentElement).getPropertyValue('--blue').trim());
  check('URL config renders standalone page',soloAccent==='#159b79'&&await solo.locator('.heading h1').textContent()==='巡检航线实验室');
+ // 正式页面 opens page/index.html in a new tab
+ const [opened]=await Promise.all([ctx.waitForEvent('page'),official.click()]);
+ await opened.waitForFunction(()=>window.PlannerDemo||document.querySelector('#executeNow'),null,{timeout:15000});
+ check('Official-page button opens index.html in a new tab',/\/dsh-drone-planner\/index\.html$/.test(opened.url())&&opened.url().indexOf('cfg=')===-1);
+ await opened.close();
  // main page has no developer-mode entry
  const main=await ctx.newPage();
  await main.goto(BASE);

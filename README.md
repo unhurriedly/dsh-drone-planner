@@ -1,10 +1,10 @@
-# 视锥航线 · Harness 工作台插件
+# 智飞航线规划 · Harness 工作台插件
 
 把一份单文件的无人机视锥航线 Demo 作为 Harness Web UI 的中央面板打开。
 面板内容就是那份原本用浏览器直接打开的 `index.html`（已随插件打包到 `page/index.html`），
 因此绘制飞行区域、航线预设、生成航线、逐点编辑、三维视锥、超视距裁切与重叠区域都与本地打开完全一致。
 
-侧边栏图标排在已有图标之后，图标悬停显示「视锥航线」。
+侧边栏图标排在已有图标之后，图标悬停显示「智飞航线规划」。（locale 标题已同步改名；插件面板若仍显示旧名，重载插件即可。）
 
 ## 工作方式
 
@@ -66,7 +66,7 @@ git clone https://github.com/unhurriedly/dsh-drone-planner.git
 plugin_manager install_bundle ~/code/dsh-drone-planner
 ```
 
-把 `~/code/dsh-drone-planner` 换成实际克隆路径。安装后无需重启，侧边栏出现「视锥航线」条目。
+把 `~/code/dsh-drone-planner` 换成实际克隆路径。安装后无需重启，侧边栏出现「智飞航线规划」条目。
 自检路由（端口以实际 Harness Web 地址为准）：
 
 ```bash
@@ -76,7 +76,7 @@ curl -I http://127.0.0.1:<harness-port>/dsh-drone-planner/
 ## 更新 Demo 内容
 
 用新的 `index.html` 覆盖 `page/index.html`（本地目录安装是链接方式，覆盖即生效），
-然后在面板里刷新页面，或重新打开「视锥航线」。
+然后在面板里刷新页面，或重新打开「智飞航线规划」。
 
 ## 安全边界
 

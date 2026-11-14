@@ -1,5 +1,5 @@
 /**
- * 视锥航线 · 嵌入加载器
+ * 智飞航线规划 · 嵌入加载器
  *
  * 宿主页面引入本文件后即可用 `OttoPlexDronePlanner` 挂载与热更新配置：
  *
@@ -37,7 +37,7 @@
     var cfg = Object.assign({}, config || {})
     var iframe = document.createElement('iframe')
     iframe.src = base() + (Object.keys(cfg).length ? '?cfg=' + encode(cfg) : '')
-    iframe.title = '视锥航线'
+    iframe.title = '智飞航线规划'
     iframe.style.cssText = 'display:block;width:100%;height:' + (cfg.height || 900) + 'px;border:0'
     iframe.setAttribute('allow', 'fullscreen')
     host.innerHTML = ''
