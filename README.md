@@ -3,6 +3,8 @@
 把无人机航线规划工作台作为 **DeepSeek Harness Web UI** 的中央面板打开，并附带一个独立的
 **开发者模式**页，用于调主题/字体/文案/尺寸、复制接入代码。
 
+已在 [awesome-dsh-plugin](https://awesome-dsh-plugin.com) 插件市场收录（`tools` 分类），可直接在市场里搜索安装，见[安装](#方式一插件市场安装推荐)。
+
 插件内含两个互相独立的页面：
 
 | 页面 | 地址 | 用途 |
@@ -19,27 +21,67 @@
 
 ## 在 DeepSeek Harness 中引用
 
-### 安装
+插件已收录进 [awesome-dsh-plugin](https://awesome-dsh-plugin.com) 插件市场（`tools` 分类），
+仓库：<https://github.com/unhurriedly/dsh-drone-planner>。
+
+包名 `dsh-drone-planner`，`package.json` 声明 `dsh.bundle`（`cordis.patch.yml`）与 `dsh.client`；
+**没有依赖，也没有构建脚本**，安装不触发 `allowBuilds` 授权。
+
+### 方式一：插件市场安装（推荐）
+
+**Harness Desktop**：打开 **设置 → 插件**，切到 **插件市场** 标签（dsh 0.2.1 起也在 Plugins 页），
+搜索 `智飞航线规划` 或 `dsh-drone-planner`，点安装。装完侧边栏即出现图标，无需重启。
+
+**自建 profile / `dsh web`**：profile 装有 `dshmarket` 时同样可从「插件市场」搜索安装；
+没装市场就走方式二。
+
+### 方式二：命令行从 GitHub 安装
 
 ```bash
-# 方式一：直接按仓库名安装
-dsh plugin --profile web add github:unhurriedly/dsh-drone-planner
-
-# 方式二：本地克隆后用 plugin_manager
-git clone https://github.com/unhurriedly/dsh-drone-planner.git
-plugin_manager install_bundle ./dsh-drone-planner
+dsh plugin --profile <profile> add github:unhurriedly/dsh-drone-planner
 ```
 
-包名：`dsh-drone-planner`（公开包名，`package.json` 声明 `dsh.bundle` 与 `cordis.patch.yml`）。
+- `<profile>` 换成实际 profile：Desktop 用 `desktop`，`dsh web` 默认 `web`；
+- **Desktop 用户请优先用方式一**：在终端里往 `web` profile 安装不会出现在 Desktop 里，
+  因为 Desktop 管理的是 `desktop` profile。
 
-安装后无需重启，侧边栏出现「智飞航线规划」图标（悬停显示名称），点击即在工作台中央面板打开正式页面。
+### 方式三：本地克隆（开发或需要改代码时）
+
+本地目录安装是**符号链接**，改完仓库里的文件即时生效：
+
+```bash
+git clone https://github.com/unhurriedly/dsh-drone-planner.git
+```
+
+然后在 Harness 里让 agent 用 `plugin_manager` 安装该**绝对路径**（这是插件管理工具，不是 shell 命令）：
+
+```
+plugin_manager install_bundle /绝对路径/dsh-drone-planner
+```
+
+等价命令行写法：
+
+```bash
+dsh plugin --profile <profile> add /绝对路径/dsh-drone-planner
+```
+
+### 验证安装
+
+- 侧边栏出现「智飞航线规划」图标，点击即在工作台中央面板打开正式页面；
+- 两条路由可访问（端口以实际 Harness Web 地址为准）：
+
+```bash
+curl -I http://127.0.0.1:<harness-port>/dsh-drone-planner/
+curl -I http://127.0.0.1:<harness-port>/dsh-drone-planner/dev.html
+```
 
 ### 已安装时的更新
 
 ```bash
 cd dsh-drone-planner && git pull
-plugin_manager install_bundle ./dsh-drone-planner   # 重装以刷新版本与面板元数据
 ```
+
+然后重新安装以刷新版本与面板元数据：市场里点「更新」，或重复一次上面的安装命令。
 
 - **只改了 `page/` 下的页面/脚本**（`index.html`、`dev.html`、`api.js`）：刷新面板即可，无需重装；
   这些文件是逐请求读取并带 `cache-control: no-store`。
@@ -141,9 +183,7 @@ plugin_manager install_bundle ./dsh-drone-planner   # 重装以刷新版本与�
 ## 自检
 
 ```bash
-# 路由
-curl -I http://127.0.0.1:<harness-port>/dsh-drone-planner/
-curl -I http://127.0.0.1:<harness-port>/dsh-drone-planner/dev.html
+# 路由（前两条见「验证安装」）
 curl -I http://127.0.0.1:<harness-port>/dsh-drone-planner/api.js
 
 # 验收（需要本机 Chrome 与 Playwright）
