@@ -12,10 +12,10 @@ const context = { document: {}, console, setTimeout };
 vm.createContext(context);
 vm.runInContext(
   source.split('let screen=')[0] +
-    '\nglobalThis.api={fov,geometry,basis,insideFov,validateTarget,directionOK,effYawTarget,segYawOf,toLatLon,state,area,spacingAllowed,slopeAB,groundZfn,riskInfo,ACTION_DEFS,NO_STAY_OK,samples,cylinderOf,spiralWaypoints,lineWaypoints,greedyWaypoints,scanWaypoints,fillGaps,simRoute,simPose,simReset};',
+    '\nglobalThis.api={fov,geometry,basis,insideFov,validateTarget,directionOK,effYawTarget,segYawOf,toLatLon,state,area,spacingAllowed,slopeAB,groundZfn,riskInfo,ACTION_DEFS,NO_STAY_OK,samples,cylinderOf,spiralWaypoints,lineWaypoints,greedyWaypoints,scanWaypoints,fillGaps,simRoute,simPose,simReset,planResume,planMulti,homeLocal};',
   context,
 );
-const { fov, geometry, basis, insideFov, validateTarget, directionOK, effYawTarget, segYawOf, toLatLon, state, area, spacingAllowed, slopeAB, groundZfn, riskInfo, ACTION_DEFS, NO_STAY_OK, samples, cylinderOf, spiralWaypoints, lineWaypoints, scanWaypoints, simRoute, simPose } = context.api;
+const { fov, geometry, basis, insideFov, validateTarget, directionOK, effYawTarget, segYawOf, toLatLon, state, area, spacingAllowed, slopeAB, groundZfn, riskInfo, ACTION_DEFS, NO_STAY_OK, samples, cylinderOf, spiralWaypoints, lineWaypoints, scanWaypoints, simRoute, simPose, planResume, planMulti, homeLocal } = context.api;
 
 let checks = 0;
 function test(name, fn) { fn(); checks++; console.log('PASS ' + name); }
@@ -74,14 +74,14 @@ test('toLatLon: origin maps to home, axes convert at expected rate', () => {
 });
 
 test('Removed UI surface: no parseTask/strategy/lens/export/reset/addPoint/clipDemo', () => {
-  for (const stale of ['parseTask', 'strategy', 'baseLens', "lens===", "lens:", "directionMode", 'wideH', "clipDemo", "addPoint'", "export'", "reset'"]) {
+  for (const stale of ['parseTask', 'baseLens', "lens===", "lens:", "directionMode", 'wideH', "clipDemo", "addPoint'", "export'", "reset'"]) {
     assert.ok(!source.includes(stale), 'stale reference: ' + stale);
   }
 });
 
 test('New preset ids present exactly once in the page', () => {
   const page = fs.readFileSync(__dirname + '/page/index.html', 'utf8');
-  for (const id of ['planner-page', 'dev-page', 'tab-planner', 'tab-dev', 'cfgCode', 'executeNow', 'simulate', 'simSpeed', 'simStop', 'simStatus', 'codeInstall', 'codeIframe', 'codeApi', 'openOfficial', 'heightMode', 'groundElevation', 'speed', 'yawMode', 'bodyYaw', 'gimbalPitch', 'zoom', 'cutDistance', 'stay', 'endAction', 'homeLat', 'homeLon', 'spacingStat', 'pointLatlon', 'pointHeight', 'riskBar', 'energyItem', 'energyTime', 'energyBudget', 'altItem', 'spaceItem', 'resumeRow']) {
+  for (const id of ['planner-page', 'dev-page', 'tab-planner', 'tab-dev', 'cfgCode', 'executeNow', 'simulate', 'simSpeed', 'simStop', 'simStatus', 'planPanel', 'planBody', 'planHint', 'codeInstall', 'codeIframe', 'codeApi', 'openOfficial', 'heightMode', 'groundElevation', 'speed', 'yawMode', 'bodyYaw', 'gimbalPitch', 'zoom', 'cutDistance', 'stay', 'endAction', 'homeLat', 'homeLon', 'spacingStat', 'pointLatlon', 'pointHeight', 'riskBar', 'energyItem', 'energyTime', 'energyBudget', 'altItem', 'spaceItem']) {
     assert.ok(page.includes(`id="${id}"`), 'missing id ' + id);
   }
   for (const gone of ['id="previewFrame"', 'id="reloadPreview"', 'id="task"', 'id="parseTask"', 'id="directionMode"', 'id="basePitch"', 'id="baseLens"', 'id="strategy"', 'id="export"', 'id="reset"', 'id="clipDemo"', 'id="addPoint"', 'id="pointLens"', 'id="resultNote"', 'id="sampleCount"', 'id="sampleSpacing"', 'id="missCount"', 'id="overlapRate"', 'class="panel risk-panel"', 'id="nfzItem"', 'id="nfzAck"']) {
@@ -283,6 +283,69 @@ test('Simulation interpolates position, heading and progress along a leg', () =>
   state.points[1].height = 210;
   assert.ok(Math.abs(simPose(50).height - 160) < 1e-9);
   state.points = [];
+});
+
+test('Resume strategy splits the route into feasible sorties', () => {
+  state.config = { height: 110, speed: 5, endAction: 'hover', home: { lat: 0, lon: 0 } };
+  // ring of waypoints: every sortie needs a short out-and-back, so several fit
+  state.points = Array.from({ length: 8 }, (_, i) => {
+    const a = i * Math.PI / 4;
+    return { x: Math.cos(a) * 100, y: Math.sin(a) * 100, yaw: 0, pitch: -60, zoom: 1, height: 110, actions: [] };
+  });
+  const budget = 120; // 2 min → 600 m of flying per sortie
+  const res = planResume(state.config, budget, { x: 0, y: 0 });
+  assert.ok(res.sorties.length >= 2, 'expected several sorties, got ' + res.sorties.length);
+  assert.equal(res.covered, 8);
+  let next = 0;
+  for (const so of res.sorties) {
+    assert.equal(so.from, next, 'sorties must be contiguous');
+    assert.ok(so.to >= so.from);
+    next = so.to + 1;
+    assert.ok(so.feasible, 'sortie should be feasible');
+    assert.ok(so.time <= budget + 1e-6, `sortie over budget: ${so.time}`);
+    assert.ok(so.dist > 0);
+  }
+  assert.equal(next, 8, 'every waypoint must be assigned');
+});
+
+test('Resume strategy flags a leg longer than the budget', () => {
+  state.config = { height: 110, speed: 5, endAction: 'hover', home: { lat: 0, lon: 0 } };
+  state.points = [
+    { x: 0, y: 0, yaw: 0, pitch: -60, zoom: 1, height: 110, actions: [] },
+    { x: 5000, y: 0, yaw: 90, pitch: -60, zoom: 1, height: 110, actions: [] },
+  ];
+  const res = planResume(state.config, 60, { x: 0, y: 0 }); // 1 min budget, 5 km leg
+  assert.ok(res.sorties.length >= 1);
+  assert.ok(res.sorties.some(so => !so.feasible), 'over-long leg must be flagged');
+  state.points = [];
+});
+
+test('Multi-drone strategy partitions every waypoint exactly once', () => {
+  state.config = { height: 110, speed: 5, endAction: 'hover', home: { lat: 0, lon: 0 } };
+  state.points = Array.from({ length: 12 }, (_, i) => ({ x: (i % 4) * 150 - 225, y: Math.floor(i / 4) * 150 - 150, yaw: 0, pitch: -60, zoom: 1, height: 110, actions: [] }));
+  const res = planMulti(state.config, 600, 2, null);
+  assert.equal(res.k, 2);
+  assert.equal(res.drones.length, 2, 'both clusters must be used');
+  const all = res.drones.flatMap(d => d.idx).sort((a, b) => a - b);
+  assert.equal(all.length, 12);
+  assert.equal(new Set(all).size, 12, 'no waypoint may be assigned twice');
+  // 数组来自 vm realm，先转成宿主 realm 的数组再比对（否则原型不同会被 deepEqual 判为不等）
+  assert.deepEqual(Array.from(all), Array.from({ length: 12 }, (_, i) => i), 'all waypoints covered');
+  for (const d of res.drones) { assert.ok(d.time > 0 && d.dist > 0); assert.ok(Number.isFinite(d.local.x)); }
+  state.points = [];
+});
+
+test('Drone take-off coordinates round-trip lat/lon to local metres', () => {
+  state.config = { home: { lat: 39.9, lon: 116.4 } };
+  for (const [x, y] of [[0, 0], [120, -80], [-300, 250], [900, 400]]) {
+    const ll = toLatLon(x, y);
+    const back = homeLocal({ lat: ll[0], lon: ll[1] });
+    assert.ok(Math.abs(back.x - x) < 1e-6 && Math.abs(back.y - y) < 1e-6, `roundtrip ${x},${y} → ${back.x},${back.y}`);
+  }
+  // moving the drone 1 km north must add ~1000 m in local space
+  const north = homeLocal({ lat: 39.9 + 0.009, lon: 116.4 });
+  assert.ok(Math.abs(north.y - 1000.7) < 2, 'north scale: ' + north.y);
+  state.config = null;
 });
 
 console.log(`${checks} redesign checks passed.`);

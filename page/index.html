@@ -42,6 +42,26 @@
 #cfgStatus.bad{color:var(--red);font-weight:600}
 .dev-code-column{display:flex;flex-direction:column;gap:14px;min-width:0}
 .dev-code pre{margin:0;padding:14px 15px;background:#0f1b33;color:#dbe4f7;font:11.5px/1.7 ui-monospace,SFMono-Regular,Menlo,monospace;overflow:auto;white-space:pre-wrap;word-break:break-all;max-height:220px}
+.plan-panel{margin-top:14px;border:1px solid #f0d8b8;border-radius:10px;background:#fffdf8;overflow:hidden}
+.plan-head{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:11px 15px;border-bottom:1px solid #f4e3cc}
+.plan-head strong{font-size:13px;color:#8a5a1c}
+.plan-tabs{display:flex;gap:6px}
+.plan-tabs button{padding:5px 10px;border:1px solid #e7d3b6;border-radius:999px;background:#fff;font-size:11.5px;color:#8a5a1c;font-weight:500}
+.plan-tabs button.active{background:#fdf0dd;border-color:var(--orange);color:#a8641a;font-weight:600}
+.plan-body{padding:12px 15px;font-size:12px;color:var(--muted)}
+.plan-summary{margin:0 0 10px;line-height:1.75}
+.sortie-list{display:flex;flex-wrap:wrap;gap:8px;margin-top:2px}
+.sortie{display:flex;align-items:center;gap:7px;padding:5px 9px;border:1px solid var(--line);border-radius:7px;background:#fff;font-size:11.5px;color:var(--ink)}
+.sortie i{width:9px;height:9px;border-radius:2px;display:block;flex:none}
+.plan-table{width:100%;border-collapse:collapse;font-size:11.5px}
+.plan-table th,.plan-table td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:left;white-space:nowrap}
+.plan-table th{color:var(--muted);font-weight:500;background:#fbf8f3}
+.plan-table tr:last-child td{border-bottom:0}
+.plan-table input{width:104px;padding:4px 6px;border:1px solid var(--line);border-radius:5px;font-size:11px}
+.plan-bad{color:#c0324d;font-weight:600}
+.plan-ok{color:#159b79;font-weight:600}
+.plan-count{display:inline-flex;align-items:center;gap:6px;font-size:11.5px}
+.plan-count input{width:58px;padding:4px 6px;border:1px solid var(--line);border-radius:5px}
 @media(max-width:1080px){.dev-layout{grid-template-columns:1fr}}
 @media(max-width:720px){.module-tabs{gap:20px}.module-tabs button{font-size:12.5px}}
 </style>
@@ -267,7 +287,7 @@
 <div class="risk-bar" id="riskBar" role="status">
 <span class="risk-item warn" id="altItem" hidden>⚠ 飞行高度 <b id="altMinH">—</b> m 低于 100 m，注意高度检查</span>
 <span class="risk-item warn" id="spaceItem" hidden>⚠ <b id="spaceCount">0</b> 对航点小于最小间距</span>
-<span class="risk-item" id="energyItem">能耗<i class="fi" tabindex="0" data-tip="预计＝航程÷速度＋等待＋返航；可用＝续航×安全余量。匀速估算，未含起降、风阻与真实电池曲线。">!</i>：预计 <b id="energyTime">—</b> min / 可用 <b id="energyBudget">—</b> min<span id="energyState" class="risk-tag">—</span><label class="check" id="resumeRow" hidden><input id="resume" type="checkbox">自动断点续飞</label></span>
+<span class="risk-item" id="energyItem">能耗<i class="fi" tabindex="0" data-tip="预计＝航程÷速度＋等待＋返航；可用＝续航×安全余量。匀速估算，未含起降、风阻与真实电池曲线。">!</i>：预计 <b id="energyTime">—</b> min / 可用 <b id="energyBudget">—</b> min<span id="energyState" class="risk-tag">—</span></span>
 <details class="risk-details">
 <summary>能耗参数</summary>
 <div class="pair">
@@ -282,6 +302,17 @@
 </div>
 </details>
 </div>
+</div>
+<div class="plan-panel" id="planPanel" hidden>
+<div class="plan-head">
+<strong>电量不足 · 执行策略</strong>
+<div class="plan-tabs" role="tablist" aria-label="执行策略">
+<button type="button" role="tab" data-strategy="resume" aria-selected="true" class="active">策略 1 · 断点续飞</button>
+<button type="button" role="tab" data-strategy="multi" aria-selected="false">策略 2 · 多机协同</button>
+</div>
+<span class="tiny" id="planHint"></span>
+</div>
+<div class="plan-body" id="planBody"></div>
 </div>
 <div class="panel table-panel">
 <div class="toolbar">
@@ -454,7 +485,7 @@
 <script>
 'use strict';
 const $=id=>document.getElementById(id), R=Math.PI/180, B={xmin:-400,xmax:400,ymin:-300,ymax:300};
-const state={target:[[-160,-110],[170,-110],[205,40],[90,140],[-150,115]],points:[],selected:-1,view:'top',drawing:false,draft:[],samples:[],coverage:[],step:8,coarse:false,dirty:false,drag:null,config:null,geoms:[],source:[],busy:false,overlaps:[],hitCounts:[],spacingViolations:[],segYaw:[],resume:false,sim:{running:false,d:0,last:0,mult:4}};
+const state={target:[[-160,-110],[170,-110],[205,40],[90,140],[-150,115]],points:[],selected:-1,view:'top',drawing:false,draft:[],samples:[],coverage:[],step:8,coarse:false,dirty:false,drag:null,config:null,geoms:[],source:[],busy:false,overlaps:[],hitCounts:[],spacingViolations:[],segYaw:[],sim:{running:false,d:0,last:0,mult:4},plan:{strategy:'resume',count:2,homes:[],result:null}};
 const configIds=['height','cutDistance','speed','yawMode','bodyYaw','gimbalPitch','zoom','spacing','heightMode','groundElevation','stay','endAction','homeLat','homeLon','lineWidth','slopeAngle','slopeAspect','solidTop','enduranceMin','safetyPct'];
 function config(){const num=id=>{const v=$(id).value.trim();return v===''?null:+v};return {spacing:+$('spacing').value||0,height:+$('height').value,distance:+$('cutDistance').value,yawMode:$('yawMode').value,bodyYaw:num('bodyYaw'),pitch:num('gimbalPitch')??0,zoom:num('zoom')??1,speed:+$('speed').value||5,heightMode:$('heightMode').value,groundElevation:+$('groundElevation').value||0,stay:$('stay').value==='yes',endAction:$('endAction').value,home:{lat:+$('homeLat').value||0,lon:+$('homeLon').value||0},lineWidth:+$('lineWidth').value,slopeAngle:+$('slopeAngle').value||0,slopeAspect:+$('slopeAspect').value||0,solidTop:+$('solidTop').value||30,type:$('targetType').value};}
 function validConfig(){for(const id of configIds){const el=$(id);if(el.type!=='number'||el.value==='')continue;if(!el.checkValidity()){$('validation').textContent='请检查参数：'+((el.parentElement.querySelector('span').textContent||el.id).replace(/!$/,''));return false;}}$('validation').textContent='';return true;}
@@ -540,15 +571,67 @@ function render(){const n=state.samples.length,covered=state.coverage.filter(Boo
 
 
 $('waypointTable').innerHTML=state.points.length?state.points.map((w,i)=>{const g=state.geoms[i],ll=toLatLon(w.x,w.y),hdisp=c.heightMode==='amsl'?w.height+c.groundElevation:w.height,feq=18/Math.tan(g.fov[0]*R/2);return `<tr class="${i===state.selected?'selected':''}" data-index="${i}"><td><button aria-label="选择航点 ${i+1}">WP ${String(i+1).padStart(2,'0')}</button></td><td>${ll[0].toFixed(5)}, ${ll[1].toFixed(5)}</td><td>${format(hdisp)} m</td><td>${format(w.yaw)}° / ${format(w.pitch)}°</td><td>${format(feq,1)} mm</td><td>${format(g.validArea,0)} m²</td><td>${g.rawArea?format(g.cut/g.rawArea*100)+'%':'—'}</td></tr>`}).join(''):'<tr><td colspan="7" class="empty">暂无观察航点 · 设置飞行区域后生成</td></tr>';syncEditor();renderRisk();draw();}
+
+function ensurePlanHomes(k){const c=state.config,probe=planMulti(c,budgetSec(),k,null);
+ state.plan.homes=Array.from({length:k},(_,i)=>{const d=probe.drones[i];
+  if(!d)return {...(c.home||{lat:0,lon:0})};
+  const ll=toLatLon(d.local.x,d.local.y);return {lat:+ll[0].toFixed(6),lon:+ll[1].toFixed(6)};});}
+function renderPlan(){const panel=$('planPanel'),body=$('planBody'),c=state.config;
+ if(!c||!panel)return;
+ const r=riskInfo(c,+$('enduranceMin').value||25,(+$('safetyPct').value)||80);
+ if(!r.over||!state.points.length){panel.hidden=true;state.plan.result=null;return;}
+ panel.hidden=false;
+ const p=state.plan;
+ document.querySelectorAll('.plan-tabs button').forEach(b=>{const on=b.dataset.strategy===p.strategy;b.classList.toggle('active',on);b.setAttribute('aria-selected',String(on));});
+ const budget=budgetSec();
+ if(p.strategy==='resume'){
+   const res=planResume(c,budget,{x:0,y:0});p.result={kind:'resume',...res};
+   $('planHint').textContent='每架次上限 '+format(budget/60,1)+' min（续航 '+$('enduranceMin').value+' min × 余量 '+$('safetyPct').value+'%）';
+   const bad=res.sorties.filter(x=>!x.feasible).length;
+   const warn=bad?('，其中 <span class="plan-bad">'+bad+'</span> 个架次单段航程已超出续航，需换电/换机或提高续航'):'';
+   body.innerHTML='<p class="plan-summary">飞到电量下限即返航，落地充满后再起飞继续剩余航点。按当前航程需要 <b>'+res.sorties.length+'</b> 个架次'+warn+'。</p>'
+    +'<div class="sortie-list">'+res.sorties.map((x,i)=>'<span class="sortie"><i style="background:'+PLAN_COLORS[i%PLAN_COLORS.length]+'"></i>架次 '+(i+1)+'：WP '+(x.from+1)+'–'+(x.to+1)+' · '+format(x.dist,0)+' m · '+format(x.time/60,1)+' min '+(x.feasible?'<span class="plan-ok">✓</span>':'<span class="plan-bad">超限</span>')+'</span>').join('')+'</div>';
+ }else{
+   const k=Math.max(2,Math.min(6,+p.count||2));
+   if(p.homes.length!==k)ensurePlanHomes(k);
+   const res=planMulti(c,budget,k,p.homes);p.result={kind:'multi',...res};
+   $('planHint').textContent='每台无人机有各自的起飞点与分区航线；改经纬度即时重算';
+   const rows=res.drones.map((d,i)=>{const h=p.homes[i]||{lat:0,lon:0};
+     const st=d.feasible?'<span class="plan-ok">满足</span>':'<span class="plan-bad">超限</span>';
+     return '<tr><td><i style="display:inline-block;width:9px;height:9px;border-radius:2px;background:'+d.color+';margin-right:6px"></i>D'+d.id+'</td>'
+      +'<td><input data-home="'+i+'" data-key="lat" type="number" step="0.000001" value="'+h.lat+'"> / <input data-home="'+i+'" data-key="lon" type="number" step="0.000001" value="'+h.lon+'"></td>'
+      +'<td>'+d.idx.length+' 个</td><td>'+format(d.dist,0)+' m</td><td>'+format(d.time/60,1)+' min</td><td>'+st+'</td></tr>';}).join('');
+   body.innerHTML='<p class="plan-summary">把任务区域拆成 <b>'+res.drones.length+'</b> 台无人机的分区航线，各自从自己的起飞点出动。'
+    +'<span class="plan-count">机队数量 <input id="planDroneCount" type="number" min="2" max="6" step="1" value="'+k+'"></span></p>'
+    +'<table class="plan-table"><thead><tr><th>无人机</th><th>起飞点纬度 / 经度</th><th>负责航点</th><th>航程</th><th>预计用时</th><th>状态</th></tr></thead><tbody>'+rows+'</tbody></table>';
+ }
+}
+function drawPlan(ctx,c,gnd){const res=state.plan&&state.plan.result;if(!res||!state.points.length)return;
+ const three=state.view==='3d',z=q=>three?gnd(q.x,q.y)+(q.height??c.height):gnd(q.x,q.y);
+ const leg=(pts,color,home)=>{
+  const homePt=[home.x,home.y,gnd(home.x,home.y)];
+  path(ctx,[homePt,...pts.map(q=>[q.x,q.y,z(q)])],false);ctx.setLineDash([]);ctx.lineWidth=2.2;ctx.strokeStyle=color;ctx.stroke();
+  if(pts.length){const last=pts[pts.length-1];ctx.setLineDash([5,4]);path(ctx,[[last.x,last.y,z(last)],homePt],false);ctx.strokeStyle=color+'aa';ctx.lineWidth=1.3;ctx.stroke();ctx.setLineDash([]);}
+ };
+ const home=(home,color,label)=>{const xy=projection(home.x,home.y,gnd(home.x,home.y));
+  ctx.beginPath();ctx.moveTo(xy[0],xy[1]-6);ctx.lineTo(xy[0]+5.5,xy[1]+4);ctx.lineTo(xy[0]-5.5,xy[1]+4);ctx.closePath();ctx.fillStyle=color;ctx.fill();ctx.strokeStyle='#fff';ctx.lineWidth=1;ctx.stroke();
+  if(label){ctx.font='9px -apple-system,sans-serif';ctx.fillStyle=color;ctx.fillText(label,xy[0]+8,xy[1]+4);}};
+ if(res.kind==='resume'){
+  res.sorties.forEach((so,i)=>leg(so.idx.map(k=>state.points[k]),PLAN_COLORS[i%PLAN_COLORS.length],{x:0,y:0}));
+  home({x:0,y:0},PLAN_COLORS[0],'H');
+ }else{
+  res.drones.forEach(d=>{leg(d.idx.map(k=>state.points[k]),d.color,d.local);home(d.local,d.color,'D'+d.id);});
+ }
+}
 function riskInfo(c,endMin=25,safePct=80){const waits=state.points.reduce((s,w)=>s+(w.actions||[]).reduce((t,a)=>t+(a.type==='wait'&&a.params&&Number.isFinite(+a.params.sec)?Math.max(0,+a.params.sec):0),0),0);const v=Math.max(.1,c.speed);const travel=routeLength()/v;const ret=c.endAction==='rth'&&state.points.length?Math.hypot(state.points[state.points.length-1].x,state.points[state.points.length-1].y)/v:0;const time=travel+waits+ret;const budget=endMin*60*(safePct/100);return {waits,travel,ret,time,budget,over:time>budget};}
 function renderRisk(){const c=state.config;if(!c)return;const minH=state.points.length?Math.min(...state.points.map(w=>Number.isFinite(w.height)?w.height:c.height)):null;
  const showAlt=minH!=null&&minH<100;$('altItem').hidden=!showAlt;if(showAlt)$('altMinH').textContent=format(minH,0);
  const sv=state.spacingViolations.length;$('spaceItem').hidden=!sv;if(sv)$('spaceCount').textContent=sv;
  const r=riskInfo(c,+$('enduranceMin').value||25,(+$('safetyPct').value)||80);
  $('energyTime').textContent=format(r.time/60,1);$('energyBudget').textContent=format(r.budget/60,1);
- $('energyState').textContent=r.over?(state.resume?'无法飞完全程 · 断点续飞':'无法飞完全程'):'电量满足全程';
+ $('energyState').textContent=r.over?'无法飞完全程 · 见下方策略':'电量满足全程';
  $('energyState').className='risk-tag '+(r.over?'risk-warn':'risk-ok');
- $('energyItem').classList.toggle('warn',r.over);$('resumeRow').hidden=!r.over;}
+ $('energyItem').classList.toggle('warn',r.over);renderPlan();}
 function renderActions(){const w=state.points[state.selected],stay=state.config?state.config.stay:true;$('actionCount').textContent=w?(w.actions||[]).length+' 项':'0';if(!w){$('actionList').innerHTML='<p class="hint">生成航线并选择航点后配置动作</p>';return;}const acts=w.actions||[];$('actionList').innerHTML=acts.length?acts.map((a,i)=>{const def=ACTION_DEFS[a.type]||{group:'其他',label:a.type};const blocked=!stay&&!NO_STAY_OK.has(a.type);const groups={};Object.entries(ACTION_DEFS).forEach(([k,d])=>{if(stay||NO_STAY_OK.has(k)||k===a.type)(groups[d.group]=groups[d.group]||[]).push([k,d]);});const sel=`<select data-i="${i}" class="act-type" aria-label="动作类型">${Object.entries(groups).map(([g,items])=>`<optgroup label="${g}">${items.map(([k,d])=>`<option value="${k}"${k===a.type?' selected':''}>${d.label}</option>`).join('')}</optgroup>`).join('')}</select>`;const prm=def.param?`<input data-i="${i}" class="act-param" type="${def.param.type}" value="${a.params&&a.params[def.param.key]!=null?a.params[def.param.key]:def.param.def}"${def.param.type==='number'?` min="${def.param.min}" max="${def.param.max}" step="${def.param.step}"`:''} title="${def.param.label}" aria-label="${def.param.label}">`:'<span class="tiny act-noparam">—</span>';return `<div class="act-row"${blocked?' data-blocked="1"':''}>${sel}${prm}<button class="small-button" data-act="up" data-i="${i}"${stay?'':' disabled'} title="上移">↑</button><button class="small-button" data-act="down" data-i="${i}"${stay?'':' disabled'} title="下移">↓</button><button class="small-button" data-act="del" data-i="${i}" title="删除">删</button>${blocked?'<span class="tiny">停留=否不支持</span>':''}</div>`}).join(''):'<p class="hint">暂无动作，点击下方「新增动作」</p>';}
 // ---- 模拟飞行：沿航线匀速推进机体，实时绘制飞行过程中的视锥 ----
 function simRoute(){const pts=state.points,segs=[];let acc=0;for(let i=0;i<pts.length-1;i++){const a=pts[i],b=pts[i+1],len=Math.hypot(b.x-a.x,b.y-a.y);if(len<=1e-9)continue;segs.push({i,a,b,len,start:acc});acc+=len;}return {segs,total:acc};}
@@ -589,6 +672,54 @@ function drawSim(ctx,c,gnd){const sim=state.sim;if(!sim||(!sim.d&&!sim.running))
  ctx.beginPath();ctx.moveTo(xy[0],xy[1]);ctx.lineTo(tip[0],tip[1]);ctx.strokeStyle='#8a4f10';ctx.lineWidth=2;ctx.stroke();
  ctx.font='10px -apple-system,sans-serif';ctx.fillStyle='#a8641a';ctx.textAlign='center';ctx.fillText('模拟 '+Math.round(pose.progress*100)+'%',xy[0],xy[1]-13);ctx.textAlign='left';}
 
+// ---- 电量不足的两种执行策略：断点续飞 / 多机协同 ----
+const PLAN_COLORS=['#dc8b27','#159b79','#a855ce','#d74e66','#4459f5','#0f766e'];
+function budgetSec(){return Math.max(60,(+$('enduranceMin').value||25)*60*((+$('safetyPct').value||80)/100));}
+function waitSecOf(w){return (w.actions||[]).reduce((t,a)=>t+(a.type==='wait'&&a.params&&Number.isFinite(+a.params.sec)?Math.max(0,+a.params.sec):0),0);}
+function homeLocal(home){const h=(state.config&&state.config.home)||{lat:0,lon:0},R0=6378137,kp=Math.PI/180;
+ if(!home||!Number.isFinite(+home.lat)||!Number.isFinite(+home.lon))return {x:0,y:0};
+ return {x:(+home.lon-h.lon)*kp*R0*Math.cos(h.lat*kp),y:(+home.lat-h.lat)*kp*R0};}
+function planResume(c,budget,home){const pts=state.points,v=Math.max(.1,c.speed),H=home||{x:0,y:0},sorties=[];let i=0;
+ while(i<pts.length&&sorties.length<24){
+   const idx=[];let dist=0,waits=0,cur=H,from=i,impossible=false;
+   while(i<pts.length){
+     const w=pts[i],leg=Math.hypot(w.x-cur.x,w.y-cur.y),back=Math.hypot(w.x-H.x,w.y-H.y);
+     const t=(dist+leg+back)/v+waits+waitSecOf(w);
+     if(t>budget){ if(!idx.length){idx.push(i);dist+=leg;waits+=waitSecOf(w);impossible=true;i++;} break; }
+     idx.push(i);dist+=leg;waits+=waitSecOf(w);cur=w;i++;
+   }
+   if(!idx.length)break;
+   const last=pts[idx[idx.length-1]],back=Math.hypot(last.x-H.x,last.y-H.y),time=(dist+back)/v+waits;
+   sorties.push({from,to:i-1,idx,dist:dist+back,out:dist,back,time,feasible:time<=budget+1e-6&&!impossible});
+ }
+ return {sorties,covered:i,total:pts.length};}
+function planMulti(c,budget,count,homes){const pts=state.points,v=Math.max(.1,c.speed);
+ if(pts.length<2)return {drones:[],k:2};
+ const k=Math.max(2,Math.min(6,Math.round(count||2)));
+ let cents=[];for(let i=0;i<k;i++){const p=pts[Math.round(i*(pts.length-1)/Math.max(1,k-1))];cents.push({x:p.x,y:p.y});}
+ let assign=pts.map(()=>-1);
+ for(let iter=0;iter<14;iter++){
+   let changed=false;
+   pts.forEach((p,idx)=>{let bi=0,bd=Infinity;cents.forEach((cc,ci)=>{const d=(p.x-cc.x)**2+(p.y-cc.y)**2;if(d<bd){bd=d;bi=ci;}});if(assign[idx]!==bi){assign[idx]=bi;changed=true;}});
+   const sum=cents.map(()=>({x:0,y:0,n:0}));pts.forEach((p,idx)=>{const t=sum[assign[idx]];t.x+=p.x;t.y+=p.y;t.n++;});
+   cents=cents.map((cc,i)=>sum[i].n?{x:sum[i].x/sum[i].n,y:sum[i].y/sum[i].n}:cc);
+   if(!changed)break;
+ }
+ const drones=[];
+ for(let ci=0;ci<k;ci++){
+   const members=pts.map((p,i)=>({p,i})).filter(o=>assign[o.i]===ci);
+   if(!members.length)continue;
+   const home=(homes&&homes[ci])||null;
+   const H=home?homeLocal(home):{x:cents[ci].x,y:cents[ci].y};
+   const rest=members.slice(),order=[];let cur=H;
+   while(rest.length){let bi=0,bd=Infinity;rest.forEach((o,j)=>{const d=Math.hypot(o.p.x-cur.x,o.p.y-cur.y);if(d<bd){bd=d;bi=j;}});const o=rest.splice(bi,1)[0];order.push(o);cur=o.p;}
+   let out=0;let prev=H;for(const o of order){out+=Math.hypot(o.p.x-prev.x,o.p.y-prev.y);prev=o.p;}
+   const lastP=order[order.length-1].p,back=c.endAction==='rth'?Math.hypot(lastP.x-H.x,lastP.y-H.y):0;
+   const waits=order.reduce((t,o)=>t+waitSecOf(o.p),0),time=(out+back)/v+waits;
+   drones.push({id:drones.length+1,color:PLAN_COLORS[drones.length%PLAN_COLORS.length],local:H,idx:order.map(o=>o.i),dist:out+back,time,feasible:time<=budget+1e-6});
+ }
+ return {drones,k};}
+
 let screen={scale:1,cx:0,cy:0},hitPoints=[];
 function canvasSetup(canvas){const rect=canvas.getBoundingClientRect(),dpr=Math.min(window.devicePixelRatio||1,2);canvas.width=Math.round(rect.width*dpr);canvas.height=Math.round(rect.height*dpr);const ctx=canvas.getContext('2d');ctx.scale(dpr,dpr);return {ctx,w:rect.width,h:rect.height};}
 function projection(x,y,z=0){if(state.view==='top')return [screen.cx+x*screen.scale,screen.cy-y*screen.scale];return [screen.cx+(x*.82-y*.55)*screen.scale,screen.cy+(x*.32+y*.48-z*.95)*screen.scale];}
@@ -604,7 +735,7 @@ if($('showOverlap').checked&&state.overlaps.length){
 if(c.type==='area'||c.type==='slope'){polygon(ctx,state.target.map(q=>[q[0],q[1],gnd(q[0],q[1])]),'#4459f50c','#5969ef',2);}else if(c.type==='solid'){const {cx,cy,rad,top}=cylinderOf(c),N=48,base=[];for(let k=0;k<N;k++){const a=k*2*Math.PI/N,x=cx+Math.cos(a)*rad,y=cy+Math.sin(a)*rad;base.push([x,y,gnd(x,y)]);}const tops=base.map(p=>[p[0],p[1],p[2]+top]);polygon(ctx,base,'#4459f508','#5969ef',1.6);polygon(ctx,tops,'#4459f50c','#5969ef',2);if(state.view==='3d')for(let k=0;k<N;k+=2){const j=(k+1)%N;polygon(ctx,[base[k],base[j],tops[j],tops[k]],'#4459f506','#5969ef30',.7);}}else if(c.type==='line'){path(ctx,state.target,false);ctx.lineWidth=c.lineWidth*screen.scale;ctx.strokeStyle='#6976ef25';ctx.lineCap='round';ctx.lineJoin='round';ctx.stroke();ctx.lineWidth=2;ctx.strokeStyle='#5969ef';ctx.setLineDash([5,4]);ctx.stroke();ctx.setLineDash([]);}else{for(const [i,p] of state.target.entries()){const xy=projection(...p);ctx.beginPath();ctx.arc(...xy,6,0,Math.PI*2);ctx.fillStyle='#4459f5';ctx.fill();ctx.fillText('T'+(i+1),xy[0]+9,xy[1]+4);}}
 if($('showMiss').checked){ctx.fillStyle='#d74e6690';state.samples.forEach((p,i)=>{if(!state.coverage[i]){let xy=projection(...p);ctx.fillRect(xy[0]-1.3,xy[1]-1.3,2.6,2.6);}});}
 if(state.points.length){ctx.setLineDash([5,4]);path(ctx,state.points.map(p=>[p.x,p.y,state.view==='3d'?gnd(p.x,p.y)+(p.height??c.height):0]),false);ctx.strokeStyle='#5968e8';ctx.lineWidth=1.8;ctx.stroke();ctx.setLineDash([]);}hitPoints=[];state.points.forEach((p,i)=>{const xy=projection(p.x,p.y,state.view==='3d'?gnd(p.x,p.y)+(p.height??c.height):0);hitPoints.push(xy);ctx.beginPath();ctx.arc(...xy,i===state.selected?9:6.5,0,Math.PI*2);ctx.fillStyle=i===state.selected?'#4459f5':'#fff';ctx.fill();ctx.strokeStyle='#4459f5';ctx.lineWidth=1.7;ctx.stroke();ctx.fillStyle=i===state.selected?'white':'#4459f5';ctx.font='9px -apple-system,sans-serif';ctx.textAlign='center';ctx.fillText(i+1,xy[0],xy[1]+3);ctx.textAlign='left';if(i===state.selected){let d=[Math.sin(p.yaw*R),Math.cos(p.yaw*R)];const tip=projection(p.x+d[0]*35,p.y+d[1]*35,state.view==='3d'?gnd(p.x,p.y)+(p.height??c.height):0);ctx.beginPath();ctx.moveTo(...xy);ctx.lineTo(...tip);ctx.strokeStyle='#263fb8';ctx.stroke();}});
-if(state.drawing){polygon(ctx,state.draft,'#4459f515','#4459f5',2);state.draft.forEach(p=>{ctx.beginPath();ctx.arc(...projection(...p),4,0,Math.PI*2);ctx.fillStyle='#4459f5';ctx.fill();});}drawSim(ctx,c,gnd);ctx.font='11px -apple-system,sans-serif';ctx.fillStyle='#667798';ctx.fillText(state.view==='top'?'点击选择航点 · 拖动改变位置':'三维为等轴投影 · 切回俯视可拖动',16,h-15);$('viewLabel').textContent=state.view==='top'?'局部平面 / 单位：米':'三维视锥 / 地面 z = 0';$('compass').textContent=state.view==='top'?'↑ 北 N':'等轴视图';}
+if(state.drawing){polygon(ctx,state.draft,'#4459f515','#4459f5',2);state.draft.forEach(p=>{ctx.beginPath();ctx.arc(...projection(...p),4,0,Math.PI*2);ctx.fillStyle='#4459f5';ctx.fill();});}drawSim(ctx,c,gnd);drawPlan(ctx,c,gnd);ctx.font='11px -apple-system,sans-serif';ctx.fillStyle='#667798';ctx.fillText(state.view==='top'?'点击选择航点 · 拖动改变位置':'三维为等轴投影 · 切回俯视可拖动',16,h-15);$('viewLabel').textContent=state.view==='top'?'局部平面 / 单位：米':'三维视锥 / 地面 z = 0';$('compass').textContent=state.view==='top'?'↑ 北 N':'等轴视图';}
 function drawProfile(){const {ctx,w,h}=canvasSetup($('profile')),wp=state.points[state.selected],c=state.config;if(!wp||w<1||h<1)return;const wh=Number.isFinite(wp.height)?wp.height:c.height;let scale=Math.max(.05,Math.min((w-35)/Math.max(c.distance*1.1,160),(h-38)/Math.max(wh*1.2,130)));let ox=22,oy=h-22,dy=oy-wh*scale;ctx.strokeStyle='#cad5e5';ctx.beginPath();ctx.moveTo(10,oy);ctx.lineTo(w-10,oy);ctx.stroke();ctx.strokeStyle='#d79736';ctx.setLineDash([4,3]);ctx.beginPath();ctx.arc(ox,dy,c.distance*scale,0,Math.PI/2);ctx.stroke();ctx.setLineDash([]);const len=Math.min(c.distance*1.15,wh/Math.max(.001,Math.sin(-wp.pitch*R)));ctx.beginPath();ctx.moveTo(ox,dy);ctx.lineTo(ox+Math.cos(wp.pitch*R)*len*scale,dy-Math.sin(wp.pitch*R)*len*scale);ctx.strokeStyle='#4459f5';ctx.lineWidth=2;ctx.stroke();ctx.beginPath();ctx.arc(ox,dy,4,0,Math.PI*2);ctx.fillStyle='#4459f5';ctx.fill();ctx.font='10px -apple-system,sans-serif';ctx.fillStyle='#667798';ctx.fillText(wp.pitch+'°',ox+8,dy+13);ctx.fillText('地面',w-36,oy+14);}
 function pointFromEvent(e){const r=$('scene').getBoundingClientRect();return [(e.clientX-r.left-screen.cx)/screen.scale,-(e.clientY-r.top-screen.cy)/screen.scale];}
 function chooseHit(e){const r=$('scene').getBoundingClientRect(),p=[e.clientX-r.left,e.clientY-r.top];let index=-1,best=16;hitPoints.forEach((q,i)=>{const d=dist(p,q);if(d<best){best=d;index=i;}});return index;}
@@ -631,13 +762,16 @@ $('restorePoint').onclick=()=>{if(state.selected<0)return;const src=state.source
 $('actionList').addEventListener('change',e=>{const w=state.points[state.selected];if(!w||!e.target.dataset.i)return;const i=+e.target.dataset.i;if(!(w.actions&&w.actions[i]))return;if(e.target.classList.contains('act-type')){const t=e.target.value,def=ACTION_DEFS[t];w.actions[i].type=t;w.actions[i].params=def.param?{[def.param.key]:def.param.def}:{};recalc();}else if(e.target.classList.contains('act-param')){const def=ACTION_DEFS[w.actions[i].type];if(def&&def.param)w.actions[i].params[def.param.key]=def.param.type==='number'?+e.target.value:e.target.value;renderRisk();}});
 $('actionList').addEventListener('click',e=>{const b=e.target.closest('button[data-act]');if(!b||b.disabled)return;const w=state.points[state.selected];if(!w)return;const i=+b.dataset.i,a=w.actions;if(!a||!a[i])return;if(b.dataset.act==='del')a.splice(i,1);if(b.dataset.act==='up'&&i>0)[a[i-1],a[i]]=[a[i],a[i-1]];if(b.dataset.act==='down'&&i<a.length-1)[a[i+1],a[i]]=[a[i],a[i+1]];recalc();});
 $('addAction').onclick=()=>{const w=state.points[state.selected];if(!w)return toast('请先选择航点');w.actions=w.actions||[];if(w.actions.length>=20)return toast('单航点最多 20 个动作');w.actions.push({id:'a'+Date.now().toString(36),type:'photo',params:{}});recalc();};
-$('resume').onchange=()=>{state.resume=$('resume').checked;renderRisk();};
 $('executeNow').onclick=()=>toast('「立即执行」为界面示意，不会执行真实飞行任务');
 $('simulate').onclick=()=>{const sim=state.sim;if(!state.points.length)return toast('请先在「航线预设」里生成航线');const {total}=simRoute();if(total<=1)return toast('航线太短，无法模拟飞行');
  if(sim.running){sim.running=false;sim.last=0;updateSimUI();draw();return;}
  if(sim.d>=total)sim.d=0;sim.mult=+($('simSpeed').value||4);sim.running=true;sim.last=0;updateSimUI();requestAnimationFrame(simTick);};
 $('simSpeed').onchange=()=>{state.sim.mult=+$('simSpeed').value||4;};
 $('simStop').onclick=()=>{simReset();draw();};
+document.querySelectorAll('.plan-tabs button').forEach(b=>{b.onclick=()=>{state.plan.strategy=b.dataset.strategy;state.plan.result=null;renderPlan();draw();};});
+$('planBody').addEventListener('change',e=>{const t=e.target;
+ if(t.id==='planDroneCount'){const k=Math.max(2,Math.min(6,+t.value||2));state.plan.count=k;state.plan.homes=[];state.plan.result=null;renderPlan();draw();return;}
+ if(t.dataset.home!=null){const i=+t.dataset.home,key=t.dataset.key;const h=state.plan.homes[i]||{lat:0,lon:0};h[key]=+t.value;state.plan.homes[i]=h;state.plan.result=null;renderPlan();draw();}});
 const fieldTip=document.createElement('div');fieldTip.id='fieldTip';document.body.appendChild(fieldTip);
 function showTip(t){const r=t.getBoundingClientRect();fieldTip.textContent=t.dataset.tip;fieldTip.classList.add('show');const w=fieldTip.offsetWidth,h=fieldTip.offsetHeight;let x=r.left+r.width/2-w/2;x=Math.max(8,Math.min(x,window.innerWidth-w-8));let y=r.top-h-8;if(y<8)y=r.bottom+8;fieldTip.style.left=x+'px';fieldTip.style.top=y+'px';}
 function hideTip(){fieldTip.classList.remove('show');}
@@ -768,7 +902,7 @@ function copyText(text){
 })();
 
 // Expose deterministic geometry for local validation; no network or device control.
-window.PlannerDemo={state,config,basis,fov,geometry,geometrySlope,insideFov,area,convexIntersection,spacingAllowed,validateTarget,samples,generate,setTarget,recalc,directionOK,effYawTarget,segYawOf,toLatLon,slopeAB,groundZfn,riskInfo,ACTION_DEFS,NO_STAY_OK,cylinderOf,spiralWaypoints,lineWaypoints,greedyWaypoints,scanWaypoints,fillGaps,simRoute,simPose,simReset};
+window.PlannerDemo={state,config,basis,fov,geometry,geometrySlope,insideFov,area,convexIntersection,spacingAllowed,validateTarget,samples,generate,setTarget,recalc,directionOK,effYawTarget,segYawOf,toLatLon,slopeAB,groundZfn,riskInfo,ACTION_DEFS,NO_STAY_OK,cylinderOf,spiralWaypoints,lineWaypoints,greedyWaypoints,scanWaypoints,fillGaps,simRoute,simPose,simReset,planResume,planMulti,homeLocal,budgetSec};
 syncControls();setTarget(state.target);generate();
 </script>
 </body></html>

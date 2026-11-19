@@ -113,6 +113,48 @@ const assert=require('node:assert/strict');
    return pausedOk;
  })());
 
+ // 电量不足的两种执行策略
+ check('Strategy panel hidden while energy suffices',await page.locator('#planPanel').isHidden());
+ await page.locator('details:has(#enduranceMin) summary').click();
+ // 5 min × 10% 余量 = 30 s 预算，任何航线都必然超出
+ await page.locator('#enduranceMin').fill('5');await page.locator('#enduranceMin').dispatchEvent('change');
+ await page.locator('#safetyPct').fill('10');await page.locator('#safetyPct').dispatchEvent('change');
+ await page.waitForTimeout(350);
+ check('Strategy panel appears when the route exceeds endurance',await page.locator('#planPanel').isVisible()&&/无法飞完全程/.test(await page.locator('#energyState').textContent()));
+ check('Resume strategy lists sorties',await page.locator('.sortie').count()>=2);
+ check('Resume sorties report distance and minutes',/min/.test(await page.locator('.sortie').first().textContent()));
+ await page.locator('.plan-tabs button[data-strategy="multi"]').click();
+ await page.waitForTimeout(350);
+ const multi=await page.evaluate(()=>{
+   const rows=[...document.querySelectorAll('.plan-table tbody tr')];
+   const assigned=rows.map(r=>parseInt(r.children[2].textContent,10));
+   return {rows:rows.length,inputs:document.querySelectorAll('[data-home]').length,total:assigned.reduce((a,b)=>a+b,0),points:PlannerDemo.state.points.length};
+ });
+ check('Multi-drone strategy splits into 2+ drones',multi.rows>=2&&multi.inputs===multi.rows*2);
+ check('Every waypoint is assigned exactly once',multi.total===multi.points);
+ check('Each drone has its own take-off coordinates',await page.evaluate(()=>PlannerDemo.state.plan.homes.length>=2&&PlannerDemo.state.plan.homes.every(h=>Number.isFinite(h.lat)&&Number.isFinite(h.lon))));
+ await page.locator('#planDroneCount').fill('3');await page.locator('#planDroneCount').dispatchEvent('change');
+ await page.waitForTimeout(350);
+ check('Fleet size is adjustable',await page.locator('.plan-table tbody tr').count()===3&&(await page.evaluate(()=>PlannerDemo.state.plan.homes.length))===3);
+ const latBefore=await page.evaluate(()=>PlannerDemo.state.plan.homes[0].lat);
+ await page.locator('[data-home="0"][data-key="lat"]').fill('39.95');
+ await page.locator('[data-home="0"][data-key="lat"]').dispatchEvent('change');
+ await page.waitForTimeout(350);
+ check('Editing a take-off point is kept',await page.evaluate(v=>PlannerDemo.state.plan.homes[0].lat===v,39.95)&&latBefore!==39.95);
+ check('Plan routes are drawn on the canvas',await page.evaluate(()=>{
+   const cv=document.getElementById('scene'),d=cv.getContext('2d').getImageData(0,0,cv.width,cv.height).data;
+   const targets=[[220,139,39],[21,155,121],[168,85,206],[215,78,102]];
+   for(let i=0;i<d.length;i+=4)for(const t of targets)if(Math.abs(d[i]-t[0])<16&&Math.abs(d[i+1]-t[1])<16&&Math.abs(d[i+2]-t[2])<16)return true;
+   return false;
+ }));
+ await page.locator('#enduranceMin').fill('60');await page.locator('#enduranceMin').dispatchEvent('change');
+ await page.locator('#safetyPct').fill('100');await page.locator('#safetyPct').dispatchEvent('change');
+ await page.waitForTimeout(350);
+ check('Strategy panel hides again when energy suffices',await page.locator('#planPanel').isHidden()&&/电量满足全程/.test(await page.locator('#energyState').textContent()));
+ await page.locator('#enduranceMin').fill('25');await page.locator('#enduranceMin').dispatchEvent('change');
+ await page.locator('#safetyPct').fill('80');await page.locator('#safetyPct').dispatchEvent('change');
+ await page.waitForTimeout(200);
+
  // 合并为单页两 tab 后，规划侧功能必须照旧
  check('Planner tab renders the risk bar',await page.locator('#riskBar').isVisible()&&await page.locator('#energyTime').textContent()!=='—');
  const beforeActions=await page.evaluate(()=>JSON.stringify(PlannerDemo.state.points));

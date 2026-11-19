@@ -1,6 +1,6 @@
 {
   "name": "dsh-drone-planner",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "type": "module",
   "description": "Drone frustum route lab for the Harness Web UI, with a developer mode page for theme/copy/embed config",
   "exports": {
@@ -25,7 +25,9 @@
     "README.md",
     "preview-dev-mode.png",
     "screenshots.json",
-    "preview-sim-3d.png"
+    "preview-sim-3d.png",
+    "preview-plan-resume.png",
+    "preview-plan-multi.png"
   ],
   "dsh": {
     "bundle": {
