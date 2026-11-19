@@ -23,6 +23,12 @@ const assert=require('node:assert/strict');
  check('Planner tab active by default',await page.locator('#planner-page').isVisible()&&await page.locator('#dev-page').isHidden());
  check('Planner still generates routes',await page.evaluate(()=>PlannerDemo.state.points.length>0));
 
+ // 立即执行 属于航线规划 tab（放在画布工具条右侧）
+ const execBox=await page.locator('#executeNow').boundingBox();
+ const toolbarBox=await page.locator('.toolbar').first().boundingBox();
+ check('立即执行 lives in the planner toolbar',execBox&&toolbarBox&&execBox.y>=toolbarBox.y-2&&execBox.y+execBox.height<=toolbarBox.y+toolbarBox.height+2);
+ check('立即执行 is visible on the planner tab',await page.locator('#executeNow').isVisible());
+
  // 2. legacy /dev.html route still lands on the dev tab
  const legacy=await ctx.newPage();
  await legacy.goto(BASE+'dev.html');
@@ -49,11 +55,14 @@ const assert=require('node:assert/strict');
  await page.locator('#tab-dev').click();
  await page.waitForTimeout(300);
  check('No back-to-planner button',await page.locator('a:has-text("返回")').count()===0);
- check('Editor and preview sit side by side',await page.evaluate(()=>{
+ check('立即执行 is not shown on the dev tab',await page.locator('#executeNow').isHidden());
+ check('Heading no longer carries the action cluster',await page.locator('.heading-actions').count()===0);
+ check('Config editor and code snippets sit side by side',await page.evaluate(()=>{
    const a=document.querySelector('.dev-editor').getBoundingClientRect();
-   const b=document.querySelector('.dev-preview').getBoundingClientRect();
+   const b=document.querySelector('.dev-code-column').getBoundingClientRect();
    return b.left>a.right-1&&Math.abs(a.top-b.top)<2;
  }));
+ check('Live preview panel removed',await page.locator('#previewFrame').count()===0&&await page.locator('.devices').count()===0&&await page.locator('#reloadPreview').count()===0);
  check('Config is a code editor, not form controls',await page.locator('#cfgCode').count()===1&&await page.locator('#cfgAccentHex').count()===0);
 
  // 5. apply / error / reset
@@ -69,24 +78,7 @@ const assert=require('node:assert/strict');
  const afterBad=await page.evaluate(()=>window.OttoPlexDev.getConfig());
  check('Broken code errors and keeps the last config',/解析失败/.test(await page.locator('#cfgStatus').textContent())&&afterBad.accent==='#159b79');
 
- // 6. preview reflects config
- const frame=page.frameLocator('#previewFrame');
- await frame.locator('#executeNow').waitFor({timeout:15000});
- await page.waitForTimeout(500);
- const live=await frame.locator('body').evaluate(()=>({
-   accent:getComputedStyle(document.documentElement).getPropertyValue('--blue').trim(),
-   size:getComputedStyle(document.body).fontSize,
-   title:document.querySelector('.heading h1').textContent,
-   scene:Math.round(document.getElementById('scene').getBoundingClientRect().height),
-   tab:!!document.getElementById('planner-page'),
- }));
- check('Preview applies theme live',live.accent==='#159b79');
- check('Preview applies font size live',live.size==='17px');
- check('Preview applies copy live',live.title==='巡检航线实验室');
- check('Preview applies canvas size live',Math.abs(live.scene-600)<=2);
- check('Preview shows the planner tab',live.tab===true);
-
- // 7. switching back redraws the planner with the configured size
+ // 6. the planner tab itself carries the applied look (no preview needed)
  await page.locator('#tab-planner').click();
  await page.waitForTimeout(500);
  const scene=await page.locator('#scene').evaluate(el=>({h:Math.round(el.getBoundingClientRect().height),w:el.width}));

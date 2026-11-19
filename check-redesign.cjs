@@ -81,10 +81,10 @@ test('Removed UI surface: no parseTask/strategy/lens/export/reset/addPoint/clipD
 
 test('New preset ids present exactly once in the page', () => {
   const page = fs.readFileSync(__dirname + '/page/index.html', 'utf8');
-  for (const id of ['planner-page', 'dev-page', 'tab-planner', 'tab-dev', 'cfgCode', 'previewFrame', 'codeInstall', 'codeIframe', 'codeApi', 'openOfficial', 'heightMode', 'groundElevation', 'speed', 'yawMode', 'bodyYaw', 'gimbalPitch', 'zoom', 'cutDistance', 'stay', 'endAction', 'homeLat', 'homeLon', 'spacingStat', 'pointLatlon', 'pointHeight', 'riskBar', 'energyItem', 'energyTime', 'energyBudget', 'altItem', 'spaceItem', 'resumeRow']) {
+  for (const id of ['planner-page', 'dev-page', 'tab-planner', 'tab-dev', 'cfgCode', 'executeNow', 'codeInstall', 'codeIframe', 'codeApi', 'openOfficial', 'heightMode', 'groundElevation', 'speed', 'yawMode', 'bodyYaw', 'gimbalPitch', 'zoom', 'cutDistance', 'stay', 'endAction', 'homeLat', 'homeLon', 'spacingStat', 'pointLatlon', 'pointHeight', 'riskBar', 'energyItem', 'energyTime', 'energyBudget', 'altItem', 'spaceItem', 'resumeRow']) {
     assert.ok(page.includes(`id="${id}"`), 'missing id ' + id);
   }
-  for (const gone of ['id="task"', 'id="parseTask"', 'id="directionMode"', 'id="basePitch"', 'id="baseLens"', 'id="strategy"', 'id="export"', 'id="reset"', 'id="clipDemo"', 'id="addPoint"', 'id="pointLens"', 'id="resultNote"', 'id="sampleCount"', 'id="sampleSpacing"', 'id="missCount"', 'id="overlapRate"', 'class="panel risk-panel"', 'id="nfzItem"', 'id="nfzAck"']) {
+  for (const gone of ['id="previewFrame"', 'id="reloadPreview"', 'id="task"', 'id="parseTask"', 'id="directionMode"', 'id="basePitch"', 'id="baseLens"', 'id="strategy"', 'id="export"', 'id="reset"', 'id="clipDemo"', 'id="addPoint"', 'id="pointLens"', 'id="resultNote"', 'id="sampleCount"', 'id="sampleSpacing"', 'id="missCount"', 'id="overlapRate"', 'class="panel risk-panel"', 'id="nfzItem"', 'id="nfzAck"']) {
     assert.ok(!page.includes(gone), 'unexpected id ' + gone);
   }
 });

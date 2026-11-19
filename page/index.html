@@ -8,7 +8,7 @@
 .overlap-summary{display:flex;gap:14px;align-items:center;flex-wrap:wrap;padding:12px 16px;border-bottom:1px solid var(--line);font-size:12px;color:var(--muted)}.overlap-summary strong{color:#8a40ab;font-variant-numeric:tabular-nums}.spacing-conflict{color:var(--red)}[hidden]{display:none!important}.center,.planner,.inspector{min-width:0}.result-status.warning{background:#fff7e9;color:#925a16}.result-status.error{background:#fff0f3;color:#ae3450}
 .risk-body{padding:4px 0}.risk-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:10px 15px;border-bottom:1px solid var(--line);font-size:12px;color:var(--muted)}.risk-row:last-child{border:0}.risk-tag{padding:2px 8px;border-radius:999px;font-size:11px;white-space:nowrap}.risk-warn{color:#925a16;background:#fff7e9}.risk-ok{color:#287961;background:#edf9f4}.risk-details{padding:6px 15px 10px}.risk-details .pair{padding-top:4px}.act-row{display:grid;grid-template-columns:minmax(0,1fr) 86px auto auto auto;gap:6px;align-items:center;margin-bottom:7px}.act-row[data-blocked="1"]{opacity:.55}.act-row select,.act-row input{padding:6px 8px;font-size:12px}.act-noparam{text-align:center;color:var(--muted)}
 .risk-bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:10px 15px;font-size:12px;color:var(--muted)}.risk-item{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:7px;background:var(--soft);color:#4a5b86}.risk-item.warn{background:#fde8ed;border:1px solid #f4b8c6;color:#c0324d;font-weight:600}.risk-item b{font-variant-numeric:tabular-nums}.risk-bar .risk-details{margin-left:auto}.risk-bar .risk-details[open]{width:100%}.risk-bar .risk-details .pair{max-width:420px;padding-top:6px}
-.heading-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end}.exec-button{display:inline-flex;align-items:center;gap:6px;padding:9px 16px;font-size:13px;font-weight:600;white-space:nowrap}.exec-button svg{display:block;flex:none}@media(max-width:720px){.heading-actions{justify-content:flex-start}}.fi{display:inline-flex;align-items:center;justify-content:center;width:13px;height:13px;margin-left:5px;border-radius:50%;background:#8a97bd;color:#fff;font-style:normal;font-size:10px;font-weight:700;line-height:1;cursor:help;vertical-align:1px;flex:none}.fi:hover,.fi:focus-visible{background:var(--blue);outline:none}#fieldTip{position:fixed;z-index:80;max-width:300px;padding:8px 11px;border-radius:8px;background:#1f335d;color:#fff;font-size:11.5px;line-height:1.65;box-shadow:0 8px 22px #172b5940;pointer-events:none;display:none}#fieldTip.show{display:block}
+.toolbar-actions{display:flex;align-items:center;gap:10px;margin-left:auto;flex-wrap:wrap}.exec-button{display:inline-flex;align-items:center;gap:6px;padding:9px 16px;font-size:13px;font-weight:600;white-space:nowrap}.exec-button svg{display:block;flex:none}@media(max-width:720px){.toolbar-actions{width:100%;justify-content:flex-start}}.fi{display:inline-flex;align-items:center;justify-content:center;width:13px;height:13px;margin-left:5px;border-radius:50%;background:#8a97bd;color:#fff;font-style:normal;font-size:10px;font-weight:700;line-height:1;cursor:help;vertical-align:1px;flex:none}.fi:hover,.fi:focus-visible{background:var(--blue);outline:none}#fieldTip{position:fixed;z-index:80;max-width:300px;padding:8px 11px;border-radius:8px;background:#1f335d;color:#fff;font-size:11.5px;line-height:1.65;box-shadow:0 8px 22px #172b5940;pointer-events:none;display:none}#fieldTip.show{display:block}
 /* module tabs — 参考 vision-model 的 module-tabs 结构 */
 .module-tabs{display:flex;gap:26px;border-bottom:1px solid var(--line);margin:0 0 16px}
 .module-tabs button{position:relative;display:inline-flex;align-items:center;padding:12px 2px 14px;border:0;border-radius:0;background:transparent;font-size:13px;font-weight:600;color:var(--muted);line-height:1}
@@ -28,29 +28,22 @@
 .panel-heading{display:flex;align-items:center;gap:10px;padding:12px 15px;border-bottom:1px solid var(--line)}
 .panel-heading h2{margin:0;font-size:13px}
 .panel-heading .pill{margin-left:auto;font-size:11px;padding:3px 7px}
-.dev-layout{display:grid;grid-template-columns:minmax(320px,.85fr) minmax(0,1.2fr);gap:14px;align-items:start}
+.dev-layout{display:grid;grid-template-columns:minmax(320px,440px) minmax(0,1fr);gap:14px;align-items:start}
 .dev-editor{display:flex;flex-direction:column;min-width:0}
 .dev-note{margin:12px 15px 0;font-size:11.5px;color:var(--muted);line-height:1.7}
 #cfgCode{display:block;margin:12px 15px 0;width:calc(100% - 30px);min-height:330px;resize:vertical;padding:13px;border:1px solid var(--line);border-radius:8px;background:#0f1b33;color:#dbe4f7;font:12px/1.7 ui-monospace,SFMono-Regular,Menlo,monospace;tab-size:2}
 .dev-actions{display:flex;gap:8px;flex-wrap:wrap;padding:12px 15px 0}
 #cfgStatus{margin:10px 15px 15px;font-size:11.5px;color:var(--muted);line-height:1.7}
 #cfgStatus.bad{color:var(--red);font-weight:600}
-.dev-preview{min-width:0}
-.devices{display:flex;gap:4px;margin-left:auto}
-.devices button{padding:4px 8px;border:1px solid var(--line);border-radius:6px;background:#fff;font-size:11px;color:var(--muted)}
-.devices button.active{border-color:#a6b0ff;background:var(--soft);color:var(--blue);font-weight:600}
-.frame-wrap{padding:12px;background:#eef2fa;display:flex;justify-content:center}
-#previewFrame{width:100%;height:min(72vh,760px);border:1px solid var(--line);border-radius:8px;background:#fff}
-.dev-code{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}
-.dev-code .span-two{grid-column:1/-1}
+.dev-code-column{display:flex;flex-direction:column;gap:14px;min-width:0}
 .dev-code pre{margin:0;padding:14px 15px;background:#0f1b33;color:#dbe4f7;font:11.5px/1.7 ui-monospace,SFMono-Regular,Menlo,monospace;overflow:auto;white-space:pre-wrap;word-break:break-all;max-height:220px}
-@media(max-width:1080px){.dev-layout{grid-template-columns:1fr}.dev-code{grid-template-columns:1fr}}
+@media(max-width:1080px){.dev-layout{grid-template-columns:1fr}}
 @media(max-width:720px){.module-tabs{gap:20px}.module-tabs button{font-size:12.5px}}
 </style>
 </head>
 <body>
 <main>
-<div class="heading"><div><h1>智飞航线规划</h1><p>航线让无人机视野覆盖目标区域</p></div><div class="heading-actions"><span class="tiny" id="planState" role="status">准备规划</span><button id="executeNow" type="button" class="primary exec-button" title="示意按钮，不会执行真实飞行"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4.2 2.8 13 8l-8.8 5.2V2.8Z" fill="currentColor"/></svg>立即执行</button></div></div>
+<div class="heading"><div><h1>智飞航线规划</h1><p>航线让无人机视野覆盖目标区域</p></div></div>
 <div class="module-tabs" role="tablist" aria-label="功能模块">
 <button id="tab-planner" class="active" role="tab" aria-selected="true" aria-controls="planner-page" tabindex="0" data-page="planner">航线规划</button>
 <button id="tab-dev" role="tab" aria-selected="false" aria-controls="dev-page" tabindex="-1" data-page="dev">开发配置</button>
@@ -202,8 +195,11 @@
 <button id="topView" class="active" aria-pressed="true">俯视编辑</button>
 <button id="threeView" aria-pressed="false">三维视锥</button>
 </div>
-<span id="targetSummary" class="tiny">
-</span>
+<div class="toolbar-actions">
+<span id="targetSummary" class="tiny"></span>
+<span id="planState" class="tiny" role="status">准备规划</span>
+<button id="executeNow" type="button" class="primary exec-button" title="示意按钮，不会执行真实飞行"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4.2 2.8 13 8l-8.8 5.2V2.8Z" fill="currentColor"/></svg>立即执行</button>
+</div>
 </div>
 <div id="drawBar" hidden>
 <span id="drawHint">点击添加顶点</span>
@@ -397,7 +393,7 @@
 <div class="integration-heading">
 <div>
 <h2>开发配置</h2>
-<p>用一段前端代码维护主题、字体、文案与尺寸，右侧实时预览；下方可直接复制安装、引用与 API 配置。</p>
+<p>用一段前端代码维护主题、字体、文案与尺寸，改完切回「航线规划」即为新外观；右侧可直接复制安装、引用与 API 配置。</p>
 </div>
 <a class="button secondary" id="openOfficial" href="?tab=planner" target="_blank" rel="noopener">新标签打开 ↗</a>
 </div>
@@ -415,21 +411,7 @@
 </div>
 <p id="cfgStatus" role="status">已应用</p>
 </section>
-<section class="panel dev-preview">
-<div class="panel-heading">
-<h2>实时预览</h2>
-<div class="devices">
-<button data-w="1280" class="active" type="button">桌面</button>
-<button data-w="1024" type="button">1024</button>
-<button data-w="768" type="button">平板</button>
-<button data-w="390" type="button">手机</button>
-</div>
-<button class="button text" id="reloadPreview" type="button">重新加载</button>
-</div>
-<div class="frame-wrap"><iframe id="previewFrame" src="?tab=planner" title="航线规划预览"></iframe></div>
-</section>
-</div>
-<div class="dev-code">
+<div class="dev-code dev-code-column">
 <section class="panel">
 <div class="panel-heading">
 <h2>安装</h2>
@@ -444,7 +426,7 @@
 </div>
 <pre id="codeIframe"></pre>
 </section>
-<section class="panel span-two">
+<section class="panel">
 <div class="panel-heading">
 <h2>API 配置</h2>
 <button class="button text" data-copy="codeApi" type="button">复制</button>
@@ -674,14 +656,12 @@ const DEV_DEFAULT_CODE=[
   '};'
 ].join('\n');
 let devCfg={...DEV_DEFAULTS};
-const devFrame=document.getElementById('previewFrame');
 function devBase(){return location.origin+location.pathname;}
 function devB64(obj){
   const bytes=new TextEncoder().encode(JSON.stringify(obj)),bin=String.fromCharCode(...bytes);
   return btoa(bin).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
 }
 function devStatus(text,bad){const el=document.getElementById('cfgStatus');el.textContent=text;el.className=bad?'bad':'';}
-function devSend(){if(devFrame&&devFrame.contentWindow)devFrame.contentWindow.postMessage({type:'otp:config',cfg:devCfg},'*');}
 function devSnippets(){
   const embed=devBase(),url=embed+'?tab=planner&cfg='+devB64(devCfg);
   document.getElementById('codeInstall').textContent='# 方式一：Harness 插件市场安装\n#   设置 → 插件 → 插件市场，搜索「智飞航线规划」\n\n# 方式二：命令行从 GitHub 安装\ndsh plugin --profile <profile> add github:unhurriedly/dsh-drone-planner\n\n# 方式三：本地克隆后安装\nplugin_manager install_bundle /绝对路径/dsh-drone-planner\n\n# 自检\ncurl -I '+embed;
@@ -689,7 +669,6 @@ function devSnippets(){
   const S='<'+'script', E='<'+'/'+'script>';
   document.getElementById('codeApi').textContent='<div id="drone"></div>\n'+S+' src="'+embed.replace(/[^/]*$/,'api.js')+'">'+E+'\n'+S+'>\n  var app = OttoPlexDronePlanner.mount("#drone", '+JSON.stringify(devCfg,null,2).replace(/\n/g,'\n  ')+');\n  app.apply({ title: "新的标题" }); // 不重载即可热更新\n'+E;
   document.getElementById('openOfficial').href=embed+'?tab=planner';
-  if(devFrame)devFrame.title='航线规划预览';
 }
 function devApply(){
   const text=document.getElementById('cfgCode').value;
@@ -700,7 +679,6 @@ function devApply(){
     if(!parsed||typeof parsed!=='object'||Array.isArray(parsed))throw new Error('配置需要是一个对象');
     devCfg={...DEV_DEFAULTS,...parsed};
     applyCfg(devCfg);      // 本页立即生效（切到「航线规划」即是新样式）
-    devSend();             // 右侧预览同步
     devSnippets();
     devStatus('已应用 · '+new Date().toLocaleTimeString('zh-CN',{hour12:false}));
     return true;
@@ -722,21 +700,10 @@ function copyText(text){
   code.addEventListener('input',()=>{clearTimeout(timer);timer=setTimeout(devApply,350);});
   document.getElementById('resetConfig').addEventListener('click',()=>{code.value=DEV_DEFAULT_CODE;devApply();});
   document.getElementById('copyConfig').addEventListener('click',()=>copyText(code.value));
-  document.getElementById('reloadPreview').addEventListener('click',()=>{devFrame.src=devBase()+'?tab=planner&cfg='+devB64(devCfg)+'&t='+Date.now();});
-  document.querySelectorAll('.devices button').forEach(btn=>{
-    btn.addEventListener('click',()=>{
-      document.querySelectorAll('.devices button').forEach(x=>x.classList.remove('active'));
-      btn.classList.add('active');
-      const w=+btn.dataset.w;
-      devFrame.style.width=w>=1100?'100%':w+'px';
-      devFrame.style.maxWidth='100%';
-    });
-  });
   document.addEventListener('click',event=>{
     const btn=event.target.closest('[data-copy]');
     if(btn)copyText(document.getElementById(btn.dataset.copy).textContent);
   });
-  devFrame.addEventListener('load',()=>devSend());
   goPage(readTab());
   devSnippets();
   window.OttoPlexDev={getConfig:()=>devCfg,setCode(code2){code.value=code2;devApply();},apply:devApply};

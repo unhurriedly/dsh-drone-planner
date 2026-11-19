@@ -92,6 +92,15 @@ const assert=require('node:assert/strict');
  const afterTabs=await page.evaluate(()=>JSON.stringify(PlannerDemo.state.points.map(p=>({x:p.x,y:p.y,yaw:p.yaw}))));
  check('Switching tabs keeps planner state',beforeActions.length>0&&afterTabs.length>0&&await page.locator('#scene').evaluate(el=>el.width>0));
  check('Planner tab is the default landing view',await page.locator('#planner-page').isVisible());
+ check('立即执行 sits in the canvas toolbar',await page.evaluate(()=>{
+   const b=document.getElementById('executeNow').getBoundingClientRect();
+   const t=document.querySelector('.toolbar').getBoundingClientRect();
+   return b.width>0&&b.y>=t.y-2&&b.y+b.height<=t.y+t.height+2;
+ }));
+ await page.locator('#tab-dev').click();await page.waitForTimeout(250);
+ check('立即执行 hidden on the dev tab',await page.locator('#executeNow').isHidden());
+ check('Dev tab has no preview iframe',await page.locator('#previewFrame').count()===0);
+ await page.locator('#tab-planner').click();await page.waitForTimeout(250);
  check('No browser runtime errors',errors.length===0);
  await browser.close();
  console.log(`${checks.length} browser checks passed.`);
