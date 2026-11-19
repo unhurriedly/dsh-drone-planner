@@ -12,10 +12,10 @@ const context = { document: {}, console, setTimeout };
 vm.createContext(context);
 vm.runInContext(
   source.split('let screen=')[0] +
-    '\nglobalThis.api={fov,geometry,basis,insideFov,validateTarget,directionOK,effYawTarget,segYawOf,toLatLon,state,area,spacingAllowed,slopeAB,groundZfn,riskInfo,ACTION_DEFS,NO_STAY_OK,samples,cylinderOf,spiralWaypoints,lineWaypoints,greedyWaypoints,scanWaypoints,fillGaps};',
+    '\nglobalThis.api={fov,geometry,basis,insideFov,validateTarget,directionOK,effYawTarget,segYawOf,toLatLon,state,area,spacingAllowed,slopeAB,groundZfn,riskInfo,ACTION_DEFS,NO_STAY_OK,samples,cylinderOf,spiralWaypoints,lineWaypoints,greedyWaypoints,scanWaypoints,fillGaps,simRoute,simPose,simReset};',
   context,
 );
-const { fov, geometry, basis, insideFov, validateTarget, directionOK, effYawTarget, segYawOf, toLatLon, state, area, spacingAllowed, slopeAB, groundZfn, riskInfo, ACTION_DEFS, NO_STAY_OK, samples, cylinderOf, spiralWaypoints, lineWaypoints, scanWaypoints } = context.api;
+const { fov, geometry, basis, insideFov, validateTarget, directionOK, effYawTarget, segYawOf, toLatLon, state, area, spacingAllowed, slopeAB, groundZfn, riskInfo, ACTION_DEFS, NO_STAY_OK, samples, cylinderOf, spiralWaypoints, lineWaypoints, scanWaypoints, simRoute, simPose } = context.api;
 
 let checks = 0;
 function test(name, fn) { fn(); checks++; console.log('PASS ' + name); }
@@ -81,7 +81,7 @@ test('Removed UI surface: no parseTask/strategy/lens/export/reset/addPoint/clipD
 
 test('New preset ids present exactly once in the page', () => {
   const page = fs.readFileSync(__dirname + '/page/index.html', 'utf8');
-  for (const id of ['planner-page', 'dev-page', 'tab-planner', 'tab-dev', 'cfgCode', 'executeNow', 'codeInstall', 'codeIframe', 'codeApi', 'openOfficial', 'heightMode', 'groundElevation', 'speed', 'yawMode', 'bodyYaw', 'gimbalPitch', 'zoom', 'cutDistance', 'stay', 'endAction', 'homeLat', 'homeLon', 'spacingStat', 'pointLatlon', 'pointHeight', 'riskBar', 'energyItem', 'energyTime', 'energyBudget', 'altItem', 'spaceItem', 'resumeRow']) {
+  for (const id of ['planner-page', 'dev-page', 'tab-planner', 'tab-dev', 'cfgCode', 'executeNow', 'simulate', 'simSpeed', 'simStop', 'simStatus', 'codeInstall', 'codeIframe', 'codeApi', 'openOfficial', 'heightMode', 'groundElevation', 'speed', 'yawMode', 'bodyYaw', 'gimbalPitch', 'zoom', 'cutDistance', 'stay', 'endAction', 'homeLat', 'homeLon', 'spacingStat', 'pointLatlon', 'pointHeight', 'riskBar', 'energyItem', 'energyTime', 'energyBudget', 'altItem', 'spaceItem', 'resumeRow']) {
     assert.ok(page.includes(`id="${id}"`), 'missing id ' + id);
   }
   for (const gone of ['id="previewFrame"', 'id="reloadPreview"', 'id="task"', 'id="parseTask"', 'id="directionMode"', 'id="basePitch"', 'id="baseLens"', 'id="strategy"', 'id="export"', 'id="reset"', 'id="clipDemo"', 'id="addPoint"', 'id="pointLens"', 'id="resultNote"', 'id="sampleCount"', 'id="sampleSpacing"', 'id="missCount"', 'id="overlapRate"', 'class="panel risk-panel"', 'id="nfzItem"', 'id="nfzAck"']) {
@@ -260,6 +260,29 @@ test('Page copy follows the 智飞航线规划 wording', () => {
   assert.ok(!page.includes('距机身超视距裁切距离（三维斜距）以外的地面投影不计入有效数据'), 'table footnote still present');
   assert.ok((page.match(/class="module-tabs"/g) || []).length === 1, 'expected exactly one module-tabs bar');
   assert.ok(!page.includes('让视野覆盖目标'), 'old title still present');
+});
+
+test('Simulation interpolates position, heading and progress along a leg', () => {
+  state.config = { height: 110, speed: 5, distance: 210, zoom: 1, pitch: -60 };
+  state.points = [
+    { x: 0, y: 0, yaw: 0, pitch: -60, zoom: 1, height: 110 },
+    { x: 0, y: 100, yaw: 0, pitch: -60, zoom: 1, height: 110 },
+  ];
+  const route = simRoute();
+  assert.ok(Math.abs(route.total - 100) < 1e-9);
+  const mid = simPose(50);
+  assert.ok(Math.abs(mid.x) < 1e-9 && Math.abs(mid.y - 50) < 1e-9);
+  assert.ok(Math.abs(mid.progress - 0.5) < 1e-9 && mid.leg === 0 && Math.abs(mid.t - 0.5) < 1e-9);
+  const start = simPose(0), end = simPose(100);
+  assert.ok(Math.abs(start.y) < 1e-9 && Math.abs(end.y - 100) < 1e-9);
+  // yaw follows the leg heading (north = 0°)
+  assert.ok(Math.abs(mid.yaw) < 1e-9);
+  // clamps outside the route
+  assert.ok(Math.abs(simPose(-10).y) < 1e-9 && Math.abs(simPose(999).y - 100) < 1e-9);
+  // per-waypoint height is interpolated for the moving camera
+  state.points[1].height = 210;
+  assert.ok(Math.abs(simPose(50).height - 160) < 1e-9);
+  state.points = [];
 });
 
 console.log(`${checks} redesign checks passed.`);

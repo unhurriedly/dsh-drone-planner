@@ -9,7 +9,7 @@
 
 | Tab | 地址 | 用途 |
 | --- | --- | --- |
-| 航线规划 | `/dsh-drone-planner/`、`/dsh-drone-planner/?tab=planner` | 业务界面：飞行区域、航线预设、航线规划、航点编辑 |
+| 航线规划 | `/dsh-drone-planner/`、`/dsh-drone-planner/?tab=planner` | 业务界面：飞行区域、航线预设、航线规划、航点编辑、模拟飞行 |
 | 开发配置 | `/dsh-drone-planner/?tab=dev` | 配置代码、安装/引用/API 代码复制 |
 
 旧的 `/dsh-drone-planner/dev.html` 路由仍然保留，只做跳转到 `?tab=dev`。
@@ -112,6 +112,22 @@ cd dsh-drone-planner && git pull
 - **Client 半区**（`client.js`）注册 `sidebar.panellist` 图标与同 id 的 `main` 面板；面板先对
   `/dsh-drone-planner/` 做一次 `HEAD` 自检，正常则铺满同源 iframe，路由缺失则显示带「重试」的错误卡片。
 
+## 模拟飞行
+
+画布工具条右侧「▶ 模拟飞行」：机体沿当前航线匀速飞行，一边飞一边画它此刻的视锥。
+
+- **怎么跑**：按预设的「全局航线速度」推进（不是逐帧跳点），位置、机身水平角、云台俯仰、变焦、高度都在相邻航点之间插值；
+  右上角状态显示 `WP 15/32 · 45% · 用时 2:35`。
+- **看什么**：橙色机身标记（带机头指向）、已飞过的实心轨迹、当前视锥的地面投影（半透明填充 + 实线边界）；
+  叠加「原始视锥 / 裁切」时同时显示未裁切的橙色轮廓；切到**三维视锥**可见机体、垂线与锥体棱线。
+- **倍速**：`×1 / ×4 / ×16`，只改变观看速度，不改变「用时」（用时＝已飞距离 ÷ 航线速度）。
+- **控制**：按钮在「模拟飞行 / ⏸ 暂停 / ▶ 继续 / ▶ 重新模拟」间切换；「停止」清除轨迹并隐藏状态。
+  暂停时轨迹与视锥保留，可慢慢查看。
+
+自动行为：飞到终点自动停止并提示；重新生成航线、编辑航点或改目标会重置模拟；切到「开发配置」tab 自动暂停。
+
+模拟只按航线顺序匀速运动，不含加/减速、转弯半径、爬升率与停留动作的耗时——它是几何过程的演示，不是飞控仿真。
+
 ## 开发配置（第二个 tab）
 
 地址：`http://127.0.0.1:<harness-port>/dsh-drone-planner/?tab=dev`（旧 `dev.html` 会跳到这里）
@@ -183,7 +199,7 @@ cd dsh-drone-planner && git pull
 | `page/dev.html` | 旧入口：跳转到 `?tab=dev`（开发配置已并入正式页面） |
 | `page/api.js` | 嵌入加载器 `OttoPlexDronePlanner.mount/apply` |
 | `check-redesign.cjs` | 函数级验收（几何、斜面、圆柱螺旋、弓字形扫描等） |
-| `check-defaults.cjs` | 浏览器验收（默认值、航线形态、响应式对齐） |
+| `check-defaults.cjs` | 浏览器验收（默认值、航线形态、模拟飞行、响应式对齐） |
 | `check-dev-mode.cjs` | 浏览器验收（单页两 tab、开发配置、立即执行归属、代码接入） |
 | `locale/zh.json`、`locale/en.json` | 插件管理里显示的标题与说明 |
 | `icon.svg` | 侧边栏与详情页图标 |

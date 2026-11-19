@@ -8,7 +8,12 @@
 .overlap-summary{display:flex;gap:14px;align-items:center;flex-wrap:wrap;padding:12px 16px;border-bottom:1px solid var(--line);font-size:12px;color:var(--muted)}.overlap-summary strong{color:#8a40ab;font-variant-numeric:tabular-nums}.spacing-conflict{color:var(--red)}[hidden]{display:none!important}.center,.planner,.inspector{min-width:0}.result-status.warning{background:#fff7e9;color:#925a16}.result-status.error{background:#fff0f3;color:#ae3450}
 .risk-body{padding:4px 0}.risk-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:10px 15px;border-bottom:1px solid var(--line);font-size:12px;color:var(--muted)}.risk-row:last-child{border:0}.risk-tag{padding:2px 8px;border-radius:999px;font-size:11px;white-space:nowrap}.risk-warn{color:#925a16;background:#fff7e9}.risk-ok{color:#287961;background:#edf9f4}.risk-details{padding:6px 15px 10px}.risk-details .pair{padding-top:4px}.act-row{display:grid;grid-template-columns:minmax(0,1fr) 86px auto auto auto;gap:6px;align-items:center;margin-bottom:7px}.act-row[data-blocked="1"]{opacity:.55}.act-row select,.act-row input{padding:6px 8px;font-size:12px}.act-noparam{text-align:center;color:var(--muted)}
 .risk-bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:10px 15px;font-size:12px;color:var(--muted)}.risk-item{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:7px;background:var(--soft);color:#4a5b86}.risk-item.warn{background:#fde8ed;border:1px solid #f4b8c6;color:#c0324d;font-weight:600}.risk-item b{font-variant-numeric:tabular-nums}.risk-bar .risk-details{margin-left:auto}.risk-bar .risk-details[open]{width:100%}.risk-bar .risk-details .pair{max-width:420px;padding-top:6px}
-.toolbar-actions{display:flex;align-items:center;gap:10px;margin-left:auto;flex-wrap:wrap}.exec-button{display:inline-flex;align-items:center;gap:6px;padding:9px 16px;font-size:13px;font-weight:600;white-space:nowrap}.exec-button svg{display:block;flex:none}@media(max-width:720px){.toolbar-actions{width:100%;justify-content:flex-start}}.fi{display:inline-flex;align-items:center;justify-content:center;width:13px;height:13px;margin-left:5px;border-radius:50%;background:#8a97bd;color:#fff;font-style:normal;font-size:10px;font-weight:700;line-height:1;cursor:help;vertical-align:1px;flex:none}.fi:hover,.fi:focus-visible{background:var(--blue);outline:none}#fieldTip{position:fixed;z-index:80;max-width:300px;padding:8px 11px;border-radius:8px;background:#1f335d;color:#fff;font-size:11.5px;line-height:1.65;box-shadow:0 8px 22px #172b5940;pointer-events:none;display:none}#fieldTip.show{display:block}
+.toolbar-actions{display:flex;align-items:center;gap:10px;margin-left:auto;flex-wrap:wrap}
+.sim-button{display:inline-flex;align-items:center;gap:6px;padding:8px 12px;border:1px solid var(--line);border-radius:7px;background:#fff;font-size:12px;font-weight:600;color:var(--ink);white-space:nowrap}
+.sim-button:hover{border-color:var(--orange);background:#fff8ef;color:#a8641a}
+.sim-button.on{border-color:var(--orange);background:#fff3e2;color:#a8641a}
+#simSpeed{width:auto;height:32px;padding:0 6px;border:1px solid var(--line);border-radius:7px;background:#fff;font-size:12px;color:var(--ink)}
+#simStatus{font-variant-numeric:tabular-nums;color:#a8641a}.exec-button{display:inline-flex;align-items:center;gap:6px;padding:9px 16px;font-size:13px;font-weight:600;white-space:nowrap}.exec-button svg{display:block;flex:none}@media(max-width:720px){.toolbar-actions{width:100%;justify-content:flex-start}}.fi{display:inline-flex;align-items:center;justify-content:center;width:13px;height:13px;margin-left:5px;border-radius:50%;background:#8a97bd;color:#fff;font-style:normal;font-size:10px;font-weight:700;line-height:1;cursor:help;vertical-align:1px;flex:none}.fi:hover,.fi:focus-visible{background:var(--blue);outline:none}#fieldTip{position:fixed;z-index:80;max-width:300px;padding:8px 11px;border-radius:8px;background:#1f335d;color:#fff;font-size:11.5px;line-height:1.65;box-shadow:0 8px 22px #172b5940;pointer-events:none;display:none}#fieldTip.show{display:block}
 /* module tabs — 参考 vision-model 的 module-tabs 结构 */
 .module-tabs{display:flex;gap:26px;border-bottom:1px solid var(--line);margin:0 0 16px}
 .module-tabs button{position:relative;display:inline-flex;align-items:center;padding:12px 2px 14px;border:0;border-radius:0;background:transparent;font-size:13px;font-weight:600;color:var(--muted);line-height:1}
@@ -198,6 +203,14 @@
 <div class="toolbar-actions">
 <span id="targetSummary" class="tiny"></span>
 <span id="planState" class="tiny" role="status">准备规划</span>
+<span id="simStatus" class="tiny" hidden></span>
+<select id="simSpeed" title="模拟倍速" aria-label="模拟倍速">
+<option value="1">×1</option>
+<option value="4" selected>×4</option>
+<option value="16">×16</option>
+</select>
+<button id="simulate" type="button" class="sim-button" title="沿航线模拟飞行，并显示飞行过程中的视锥">▶ 模拟飞行</button>
+<button id="simStop" type="button" class="sim-button" hidden title="结束模拟并清除飞行轨迹">停止</button>
 <button id="executeNow" type="button" class="primary exec-button" title="示意按钮，不会执行真实飞行"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4.2 2.8 13 8l-8.8 5.2V2.8Z" fill="currentColor"/></svg>立即执行</button>
 </div>
 </div>
@@ -441,7 +454,7 @@
 <script>
 'use strict';
 const $=id=>document.getElementById(id), R=Math.PI/180, B={xmin:-400,xmax:400,ymin:-300,ymax:300};
-const state={target:[[-160,-110],[170,-110],[205,40],[90,140],[-150,115]],points:[],selected:-1,view:'top',drawing:false,draft:[],samples:[],coverage:[],step:8,coarse:false,dirty:false,drag:null,config:null,geoms:[],source:[],busy:false,overlaps:[],hitCounts:[],spacingViolations:[],segYaw:[],resume:false};
+const state={target:[[-160,-110],[170,-110],[205,40],[90,140],[-150,115]],points:[],selected:-1,view:'top',drawing:false,draft:[],samples:[],coverage:[],step:8,coarse:false,dirty:false,drag:null,config:null,geoms:[],source:[],busy:false,overlaps:[],hitCounts:[],spacingViolations:[],segYaw:[],resume:false,sim:{running:false,d:0,last:0,mult:4}};
 const configIds=['height','cutDistance','speed','yawMode','bodyYaw','gimbalPitch','zoom','spacing','heightMode','groundElevation','stay','endAction','homeLat','homeLon','lineWidth','slopeAngle','slopeAspect','solidTop','enduranceMin','safetyPct'];
 function config(){const num=id=>{const v=$(id).value.trim();return v===''?null:+v};return {spacing:+$('spacing').value||0,height:+$('height').value,distance:+$('cutDistance').value,yawMode:$('yawMode').value,bodyYaw:num('bodyYaw'),pitch:num('gimbalPitch')??0,zoom:num('zoom')??1,speed:+$('speed').value||5,heightMode:$('heightMode').value,groundElevation:+$('groundElevation').value||0,stay:$('stay').value==='yes',endAction:$('endAction').value,home:{lat:+$('homeLat').value||0,lon:+$('homeLon').value||0},lineWidth:+$('lineWidth').value,slopeAngle:+$('slopeAngle').value||0,slopeAspect:+$('slopeAspect').value||0,solidTop:+$('solidTop').value||30,type:$('targetType').value};}
 function validConfig(){for(const id of configIds){const el=$(id);if(el.type!=='number'||el.value==='')continue;if(!el.checkValidity()){$('validation').textContent='请检查参数：'+((el.parentElement.querySelector('span').textContent||el.id).replace(/!$/,''));return false;}}$('validation').textContent='';return true;}
@@ -493,7 +506,7 @@ function convexIntersection(a,b){
  for(let i=0;i<b.length&&result.length;i++){const p=b[i],q=b[(i+1)%b.length];result=clip(result,r=>orientation*((q[0]-p[0])*(r[1]-p[1])-(q[1]-p[1])*(r[0]-p[0])));}
  return area(result)>1e-7?result:[];
 }
-function recalc(){const c=state.config;if(!c)return;computeSegYaw();state.geoms=state.points.map(w=>geometry(w,c));state.hitCounts=state.samples.map(p=>state.points.reduce((n,w,i)=>n+(directionOK(w,c,state.segYaw[i])&&insideFov(p,w,c,state.geoms[i])?1:0),0));state.coverage=state.hitCounts.map(n=>n>0);state.overlaps=[];state.spacingViolations=[];
+function recalc(){const c=state.config;if(!c)return;simReset();computeSegYaw();state.geoms=state.points.map(w=>geometry(w,c));state.hitCounts=state.samples.map(p=>state.points.reduce((n,w,i)=>n+(directionOK(w,c,state.segYaw[i])&&insideFov(p,w,c,state.geoms[i])?1:0),0));state.coverage=state.hitCounts.map(n=>n>0);state.overlaps=[];state.spacingViolations=[];
 for(let i=0;i<state.points.length;i++)for(let j=i+1;j<state.points.length;j++){
  const a=state.points[i],b=state.points[j],distance=Math.hypot(a.x-b.x,a.y-b.y);if(distance+1e-7<c.spacing)state.spacingViolations.push({i,j,distance});
  // Overlap is geometric: direction-conflicting waypoints still expose their footprint intersections.
@@ -537,6 +550,45 @@ function renderRisk(){const c=state.config;if(!c)return;const minH=state.points.
  $('energyState').className='risk-tag '+(r.over?'risk-warn':'risk-ok');
  $('energyItem').classList.toggle('warn',r.over);$('resumeRow').hidden=!r.over;}
 function renderActions(){const w=state.points[state.selected],stay=state.config?state.config.stay:true;$('actionCount').textContent=w?(w.actions||[]).length+' 项':'0';if(!w){$('actionList').innerHTML='<p class="hint">生成航线并选择航点后配置动作</p>';return;}const acts=w.actions||[];$('actionList').innerHTML=acts.length?acts.map((a,i)=>{const def=ACTION_DEFS[a.type]||{group:'其他',label:a.type};const blocked=!stay&&!NO_STAY_OK.has(a.type);const groups={};Object.entries(ACTION_DEFS).forEach(([k,d])=>{if(stay||NO_STAY_OK.has(k)||k===a.type)(groups[d.group]=groups[d.group]||[]).push([k,d]);});const sel=`<select data-i="${i}" class="act-type" aria-label="动作类型">${Object.entries(groups).map(([g,items])=>`<optgroup label="${g}">${items.map(([k,d])=>`<option value="${k}"${k===a.type?' selected':''}>${d.label}</option>`).join('')}</optgroup>`).join('')}</select>`;const prm=def.param?`<input data-i="${i}" class="act-param" type="${def.param.type}" value="${a.params&&a.params[def.param.key]!=null?a.params[def.param.key]:def.param.def}"${def.param.type==='number'?` min="${def.param.min}" max="${def.param.max}" step="${def.param.step}"`:''} title="${def.param.label}" aria-label="${def.param.label}">`:'<span class="tiny act-noparam">—</span>';return `<div class="act-row"${blocked?' data-blocked="1"':''}>${sel}${prm}<button class="small-button" data-act="up" data-i="${i}"${stay?'':' disabled'} title="上移">↑</button><button class="small-button" data-act="down" data-i="${i}"${stay?'':' disabled'} title="下移">↓</button><button class="small-button" data-act="del" data-i="${i}" title="删除">删</button>${blocked?'<span class="tiny">停留=否不支持</span>':''}</div>`}).join(''):'<p class="hint">暂无动作，点击下方「新增动作」</p>';}
+// ---- 模拟飞行：沿航线匀速推进机体，实时绘制飞行过程中的视锥 ----
+function simRoute(){const pts=state.points,segs=[];let acc=0;for(let i=0;i<pts.length-1;i++){const a=pts[i],b=pts[i+1],len=Math.hypot(b.x-a.x,b.y-a.y);if(len<=1e-9)continue;segs.push({i,a,b,len,start:acc});acc+=len;}return {segs,total:acc};}
+function lerpAngle(a,b,t){const d=((b-a+540)%360)-180;return a+d*t;}
+function simPose(d){const pts=state.points,c=state.config;if(!pts.length)return null;const {segs,total}=simRoute();
+ if(!segs.length){const p=pts[0];return {x:p.x,y:p.y,yaw:p.yaw||0,pitch:p.pitch,pitch2:p.pitch,zoom:p.zoom||1,height:p.height??c.height,leg:0,t:0,progress:1,d:0,total:0};}
+ d=Math.max(0,Math.min(total,d));let seg=segs[segs.length-1];for(const g of segs){if(d<=g.start+g.len+1e-9){seg=g;break;}}
+ const t=seg.len?Math.max(0,Math.min(1,(d-seg.start)/seg.len)):0,a=seg.a,b=seg.b;
+ const mix=(p,q)=>{const A=Number.isFinite(p)?p:(Number.isFinite(q)?q:0),B=Number.isFinite(q)?q:A;return A+(B-A)*t;};
+ return {x:a.x+(b.x-a.x)*t,y:a.y+(b.y-a.y)*t,yaw:lerpAngle(a.yaw||0,b.yaw||0,t),pitch:mix(a.pitch,b.pitch),zoom:mix(a.zoom,1),height:mix(a.height,b.height),leg:seg.i,t,progress:total?d/total:0,d,total};}
+function fmtDur(sec){const m=Math.floor(sec/60),ss=Math.round(sec%60);return m+':'+String(ss).padStart(2,'0');}
+function updateSimUI(){const sim=state.sim,pts=state.points,{total}=simRoute();if(!sim)return;const on=sim.running||sim.d>0;
+ $('simStatus').hidden=!on;$('simStop').hidden=!on;const btn=$('simulate');
+ btn.classList.toggle('on',sim.running);btn.textContent=sim.running?'⏸ 暂停':(total>0&&sim.d>=total?'▶ 重新模拟':(sim.d>0?'▶ 继续':'▶ 模拟飞行'));
+ if(!on){$('simStatus').textContent='';return;}
+ const pose=simPose(sim.d),sp=state.config?Math.max(.1,state.config.speed):5;
+ $('simStatus').textContent='WP '+Math.min(pts.length,pose.leg+1)+'/'+pts.length+' · '+Math.round(pose.progress*100)+'% · 用时 '+fmtDur(sim.d/sp);}
+function simTick(ts){const sim=state.sim;if(!sim||!sim.running)return;if(!sim.last)sim.last=ts;const dt=Math.min(.12,(ts-sim.last)/1000);sim.last=ts;
+ const {total}=simRoute(),speed=state.config?Math.max(.1,state.config.speed):5;sim.d+=dt*speed*sim.mult;
+ if(sim.d>=total){sim.d=total;sim.running=false;sim.last=0;toast('模拟飞行结束');}
+ updateSimUI();draw();
+ if(sim.running)requestAnimationFrame(simTick);}
+function simReset(){const sim=state.sim;if(!sim)return;sim.running=false;sim.last=0;sim.d=0;updateSimUI();}
+function drawSim(ctx,c,gnd){const sim=state.sim;if(!sim||(!sim.d&&!sim.running))return;const pose=simPose(sim.d);if(!pose)return;
+ const three=state.view==='3d',az=p=>three?gnd(p.x,p.y)+(p.height??c.height):gnd(p.x,p.y);
+ const pts=state.points,trail=[];
+ for(let i=0;i<=pose.leg&&i<pts.length;i++){const p=pts[i];trail.push([p.x,p.y,az(p)]);}
+ trail.push([pose.x,pose.y,az(pose)]);
+ if(trail.length>1){path(ctx,trail,false);ctx.setLineDash([]);ctx.lineWidth=2.6;ctx.strokeStyle='#dc8b27';ctx.stroke();}
+ const g=geometry(pose,c),body=[pose.x,pose.y,three?gnd(pose.x,pose.y)+pose.height:gnd(pose.x,pose.y)];
+ if(g.effective.length){polygon(ctx,g.effective,'#dc8b2730','#dc8b27',1.6);}
+ if($('showRaw').checked&&g.raw.length){polygon(ctx,g.raw,'#dc8b2718','#dc8b2799',1);}
+ if(three){if(g.effective.length){const n=g.effective.length,step=Math.max(1,Math.ceil(n/16));for(let i=0;i<n;i+=step){const j=(i+step)%n;path(ctx,[body,[...g.effective[i]],[...g.effective[j]]],true);ctx.strokeStyle='#dc8b2740';ctx.lineWidth=.8;ctx.stroke();}}
+  ctx.setLineDash([4,4]);path(ctx,[[pose.x,pose.y,gnd(pose.x,pose.y)],body],false);ctx.strokeStyle='#dc8b27aa';ctx.stroke();ctx.setLineDash([]);}
+ const xy=projection(...body);
+ ctx.beginPath();ctx.arc(xy[0],xy[1],7,0,Math.PI*2);ctx.fillStyle='#dc8b27';ctx.fill();ctx.strokeStyle='#fff';ctx.lineWidth=2;ctx.stroke();
+ const tip=projection(pose.x+Math.sin(pose.yaw*R)*16,pose.y+Math.cos(pose.yaw*R)*16,three?body[2]:body[2]);
+ ctx.beginPath();ctx.moveTo(xy[0],xy[1]);ctx.lineTo(tip[0],tip[1]);ctx.strokeStyle='#8a4f10';ctx.lineWidth=2;ctx.stroke();
+ ctx.font='10px -apple-system,sans-serif';ctx.fillStyle='#a8641a';ctx.textAlign='center';ctx.fillText('模拟 '+Math.round(pose.progress*100)+'%',xy[0],xy[1]-13);ctx.textAlign='left';}
+
 let screen={scale:1,cx:0,cy:0},hitPoints=[];
 function canvasSetup(canvas){const rect=canvas.getBoundingClientRect(),dpr=Math.min(window.devicePixelRatio||1,2);canvas.width=Math.round(rect.width*dpr);canvas.height=Math.round(rect.height*dpr);const ctx=canvas.getContext('2d');ctx.scale(dpr,dpr);return {ctx,w:rect.width,h:rect.height};}
 function projection(x,y,z=0){if(state.view==='top')return [screen.cx+x*screen.scale,screen.cy-y*screen.scale];return [screen.cx+(x*.82-y*.55)*screen.scale,screen.cy+(x*.32+y*.48-z*.95)*screen.scale];}
@@ -552,7 +604,7 @@ if($('showOverlap').checked&&state.overlaps.length){
 if(c.type==='area'||c.type==='slope'){polygon(ctx,state.target.map(q=>[q[0],q[1],gnd(q[0],q[1])]),'#4459f50c','#5969ef',2);}else if(c.type==='solid'){const {cx,cy,rad,top}=cylinderOf(c),N=48,base=[];for(let k=0;k<N;k++){const a=k*2*Math.PI/N,x=cx+Math.cos(a)*rad,y=cy+Math.sin(a)*rad;base.push([x,y,gnd(x,y)]);}const tops=base.map(p=>[p[0],p[1],p[2]+top]);polygon(ctx,base,'#4459f508','#5969ef',1.6);polygon(ctx,tops,'#4459f50c','#5969ef',2);if(state.view==='3d')for(let k=0;k<N;k+=2){const j=(k+1)%N;polygon(ctx,[base[k],base[j],tops[j],tops[k]],'#4459f506','#5969ef30',.7);}}else if(c.type==='line'){path(ctx,state.target,false);ctx.lineWidth=c.lineWidth*screen.scale;ctx.strokeStyle='#6976ef25';ctx.lineCap='round';ctx.lineJoin='round';ctx.stroke();ctx.lineWidth=2;ctx.strokeStyle='#5969ef';ctx.setLineDash([5,4]);ctx.stroke();ctx.setLineDash([]);}else{for(const [i,p] of state.target.entries()){const xy=projection(...p);ctx.beginPath();ctx.arc(...xy,6,0,Math.PI*2);ctx.fillStyle='#4459f5';ctx.fill();ctx.fillText('T'+(i+1),xy[0]+9,xy[1]+4);}}
 if($('showMiss').checked){ctx.fillStyle='#d74e6690';state.samples.forEach((p,i)=>{if(!state.coverage[i]){let xy=projection(...p);ctx.fillRect(xy[0]-1.3,xy[1]-1.3,2.6,2.6);}});}
 if(state.points.length){ctx.setLineDash([5,4]);path(ctx,state.points.map(p=>[p.x,p.y,state.view==='3d'?gnd(p.x,p.y)+(p.height??c.height):0]),false);ctx.strokeStyle='#5968e8';ctx.lineWidth=1.8;ctx.stroke();ctx.setLineDash([]);}hitPoints=[];state.points.forEach((p,i)=>{const xy=projection(p.x,p.y,state.view==='3d'?gnd(p.x,p.y)+(p.height??c.height):0);hitPoints.push(xy);ctx.beginPath();ctx.arc(...xy,i===state.selected?9:6.5,0,Math.PI*2);ctx.fillStyle=i===state.selected?'#4459f5':'#fff';ctx.fill();ctx.strokeStyle='#4459f5';ctx.lineWidth=1.7;ctx.stroke();ctx.fillStyle=i===state.selected?'white':'#4459f5';ctx.font='9px -apple-system,sans-serif';ctx.textAlign='center';ctx.fillText(i+1,xy[0],xy[1]+3);ctx.textAlign='left';if(i===state.selected){let d=[Math.sin(p.yaw*R),Math.cos(p.yaw*R)];const tip=projection(p.x+d[0]*35,p.y+d[1]*35,state.view==='3d'?gnd(p.x,p.y)+(p.height??c.height):0);ctx.beginPath();ctx.moveTo(...xy);ctx.lineTo(...tip);ctx.strokeStyle='#263fb8';ctx.stroke();}});
-if(state.drawing){polygon(ctx,state.draft,'#4459f515','#4459f5',2);state.draft.forEach(p=>{ctx.beginPath();ctx.arc(...projection(...p),4,0,Math.PI*2);ctx.fillStyle='#4459f5';ctx.fill();});}ctx.font='11px -apple-system,sans-serif';ctx.fillStyle='#667798';ctx.fillText(state.view==='top'?'点击选择航点 · 拖动改变位置':'三维为等轴投影 · 切回俯视可拖动',16,h-15);$('viewLabel').textContent=state.view==='top'?'局部平面 / 单位：米':'三维视锥 / 地面 z = 0';$('compass').textContent=state.view==='top'?'↑ 北 N':'等轴视图';}
+if(state.drawing){polygon(ctx,state.draft,'#4459f515','#4459f5',2);state.draft.forEach(p=>{ctx.beginPath();ctx.arc(...projection(...p),4,0,Math.PI*2);ctx.fillStyle='#4459f5';ctx.fill();});}drawSim(ctx,c,gnd);ctx.font='11px -apple-system,sans-serif';ctx.fillStyle='#667798';ctx.fillText(state.view==='top'?'点击选择航点 · 拖动改变位置':'三维为等轴投影 · 切回俯视可拖动',16,h-15);$('viewLabel').textContent=state.view==='top'?'局部平面 / 单位：米':'三维视锥 / 地面 z = 0';$('compass').textContent=state.view==='top'?'↑ 北 N':'等轴视图';}
 function drawProfile(){const {ctx,w,h}=canvasSetup($('profile')),wp=state.points[state.selected],c=state.config;if(!wp||w<1||h<1)return;const wh=Number.isFinite(wp.height)?wp.height:c.height;let scale=Math.max(.05,Math.min((w-35)/Math.max(c.distance*1.1,160),(h-38)/Math.max(wh*1.2,130)));let ox=22,oy=h-22,dy=oy-wh*scale;ctx.strokeStyle='#cad5e5';ctx.beginPath();ctx.moveTo(10,oy);ctx.lineTo(w-10,oy);ctx.stroke();ctx.strokeStyle='#d79736';ctx.setLineDash([4,3]);ctx.beginPath();ctx.arc(ox,dy,c.distance*scale,0,Math.PI/2);ctx.stroke();ctx.setLineDash([]);const len=Math.min(c.distance*1.15,wh/Math.max(.001,Math.sin(-wp.pitch*R)));ctx.beginPath();ctx.moveTo(ox,dy);ctx.lineTo(ox+Math.cos(wp.pitch*R)*len*scale,dy-Math.sin(wp.pitch*R)*len*scale);ctx.strokeStyle='#4459f5';ctx.lineWidth=2;ctx.stroke();ctx.beginPath();ctx.arc(ox,dy,4,0,Math.PI*2);ctx.fillStyle='#4459f5';ctx.fill();ctx.font='10px -apple-system,sans-serif';ctx.fillStyle='#667798';ctx.fillText(wp.pitch+'°',ox+8,dy+13);ctx.fillText('地面',w-36,oy+14);}
 function pointFromEvent(e){const r=$('scene').getBoundingClientRect();return [(e.clientX-r.left-screen.cx)/screen.scale,-(e.clientY-r.top-screen.cy)/screen.scale];}
 function chooseHit(e){const r=$('scene').getBoundingClientRect(),p=[e.clientX-r.left,e.clientY-r.top];let index=-1,best=16;hitPoints.forEach((q,i)=>{const d=dist(p,q);if(d<best){best=d;index=i;}});return index;}
@@ -581,6 +633,11 @@ $('actionList').addEventListener('click',e=>{const b=e.target.closest('button[da
 $('addAction').onclick=()=>{const w=state.points[state.selected];if(!w)return toast('请先选择航点');w.actions=w.actions||[];if(w.actions.length>=20)return toast('单航点最多 20 个动作');w.actions.push({id:'a'+Date.now().toString(36),type:'photo',params:{}});recalc();};
 $('resume').onchange=()=>{state.resume=$('resume').checked;renderRisk();};
 $('executeNow').onclick=()=>toast('「立即执行」为界面示意，不会执行真实飞行任务');
+$('simulate').onclick=()=>{const sim=state.sim;if(!state.points.length)return toast('请先在「航线预设」里生成航线');const {total}=simRoute();if(total<=1)return toast('航线太短，无法模拟飞行');
+ if(sim.running){sim.running=false;sim.last=0;updateSimUI();draw();return;}
+ if(sim.d>=total)sim.d=0;sim.mult=+($('simSpeed').value||4);sim.running=true;sim.last=0;updateSimUI();requestAnimationFrame(simTick);};
+$('simSpeed').onchange=()=>{state.sim.mult=+$('simSpeed').value||4;};
+$('simStop').onclick=()=>{simReset();draw();};
 const fieldTip=document.createElement('div');fieldTip.id='fieldTip';document.body.appendChild(fieldTip);
 function showTip(t){const r=t.getBoundingClientRect();fieldTip.textContent=t.dataset.tip;fieldTip.classList.add('show');const w=fieldTip.offsetWidth,h=fieldTip.offsetHeight;let x=r.left+r.width/2-w/2;x=Math.max(8,Math.min(x,window.innerWidth-w-8));let y=r.top-h-8;if(y<8)y=r.bottom+8;fieldTip.style.left=x+'px';fieldTip.style.top=y+'px';}
 function hideTip(){fieldTip.classList.remove('show');}
@@ -625,6 +682,7 @@ function goPage(page){
   });
   try{const u=new URL(location.href);u.searchParams.set('tab',page);history.replaceState(null,'',u.pathname+u.search+u.hash);}catch(error){}
   if(page==='planner')requestAnimationFrame(()=>{draw();drawProfile();});
+  else if(state.sim&&state.sim.running){state.sim.running=false;state.sim.last=0;updateSimUI();}
 }
 document.querySelectorAll('.module-tabs [role="tab"]').forEach(tab=>{
   tab.addEventListener('click',()=>goPage(tab.dataset.page));
@@ -710,7 +768,7 @@ function copyText(text){
 })();
 
 // Expose deterministic geometry for local validation; no network or device control.
-window.PlannerDemo={state,config,basis,fov,geometry,geometrySlope,insideFov,area,convexIntersection,spacingAllowed,validateTarget,samples,generate,setTarget,recalc,directionOK,effYawTarget,segYawOf,toLatLon,slopeAB,groundZfn,riskInfo,ACTION_DEFS,NO_STAY_OK,cylinderOf,spiralWaypoints,lineWaypoints,greedyWaypoints,scanWaypoints,fillGaps};
+window.PlannerDemo={state,config,basis,fov,geometry,geometrySlope,insideFov,area,convexIntersection,spacingAllowed,validateTarget,samples,generate,setTarget,recalc,directionOK,effYawTarget,segYawOf,toLatLon,slopeAB,groundZfn,riskInfo,ACTION_DEFS,NO_STAY_OK,cylinderOf,spiralWaypoints,lineWaypoints,greedyWaypoints,scanWaypoints,fillGaps,simRoute,simPose,simReset};
 syncControls();setTarget(state.target);generate();
 </script>
 </body></html>

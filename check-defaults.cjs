@@ -79,6 +79,40 @@ const assert=require('node:assert/strict');
  check('Range sliders stay side by side',!layout.some(r=>r.bad.includes('range-stacked')));
  check('No horizontal overflow while narrowing',layout.every(r=>r.overflow<=1));
  await page.setViewportSize({width:1512,height:1100});
+ // 模拟飞行
+ const orange=()=>page.evaluate(()=>{const cv=document.getElementById('scene'),d=cv.getContext('2d').getImageData(0,0,cv.width,cv.height).data;let n=0;for(let i=0;i<d.length;i+=4)if(Math.abs(d[i]-220)<18&&Math.abs(d[i+1]-139)<18&&Math.abs(d[i+2]-39)<20)n++;return n;});
+ check('Simulation starts and advances along the route',await (async()=>{
+   const before=await page.evaluate(()=>PlannerDemo.state.sim.d);
+   await page.locator('#simulate').click();
+   await page.waitForTimeout(700);
+   const st=await page.evaluate(()=>({running:PlannerDemo.state.sim.running,d:PlannerDemo.state.sim.d}));
+   return st.running&&st.d>before;
+ })());
+ check('Frustum is drawn during flight',(await orange())>50);
+ check('Status line reports waypoint, progress and time',/^WP \d+\/\d+ · \d+% · 用时 \d+:\d{2}$/.test((await page.locator('#simStatus').textContent()).trim()));
+ await page.locator('#simulate').click();await page.waitForTimeout(200);
+ const paused=await page.evaluate(()=>PlannerDemo.state.sim.d);await page.waitForTimeout(400);
+ check('Pausing freezes the drone',await page.evaluate(d0=>PlannerDemo.state.sim.d===d0,paused)&&await page.evaluate(()=>!PlannerDemo.state.sim.running));
+ await page.locator('#simulate').click();await page.waitForTimeout(200);
+ await page.evaluate(()=>{PlannerDemo.state.sim.d=PlannerDemo.simRoute().total-0.4;});
+ await page.waitForTimeout(600);
+ check('Simulation stops at the end of the route',await page.evaluate(()=>!PlannerDemo.state.sim.running&&Math.abs(PlannerDemo.state.sim.d-PlannerDemo.simRoute().total)<0.01));
+ await page.locator('#simStop').click();await page.waitForTimeout(150);
+ check('Stop clears the flown trail',await page.evaluate(()=>PlannerDemo.state.sim.d===0)&&await page.locator('#simStatus').isHidden()&&await page.locator('#simStop').isHidden());
+ check('Regenerating resets the simulation',await (async()=>{
+   await page.locator('#simulate').click();await page.waitForTimeout(300);
+   await page.evaluate(()=>PlannerDemo.recalc());
+   return await page.evaluate(()=>!PlannerDemo.state.sim.running&&PlannerDemo.state.sim.d===0);
+ })());
+ check('Switching to the dev tab pauses the simulation',await (async()=>{
+   await page.locator('#simulate').click();await page.waitForTimeout(300);
+   await page.locator('#tab-dev').click();await page.waitForTimeout(250);
+   const pausedOk=await page.evaluate(()=>!PlannerDemo.state.sim.running);
+   await page.locator('#tab-planner').click();await page.waitForTimeout(250);
+   await page.locator('#simStop').click();
+   return pausedOk;
+ })());
+
  // 合并为单页两 tab 后，规划侧功能必须照旧
  check('Planner tab renders the risk bar',await page.locator('#riskBar').isVisible()&&await page.locator('#energyTime').textContent()!=='—');
  const beforeActions=await page.evaluate(()=>JSON.stringify(PlannerDemo.state.points));
