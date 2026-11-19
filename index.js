@@ -6,10 +6,10 @@
  * Client panel can frame it and every demo feature (canvas, pointer editing,
  * Blob download) keeps working exactly as when the file is opened locally.
  *
- * Two independent pages share the prefix:
+ * One page with two tabs (page/index.html) plus legacy entries:
  *   GET|HEAD /dsh-drone-planner/            -> page/index.html  (航线实验室)
  *   GET|HEAD /dsh-drone-planner/index.html  -> page/index.html
- *   GET|HEAD /dsh-drone-planner/dev.html    -> page/dev.html    (开发者模式)
+ *   GET|HEAD /dsh-drone-planner/dev.html    -> page/dev.html    (旧入口，跳转到 ?tab=dev)
  *   GET|HEAD /dsh-drone-planner/dev         -> page/dev.html
  *   GET|HEAD /dsh-drone-planner/api.js      -> page/api.js      (嵌入加载器)
  *

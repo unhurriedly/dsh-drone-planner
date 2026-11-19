@@ -1,23 +1,26 @@
 # 智飞航线规划 · DeepSeek Harness 工作台插件
 
-把无人机航线规划工作台作为 **DeepSeek Harness Web UI** 的中央面板打开，并附带一个独立的
-**开发者模式**页，用于调主题/字体/文案/尺寸、复制接入代码。
+把无人机航线规划工作台作为 **DeepSeek Harness Web UI** 的中央面板打开。同一个页面里用 tab
+分成 **航线规划** 与 **开发配置** 两个模块，后者用一段前端代码维护主题/字体/文案/尺寸，并复制接入代码。
 
 已在 [awesome-dsh-plugin](https://awesome-dsh-plugin.com) 插件市场收录（`tools` 分类），可直接在市场里搜索安装，见[安装](#方式一插件市场安装推荐)。
 
-插件内含两个互相独立的页面：
+单页两 tab（结构参考 vision-model 的 `module-tabs`）：
 
-| 页面 | 地址 | 用途 |
+| Tab | 地址 | 用途 |
 | --- | --- | --- |
-| 航线实验室（正式页面） | `/dsh-drone-planner/` | 业务界面：飞行区域、航线预设、航线规划、航点编辑 |
-| 开发者模式 | `/dsh-drone-planner/dev.html` | 开发配置、实时预览、安装/引用/API 代码复制 |
+| 航线规划 | `/dsh-drone-planner/`、`/dsh-drone-planner/?tab=planner` | 业务界面：飞行区域、航线预设、航线规划、航点编辑 |
+| 开发配置 | `/dsh-drone-planner/?tab=dev` | 配置代码、实时预览、安装/引用/API 代码复制 |
+
+旧的 `/dsh-drone-planner/dev.html` 路由仍然保留，只做跳转到 `?tab=dev`。
 
 面板内容就是 `page/index.html` 本身（单文件、离线、自包含），所以画布绘制、航线生成、
 逐点编辑、三维视锥、超视距裁切、重叠区域与风险评估都与浏览器直接打开完全一致。
 
-> 版本 1.1.0 起：产品名改为「智飞航线规划」，新增开发者模式页与 `api.js` 嵌入加载器。
-> 1.1.1 修正了面板自身的字典：侧边栏标签、错误提示、iframe 标题此前仍为旧名「视锥航线」，
-> 现统一为「智飞航线规划」。升级后若仍显示旧名，刷新 Harness 页面（或硬刷新）即可。
+> 版本 1.1.0 起：产品名改为「智飞航线规划」，新增开发者模式与 `api.js` 嵌入加载器。
+> 1.1.1 修正面板自身字典里的旧名「视锥航线」。
+> **1.2.0**：原「开发者模式」独立页并入正式页面，成为第二个 tab「开发配置」；
+> `dev.html` 改为跳转入口，不再维护两份页面。
 
 ## 在 DeepSeek Harness 中引用
 
@@ -72,7 +75,7 @@ dsh plugin --profile <profile> add /绝对路径/dsh-drone-planner
 
 ```bash
 curl -I http://127.0.0.1:<harness-port>/dsh-drone-planner/
-curl -I http://127.0.0.1:<harness-port>/dsh-drone-planner/dev.html
+curl -I "http://127.0.0.1:<harness-port>/dsh-drone-planner/?tab=dev"
 ```
 
 ### 已安装时的更新
@@ -95,7 +98,7 @@ cd dsh-drone-planner && git pull
   ```
   GET|HEAD /dsh-drone-planner/            -> page/index.html   正式页面
   GET|HEAD /dsh-drone-planner/index.html  -> page/index.html
-  GET|HEAD /dsh-drone-planner/dev.html    -> page/dev.html     开发者模式
+  GET|HEAD /dsh-drone-planner/dev.html    -> page/dev.html     旧入口，跳转到 ?tab=dev
   GET|HEAD /dsh-drone-planner/dev         -> page/dev.html
   GET|HEAD /dsh-drone-planner/api.js      -> page/api.js       嵌入加载器
   ```
@@ -105,32 +108,35 @@ cd dsh-drone-planner && git pull
 - **Client 半区**（`client.js`）注册 `sidebar.panellist` 图标与同 id 的 `main` 面板；面板先对
   `/dsh-drone-planner/` 做一次 `HEAD` 自检，正常则铺满同源 iframe，路由缺失则显示带「重试」的错误卡片。
 
-## 开发者模式
+## 开发配置（第二个 tab）
 
-地址：`http://127.0.0.1:<harness-port>/dsh-drone-planner/dev.html`
+地址：`http://127.0.0.1:<harness-port>/dsh-drone-planner/?tab=dev`（旧 `dev.html` 会跳到这里）
 
-页面分两个 tab：
+点顶部 tab 或直接访问 `?tab=dev` 即可进入，**不离开当前页面**：
 
-1. **开发配置**
-   - 左侧「开发配置」：一份 **前端代码形式** 的配置对象（不仅是表单），输入即生效（350 ms 防抖），
-     解析失败会标红提示并保留上一次有效配置，可「恢复默认」「复制配置代码」。
-     ```js
-     const config = {
-       accent: '#4459f5',   // 主题色
-       ink: '#172b59',      // 文字色
-       bg: '#f7f9fd',       // 背景色
-       font: '',            // 字体族，留空为系统默认
-       size: 14,            // 基础字号 px
-       sceneH: 520,         // 画布高度 px
-       title: '智飞航线规划',
-       subtitle: '航线让无人机视野覆盖目标区域'
-     };
-     ```
-   - 右侧「代码接入」：安装命令、iframe 引用代码、`api.js` API 配置，均可一键复制；
-     引用地址里的 `?cfg=` 是当前配置的 URL-safe base64 编码。
-2. **实时预览**：同源 iframe 直接跑正式页面，配置改动即时应用；可切换 1280/1024/768/390 宽度验证响应式。
+1. **配置代码**（左）：一份 **前端代码形式** 的配置对象，输入即生效（350 ms 防抖）。
+   解析失败会标红提示，并保留上一次有效配置；下面是「恢复默认」「复制配置」。
+   ```js
+   const config = {
+     accent: '#4459f5',   // 主题色
+     ink: '#172b59',      // 文字色
+     bg: '#f7f9fd',       // 背景色
+     font: '',            // 字体族，留空为系统默认
+     size: 14,            // 基础字号 px
+     sceneH: 520,         // 画布高度 px
+     title: '智飞航线规划',
+     subtitle: '航线让无人机视野覆盖目标区域'
+   };
+   ```
+2. **实时预览**（右）：同源 iframe 跑「航线规划」tab，配置改动即时应用；
+   可切换 1280/1024/768/390 宽度验证响应式，也可「重新加载」。
+3. **代码接入**（下方三块）：安装命令、iframe 引用代码、`api.js` API 配置，各带复制按钮；
+   引用地址里的 `?cfg=` 是当前配置的 URL-safe base64 编码。
 
-右上角「正式页面 ↗」在新标签页打开 `page/index.html`（不携带配置）；若浏览器或沙箱拦截弹窗，
+配置同时作用于**本页**：在「开发配置」里改完，切回「航线规划」tab 看到的就是新样式
+（画布高度变化后会自动重绘）。
+
+右上角「新标签打开 ↗」在新标签页打开 `?tab=planner`；若浏览器或沙箱拦截弹窗，
 会自动降级为当前页打开并提示。
 
 ### 配置落到正式页面
@@ -169,14 +175,14 @@ cd dsh-drone-planner && git pull
 
 | 文件 | 作用 |
 |---|---|
-| `index.js` | Host：只读路由（正式页面 / 开发者模式 / api.js） |
+| `index.js` | Host：只读路由（正式页面 / 旧开发者入口 / api.js） |
 | `client.js` | Client：侧边栏图标 + 中央面板（iframe + 自检） |
-| `page/index.html` | 正式页面（单文件、离线、自包含） |
-| `page/dev.html` | 开发者模式：开发配置 + 实时预览 + 代码接入 |
+| `page/index.html` | 单页两 tab：航线规划 + 开发配置（单文件、离线、自包含） |
+| `page/dev.html` | 旧入口：跳转到 `?tab=dev`（开发配置已并入正式页面） |
 | `page/api.js` | 嵌入加载器 `OttoPlexDronePlanner.mount/apply` |
 | `check-redesign.cjs` | 函数级验收（几何、斜面、圆柱螺旋、弓字形扫描等） |
 | `check-defaults.cjs` | 浏览器验收（默认值、航线形态、响应式对齐） |
-| `check-dev-mode.cjs` | 浏览器验收（开发者模式端到端） |
+| `check-dev-mode.cjs` | 浏览器验收（单页两 tab、开发配置、预览、代码接入） |
 | `locale/zh.json`、`locale/en.json` | 插件管理里显示的标题与说明 |
 | `icon.svg` | 侧边栏与详情页图标 |
 

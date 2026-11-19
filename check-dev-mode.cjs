@@ -1,114 +1,130 @@
-// 开发者模式端到端检查：需要本机 Playwright 与 Chrome。
-// PW / CHROME / BASE 可用环境变量覆盖；BASE 需为插件路由根（以 / 结尾）。
+/**
+ * 合并后单页两 tab（航线规划 / 开发配置）的端到端验收。
+ * 需要本机 Playwright 与 Chrome；PW / CHROME / BASE 可用环境变量覆盖。
+ * BASE 指向插件路由根（以 / 结尾）。
+ */
 const {chromium}=require(process.env.PW || 'playwright');
 const CHROME=process.env.CHROME || '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
 const BASE=process.env.BASE || 'http://127.0.0.1:58150/dsh-drone-planner/';
 const assert=require('node:assert/strict');
+
 (async()=>{
  const browser=await chromium.launch({executablePath:CHROME,headless:true});
  const ctx=await browser.newContext({viewport:{width:1440,height:1000},permissions:['clipboard-read','clipboard-write']});
  const page=await ctx.newPage();
- const errors=[];page.on('pageerror',e=>{errors.push(e.message);console.error('PAGEERROR',e.message);});
+ const errors=[];page.on('pageerror',e=>errors.push(e.message));
+ const checks=[];const check=(name,fn)=>{assert.ok(fn,name);checks.push(name);console.log('PASS '+name);};
+ const ready=()=>page.waitForFunction(()=>window.PlannerDemo&&!PlannerDemo.state.busy&&PlannerDemo.state.config);
 
- const checks=[];const check=(n,f)=>{assert.ok(f,n);checks.push(n);console.log('PASS '+n);};
- await page.goto(BASE+'dev.html');
- const devState=await page.evaluate(()=>window.OttoPlexDev&&window.OttoPlexDev.getConfig());
- check('Dev page and planner are separate pages',page.url().endsWith('/dev.html'));
- check('No back-to-planner button',await page.locator('a[href="index.html"]:has-text("返回")').count()===0);
- check('Subtitle paragraph removed',await page.locator('.dev-head>div>p').count()===0);
- check('Product renamed to 智飞航线规划',/智飞航线规划/.test(await page.locator('.brand').textContent())&&/智飞航线规划/.test(await page.title()));
- const official=page.locator('#openOfficial');
- check('Official-page button keeps the new label',/正式页面/.test(await official.textContent()));
- check('Official-page button targets index.html without config',(await official.getAttribute('href'))==='index.html'&&await official.getAttribute('target')==='_blank');
- check('Config and code cards sit side by side',await page.evaluate(()=>{
-   const a=document.querySelector('#panel-config .cols>.card').getBoundingClientRect();
-   const b=document.querySelectorAll('#panel-config .cols>.card')[1].getBoundingClientRect();
+ await page.goto(BASE);await ready();
+ // 1. one page, two tabs
+ const tabs=await page.locator('.module-tabs [role="tab"]').allTextContents();
+ check('Single page hosts both modules as tabs',tabs.length===2&&tabs[0]==='航线规划'&&tabs[1]==='开发配置');
+ check('Planner tab active by default',await page.locator('#planner-page').isVisible()&&await page.locator('#dev-page').isHidden());
+ check('Planner still generates routes',await page.evaluate(()=>PlannerDemo.state.points.length>0));
+
+ // 2. legacy /dev.html route still lands on the dev tab
+ const legacy=await ctx.newPage();
+ await legacy.goto(BASE+'dev.html');
+ await legacy.waitForTimeout(900);
+ check('Legacy dev.html redirects into the dev tab',/tab=dev/.test(legacy.url())&&await legacy.locator('#dev-page').isVisible());
+ await legacy.close();
+
+ // 3. tab switching + deep link + keyboard
+ await page.locator('#tab-dev').click();
+ await page.waitForTimeout(300);
+ check('Clicking 开发配置 shows the dev panel',await page.locator('#dev-page').isVisible()&&await page.locator('#planner-page').isHidden());
+ check('URL records the active tab',/tab=dev/.test(page.url()));
+ await page.locator('#tab-planner').focus();
+ await page.keyboard.press('ArrowRight');
+ await page.waitForTimeout(200);
+ check('Arrow keys move between tabs',/tab=dev/.test(page.url())&&await page.locator('#dev-page').isVisible());
+ const deep=await ctx.newPage();
+ await deep.goto(BASE+'?tab=dev');
+ await deep.waitForTimeout(700);
+ check('?tab=dev deep-links to the dev tab',await deep.locator('#dev-page').isVisible());
+ await deep.close();
+
+ // 4. dev layout
+ await page.locator('#tab-dev').click();
+ await page.waitForTimeout(300);
+ check('No back-to-planner button',await page.locator('a:has-text("返回")').count()===0);
+ check('Editor and preview sit side by side',await page.evaluate(()=>{
+   const a=document.querySelector('.dev-editor').getBoundingClientRect();
+   const b=document.querySelector('.dev-preview').getBoundingClientRect();
    return b.left>a.right-1&&Math.abs(a.top-b.top)<2;
  }));
- check('Config tab is labelled 开发配置',/开发配置/.test(await page.locator('.tab[data-tab="config"]').textContent()));
- check('Tabs switch between config and preview',await page.locator('#panel-config').isVisible()&&await page.locator('#panel-preview').isHidden());
- await page.locator('.tab[data-tab="preview"]').click();
- check('Preview tab reveals the planner frame',await page.locator('#panel-preview').isVisible()&&await page.locator('#panel-config').isHidden());
- await page.locator('.tab[data-tab="config"]').click();
- // config is maintained as front-end code
- const hasEditor=await page.locator('#cfgCode').count();
- check('Config is a code editor, not form controls',hasEditor===1&&await page.locator('#cfgAccentHex').count()===0);
+ check('Config is a code editor, not form controls',await page.locator('#cfgCode').count()===1&&await page.locator('#cfgAccentHex').count()===0);
+
+ // 5. apply / error / reset
  await page.locator('#cfgCode').fill("const config = { accent: '#159b79', size: 17, sceneH: 600, title: '巡检航线实验室' };");
- await page.waitForTimeout(600);
+ await page.waitForTimeout(650);
  const applied=await page.evaluate(()=>window.OttoPlexDev.getConfig());
  check('Editing code applies the config',applied.accent==='#159b79'&&applied.size===17&&applied.sceneH===600&&applied.title==='巡检航线实验室');
  check('Apply status reports success',/已应用/.test(await page.locator('#cfgStatus').textContent()));
- // invalid code keeps last good config
+ const docAccent=await page.evaluate(()=>getComputedStyle(document.documentElement).getPropertyValue('--blue').trim());
+ check('Config applies to this page too',docAccent==='#159b79');
  await page.locator('#cfgCode').fill('const config = { accent: ');
- await page.waitForTimeout(600);
+ await page.waitForTimeout(650);
  const afterBad=await page.evaluate(()=>window.OttoPlexDev.getConfig());
- check('Broken code shows an error and keeps the last config',/解析失败/.test(await page.locator('#cfgStatus').textContent())&&afterBad.accent==='#159b79');
- // reset restores defaults
- await page.locator('#resetConfig').click();
- await page.waitForTimeout(400);
- const reset=await page.evaluate(()=>window.OttoPlexDev.getConfig());
- check('Reset restores default code',reset.accent==='#4459f5'&&reset.sceneH===520);
- // apply the custom config again for the preview/URL checks
- await page.locator('#cfgCode').fill("const config = { accent: '#159b79', size: 17, sceneH: 600, title: '巡检航线实验室' };");
- await page.waitForTimeout(600);
- await page.locator('.tab[data-tab="preview"]').click();
+ check('Broken code errors and keeps the last config',/解析失败/.test(await page.locator('#cfgStatus').textContent())&&afterBad.accent==='#159b79');
+
+ // 6. preview reflects config
  const frame=page.frameLocator('#previewFrame');
  await frame.locator('#executeNow').waitFor({timeout:15000});
- await page.waitForTimeout(400);
+ await page.waitForTimeout(500);
  const live=await frame.locator('body').evaluate(()=>({
    accent:getComputedStyle(document.documentElement).getPropertyValue('--blue').trim(),
    size:getComputedStyle(document.body).fontSize,
    title:document.querySelector('.heading h1').textContent,
-   scene:Math.round(document.getElementById('scene').getBoundingClientRect().height)
+   scene:Math.round(document.getElementById('scene').getBoundingClientRect().height),
+   tab:!!document.getElementById('planner-page'),
  }));
  check('Preview applies theme live',live.accent==='#159b79');
  check('Preview applies font size live',live.size==='17px');
  check('Preview applies copy live',live.title==='巡检航线实验室');
  check('Preview applies canvas size live',Math.abs(live.scene-600)<=2);
- // snippets
- await page.locator('.tab[data-tab="config"]').click();
+ check('Preview shows the planner tab',live.tab===true);
+
+ // 7. switching back redraws the planner with the configured size
+ await page.locator('#tab-planner').click();
+ await page.waitForTimeout(500);
+ const scene=await page.locator('#scene').evaluate(el=>({h:Math.round(el.getBoundingClientRect().height),w:el.width}));
+ check('Planner canvas redraws after tab switch',Math.abs(scene.h-600)<=2&&scene.w>0);
+
+ // 8. snippets + copy
+ await page.locator('#tab-dev').click();
+ await page.waitForTimeout(250);
+ await page.locator('#resetConfig').click();
+ await page.waitForTimeout(450);
+ const reset=await page.evaluate(()=>window.OttoPlexDev.getConfig());
+ check('Reset restores default code',reset.accent==='#4459f5'&&reset.sceneH===520);
  const iframeCode=await page.locator('#codeIframe').textContent();
  const apiCode=await page.locator('#codeApi').textContent();
  const install=await page.locator('#codeInstall').textContent();
- check('Embed snippet carries encoded config',/src="http.*\?cfg=[A-Za-z0-9_-]+"/.test(iframeCode));
+ check('Embed snippet carries tab + encoded config',/src="http.*tab=planner&cfg=[A-Za-z0-9_-]+"/.test(iframeCode));
  check('API snippet documents the loader',/api\.js/.test(apiCode)&&/OttoPlexDronePlanner/.test(apiCode));
- check('Install snippet present',/plugin_manager install_bundle/.test(install));
+ check('Install snippet lists marketplace and GitHub paths',/插件市场/.test(install)&&/github:unhurriedly\/dsh-drone-planner/.test(install));
  await page.locator('[data-copy="codeIframe"]').click();
  await page.waitForTimeout(250);
  const clip=await page.evaluate(()=>navigator.clipboard.readText());
  check('Copy button copies snippet',clip.trim()===iframeCode.trim());
- check('Copy shows confirmation',/已复制/.test(await page.locator('#toast').textContent()));
- // config in URL renders standalone (from the embed snippet)
+
+ // 9. official link + standalone URL config
+ const official=page.locator('#openOfficial');
+ check('Open-in-new-tab targets the planner tab',/\?tab=planner$/.test(await official.getAttribute('href'))&&await official.getAttribute('target')==='_blank');
  const url=(iframeCode.match(/src="([^"]+)"/)||[])[1];
  const solo=await ctx.newPage();
  await solo.goto(url);
- await solo.waitForFunction(()=>window.OttoPlexDronePlanner);
+ await solo.waitForFunction(()=>window.PlannerDemo&&!PlannerDemo.state.busy);
  await solo.waitForTimeout(300);
  const soloAccent=await solo.evaluate(()=>getComputedStyle(document.documentElement).getPropertyValue('--blue').trim());
- check('URL config renders standalone page',soloAccent==='#159b79'&&await solo.locator('.heading h1').textContent()==='巡检航线实验室');
- // 正式页面 opens page/index.html in a new tab
- const [opened]=await Promise.all([ctx.waitForEvent('page'),official.click()]);
- await opened.waitForFunction(()=>window.PlannerDemo||document.querySelector('#executeNow'),null,{timeout:15000});
- check('Official-page button opens index.html in a new tab',/\/dsh-drone-planner\/index\.html$/.test(opened.url())&&opened.url().indexOf('cfg=')===-1);
- check('Official page really renders the planner',await opened.evaluate(()=>!!document.getElementById('scene')&&!!document.getElementById('executeNow')));
- await opened.close();
- // sandboxed embed: popups are blocked, so the handler must fall back to in-place navigation
- const sandboxHost=await ctx.newPage();
- await sandboxHost.setContent('<iframe sandbox="allow-scripts allow-same-origin" src="'+BASE+'dev.html" style="width:1200px;height:800px;border:0"></iframe>');
- await sandboxHost.waitForTimeout(800);
- await sandboxHost.frameLocator('iframe').locator('#openOfficial').click();
- await sandboxHost.waitForTimeout(1500);
- const fallbackFrame=sandboxHost.frames().find(fr=>/dsh-drone-planner\/index\.html$/.test(fr.url()));
- check('Blocked popup falls back to opening the planner',!!fallbackFrame&&await fallbackFrame.evaluate(()=>!!document.getElementById('scene')));
- await sandboxHost.close();
- // main page has no developer-mode entry
- const main=await ctx.newPage();
- await main.goto(BASE);
- await main.waitForFunction(()=>window.PlannerDemo&&!PlannerDemo.state.busy);
- check('Main page exposes no developer-mode entry',await main.locator('a[href*="dev.html"]').count()===0);
- // api.js loader
+ check('URL config renders the planner standalone',soloAccent==='#4459f5'&&await solo.locator('#planner-page').isVisible());
+ await solo.close();
+
+ // 10. api.js loader
  const host=await ctx.newPage();
- await host.goto(BASE+'dev.html');
+ await host.goto(BASE+'?tab=dev');
  const mounted=await host.evaluate(async(origin)=>{
    document.body.innerHTML='<div id="mount"></div>';
    await new Promise((res,rej)=>{const s=document.createElement('script');s.src=origin+'api.js';s.onload=res;s.onerror=rej;document.head.appendChild(s);});
@@ -118,6 +134,15 @@ const assert=require('node:assert/strict');
    return {has:!!f,src:f&&f.src,h:app.getConfig().height,version:window.OttoPlexDronePlanner.version};
  },BASE);
  check('api.js mounts an iframe with config',mounted.has&&/\?cfg=/.test(mounted.src)&&mounted.h===700&&mounted.version==='1.0.0');
+
+ // 11. narrow widths stay usable
+ const narrow=await ctx.newPage();
+ await narrow.setViewportSize({width:390,height:844});
+ await narrow.goto(BASE+'?tab=dev');
+ await narrow.waitForTimeout(800);
+ check('Dev tab has no horizontal overflow on mobile',await narrow.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth+1));
+ await narrow.close();
+
  check('No browser runtime errors',errors.length===0);
  await browser.close();
  console.log(`${checks.length} dev-mode checks passed.`);

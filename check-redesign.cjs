@@ -81,7 +81,7 @@ test('Removed UI surface: no parseTask/strategy/lens/export/reset/addPoint/clipD
 
 test('New preset ids present exactly once in the page', () => {
   const page = fs.readFileSync(__dirname + '/page/index.html', 'utf8');
-  for (const id of ['heightMode', 'groundElevation', 'speed', 'yawMode', 'bodyYaw', 'gimbalPitch', 'zoom', 'cutDistance', 'stay', 'endAction', 'homeLat', 'homeLon', 'spacingStat', 'pointLatlon', 'pointHeight', 'riskBar', 'energyItem', 'energyTime', 'energyBudget', 'altItem', 'spaceItem', 'resumeRow']) {
+  for (const id of ['planner-page', 'dev-page', 'tab-planner', 'tab-dev', 'cfgCode', 'previewFrame', 'codeInstall', 'codeIframe', 'codeApi', 'openOfficial', 'heightMode', 'groundElevation', 'speed', 'yawMode', 'bodyYaw', 'gimbalPitch', 'zoom', 'cutDistance', 'stay', 'endAction', 'homeLat', 'homeLon', 'spacingStat', 'pointLatlon', 'pointHeight', 'riskBar', 'energyItem', 'energyTime', 'energyBudget', 'altItem', 'spaceItem', 'resumeRow']) {
     assert.ok(page.includes(`id="${id}"`), 'missing id ' + id);
   }
   for (const gone of ['id="task"', 'id="parseTask"', 'id="directionMode"', 'id="basePitch"', 'id="baseLens"', 'id="strategy"', 'id="export"', 'id="reset"', 'id="clipDemo"', 'id="addPoint"', 'id="pointLens"', 'id="resultNote"', 'id="sampleCount"', 'id="sampleSpacing"', 'id="missCount"', 'id="overlapRate"', 'class="panel risk-panel"', 'id="nfzItem"', 'id="nfzAck"']) {
@@ -258,6 +258,7 @@ test('Page copy follows the 智飞航线规划 wording', () => {
   assert.ok(page.includes('航线让无人机视野覆盖目标区域'), 'subtitle not replaced');
   assert.ok(!page.includes('当前航点实时计算'), 'idle status copy still present');
   assert.ok(!page.includes('距机身超视距裁切距离（三维斜距）以外的地面投影不计入有效数据'), 'table footnote still present');
+  assert.ok((page.match(/class="module-tabs"/g) || []).length === 1, 'expected exactly one module-tabs bar');
   assert.ok(!page.includes('让视野覆盖目标'), 'old title still present');
 });
 

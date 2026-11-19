@@ -9,11 +9,53 @@
 .risk-body{padding:4px 0}.risk-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:10px 15px;border-bottom:1px solid var(--line);font-size:12px;color:var(--muted)}.risk-row:last-child{border:0}.risk-tag{padding:2px 8px;border-radius:999px;font-size:11px;white-space:nowrap}.risk-warn{color:#925a16;background:#fff7e9}.risk-ok{color:#287961;background:#edf9f4}.risk-details{padding:6px 15px 10px}.risk-details .pair{padding-top:4px}.act-row{display:grid;grid-template-columns:minmax(0,1fr) 86px auto auto auto;gap:6px;align-items:center;margin-bottom:7px}.act-row[data-blocked="1"]{opacity:.55}.act-row select,.act-row input{padding:6px 8px;font-size:12px}.act-noparam{text-align:center;color:var(--muted)}
 .risk-bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:10px 15px;font-size:12px;color:var(--muted)}.risk-item{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:7px;background:var(--soft);color:#4a5b86}.risk-item.warn{background:#fde8ed;border:1px solid #f4b8c6;color:#c0324d;font-weight:600}.risk-item b{font-variant-numeric:tabular-nums}.risk-bar .risk-details{margin-left:auto}.risk-bar .risk-details[open]{width:100%}.risk-bar .risk-details .pair{max-width:420px;padding-top:6px}
 .heading-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end}.exec-button{display:inline-flex;align-items:center;gap:6px;padding:9px 16px;font-size:13px;font-weight:600;white-space:nowrap}.exec-button svg{display:block;flex:none}@media(max-width:720px){.heading-actions{justify-content:flex-start}}.fi{display:inline-flex;align-items:center;justify-content:center;width:13px;height:13px;margin-left:5px;border-radius:50%;background:#8a97bd;color:#fff;font-style:normal;font-size:10px;font-weight:700;line-height:1;cursor:help;vertical-align:1px;flex:none}.fi:hover,.fi:focus-visible{background:var(--blue);outline:none}#fieldTip{position:fixed;z-index:80;max-width:300px;padding:8px 11px;border-radius:8px;background:#1f335d;color:#fff;font-size:11.5px;line-height:1.65;box-shadow:0 8px 22px #172b5940;pointer-events:none;display:none}#fieldTip.show{display:block}
+/* module tabs — 参考 vision-model 的 module-tabs 结构 */
+.module-tabs{display:flex;gap:26px;border-bottom:1px solid var(--line);margin:0 0 16px}
+.module-tabs button{position:relative;display:inline-flex;align-items:center;padding:12px 2px 14px;border:0;border-radius:0;background:transparent;font-size:13px;font-weight:600;color:var(--muted);line-height:1}
+.module-tabs button:hover{border:0;background:transparent;color:var(--blue)}
+.module-tabs button.active{color:var(--blue);background:transparent}
+.module-tabs button.active:after{content:'';position:absolute;left:0;right:0;bottom:-1px;height:3px;background:var(--blue);border-radius:3px 3px 0 0}
+.module-tabs button:focus-visible{outline:3px solid #abb5ff;outline-offset:2px}
+.page{display:none}.page.active{display:block}
+.integration-heading{display:flex;align-items:flex-end;justify-content:space-between;gap:14px;margin:2px 0 14px;flex-wrap:wrap}
+.integration-heading h2{font-size:17px;margin:0 0 5px;letter-spacing:-.3px}
+.integration-heading p{margin:0;color:var(--muted);font-size:12px;line-height:1.7}
+.button{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:8px 12px;border:1px solid var(--line);border-radius:7px;background:#fff;color:var(--ink);font-size:12px;font-weight:550;white-space:nowrap}
+.button:hover:not(:disabled){border-color:#8997fc;background:#f2f4ff;color:var(--blue)}
+.button.primary{background:var(--blue);border-color:var(--blue);color:#fff}
+.button.text{border-color:transparent;background:transparent;color:var(--muted);padding:6px 8px}
+.button.text:hover{background:var(--soft);color:var(--blue)}
+.panel-heading{display:flex;align-items:center;gap:10px;padding:12px 15px;border-bottom:1px solid var(--line)}
+.panel-heading h2{margin:0;font-size:13px}
+.panel-heading .pill{margin-left:auto;font-size:11px;padding:3px 7px}
+.dev-layout{display:grid;grid-template-columns:minmax(320px,.85fr) minmax(0,1.2fr);gap:14px;align-items:start}
+.dev-editor{display:flex;flex-direction:column;min-width:0}
+.dev-note{margin:12px 15px 0;font-size:11.5px;color:var(--muted);line-height:1.7}
+#cfgCode{display:block;margin:12px 15px 0;width:calc(100% - 30px);min-height:330px;resize:vertical;padding:13px;border:1px solid var(--line);border-radius:8px;background:#0f1b33;color:#dbe4f7;font:12px/1.7 ui-monospace,SFMono-Regular,Menlo,monospace;tab-size:2}
+.dev-actions{display:flex;gap:8px;flex-wrap:wrap;padding:12px 15px 0}
+#cfgStatus{margin:10px 15px 15px;font-size:11.5px;color:var(--muted);line-height:1.7}
+#cfgStatus.bad{color:var(--red);font-weight:600}
+.dev-preview{min-width:0}
+.devices{display:flex;gap:4px;margin-left:auto}
+.devices button{padding:4px 8px;border:1px solid var(--line);border-radius:6px;background:#fff;font-size:11px;color:var(--muted)}
+.devices button.active{border-color:#a6b0ff;background:var(--soft);color:var(--blue);font-weight:600}
+.frame-wrap{padding:12px;background:#eef2fa;display:flex;justify-content:center}
+#previewFrame{width:100%;height:min(72vh,760px);border:1px solid var(--line);border-radius:8px;background:#fff}
+.dev-code{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}
+.dev-code .span-two{grid-column:1/-1}
+.dev-code pre{margin:0;padding:14px 15px;background:#0f1b33;color:#dbe4f7;font:11.5px/1.7 ui-monospace,SFMono-Regular,Menlo,monospace;overflow:auto;white-space:pre-wrap;word-break:break-all;max-height:220px}
+@media(max-width:1080px){.dev-layout{grid-template-columns:1fr}.dev-code{grid-template-columns:1fr}}
+@media(max-width:720px){.module-tabs{gap:20px}.module-tabs button{font-size:12.5px}}
 </style>
 </head>
 <body>
 <main>
 <div class="heading"><div><h1>智飞航线规划</h1><p>航线让无人机视野覆盖目标区域</p></div><div class="heading-actions"><span class="tiny" id="planState" role="status">准备规划</span><button id="executeNow" type="button" class="primary exec-button" title="示意按钮，不会执行真实飞行"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4.2 2.8 13 8l-8.8 5.2V2.8Z" fill="currentColor"/></svg>立即执行</button></div></div>
+<div class="module-tabs" role="tablist" aria-label="功能模块">
+<button id="tab-planner" class="active" role="tab" aria-selected="true" aria-controls="planner-page" tabindex="0" data-page="planner">航线规划</button>
+<button id="tab-dev" role="tab" aria-selected="false" aria-controls="dev-page" tabindex="-1" data-page="dev">开发配置</button>
+</div>
+<section id="planner-page" class="page active" role="tabpanel" aria-labelledby="tab-planner">
 <div class="workspace">
 <aside class="panel planner">
 <section class="section">
@@ -350,6 +392,67 @@
 </div>
 <div class="help">
 <strong>模拟范围与计算口径</strong>　平坦地面或单斜面假设（斜面由坡度与坡向定义；几何体为拉伸多面体，未做遮挡剔除）；所有航点位于矩形模拟作业范围内。飞行途中偏航沿航线方向时，覆盖在航线排序后按航段方向复核；机身角度、云台俯仰角、变焦倍数未填写时分别取沿航线方向、0°朝前、默认 1×。超视距裁切按相机到目标点的三维斜距计算，斜面面积为坡面真实面积；焦距为 35mm 等效口径，经纬度由起飞点原点换算（等距圆柱近似）。采样覆盖率是估计值，非连续面积的完整覆盖证明；重复采样比例仅统计满足方向约束的目标采样。航点动作按停留模式门控，不停留仅低延迟动作（延迟 <1s 为真机验收项）；能耗评估为匀速估算（航程/速度 + 等待 + 返航），未含起降、风阻与真实电池曲线。未计算真实 DEM、遮挡、空域（禁飞区）与机体动力学。</div>
+</section>
+<section id="dev-page" class="page" role="tabpanel" aria-labelledby="tab-dev" hidden>
+<div class="integration-heading">
+<div>
+<h2>开发配置</h2>
+<p>用一段前端代码维护主题、字体、文案与尺寸，右侧实时预览；下方可直接复制安装、引用与 API 配置。</p>
+</div>
+<a class="button secondary" id="openOfficial" href="?tab=planner" target="_blank" rel="noopener">新标签打开 ↗</a>
+</div>
+<div class="dev-layout">
+<section class="panel dev-editor">
+<div class="panel-heading">
+<h2>配置代码</h2>
+<span class="pill">JS</span>
+</div>
+<p class="dev-note">输入即生效（350 ms 防抖）；解析失败会标红并保留上一次有效配置。</p>
+<textarea id="cfgCode" spellcheck="false" aria-label="配置代码"></textarea>
+<div class="dev-actions">
+<button class="button secondary" id="resetConfig" type="button">恢复默认</button>
+<button class="button secondary" id="copyConfig" type="button">复制配置</button>
+</div>
+<p id="cfgStatus" role="status">已应用</p>
+</section>
+<section class="panel dev-preview">
+<div class="panel-heading">
+<h2>实时预览</h2>
+<div class="devices">
+<button data-w="1280" class="active" type="button">桌面</button>
+<button data-w="1024" type="button">1024</button>
+<button data-w="768" type="button">平板</button>
+<button data-w="390" type="button">手机</button>
+</div>
+<button class="button text" id="reloadPreview" type="button">重新加载</button>
+</div>
+<div class="frame-wrap"><iframe id="previewFrame" src="?tab=planner" title="航线规划预览"></iframe></div>
+</section>
+</div>
+<div class="dev-code">
+<section class="panel">
+<div class="panel-heading">
+<h2>安装</h2>
+<button class="button text" data-copy="codeInstall" type="button">复制</button>
+</div>
+<pre id="codeInstall"></pre>
+</section>
+<section class="panel">
+<div class="panel-heading">
+<h2>引用代码</h2>
+<button class="button text" data-copy="codeIframe" type="button">复制</button>
+</div>
+<pre id="codeIframe"></pre>
+</section>
+<section class="panel span-two">
+<div class="panel-heading">
+<h2>API 配置</h2>
+<button class="button text" data-copy="codeApi" type="button">复制</button>
+</div>
+<pre id="codeApi"></pre>
+</section>
+</div>
+</section>
 <div id="toast" role="status" hidden>
 </div>
 </main>
@@ -522,6 +625,123 @@ function applyCfg(cfg){if(!cfg||typeof cfg!=='object')return;const st=document.d
 (function bootCfg(){const q=new URLSearchParams(location.search).get('cfg');const cfg=q?decodeCfg(q):null;if(cfg)applyCfg(cfg);})();
 window.addEventListener('message',e=>{if(e.data&&e.data.type==='otp:config')applyCfg(e.data.cfg);});
 window.OttoPlexDronePlanner={version:'1.0.0',init:applyCfg,apply:applyCfg,getConfig:()=>({...liveCfg}),decodeCfg};
+// ---- 模块 tab：航线规划 / 开发配置（同一页面，参考 vision-model 的 module-tabs）----
+const PAGES=['planner','dev'];
+function readTab(){const q=new URLSearchParams(location.search).get('tab');return PAGES.includes(q)?q:'planner';}
+function goPage(page){
+  if(!PAGES.includes(page))page='planner';
+  document.querySelectorAll('.module-tabs [role="tab"]').forEach(tab=>{
+    const on=tab.dataset.page===page;
+    tab.classList.toggle('active',on);
+    tab.setAttribute('aria-selected',String(on));
+    tab.tabIndex=on?0:-1;
+  });
+  document.querySelectorAll('.page').forEach(panel=>{
+    const on=panel.id===page+'-page';
+    panel.hidden=!on;
+    panel.classList.toggle('active',on);
+  });
+  try{const u=new URL(location.href);u.searchParams.set('tab',page);history.replaceState(null,'',u.pathname+u.search+u.hash);}catch(error){}
+  if(page==='planner')requestAnimationFrame(()=>{draw();drawProfile();});
+}
+document.querySelectorAll('.module-tabs [role="tab"]').forEach(tab=>{
+  tab.addEventListener('click',()=>goPage(tab.dataset.page));
+});
+document.querySelector('.module-tabs').addEventListener('keydown',event=>{
+  const tabs=[...document.querySelectorAll('.module-tabs [role="tab"]')];
+  const current=tabs.indexOf(event.target);
+  if(current<0||!['ArrowLeft','ArrowRight','Home','End'].includes(event.key))return;
+  event.preventDefault();
+  const next=event.key==='Home'?0:event.key==='End'?tabs.length-1:(current+(event.key==='ArrowRight'?1:-1)+tabs.length)%tabs.length;
+  goPage(tabs[next].dataset.page);
+  tabs[next].focus();
+});
+
+// ---- 开发配置：一份前端代码维护主题/字体/文案/尺寸，右侧同源预览 ----
+const DEV_DEFAULTS={accent:'#4459f5',ink:'#172b59',bg:'#f7f9fd',font:'',size:14,sceneH:520,title:'智飞航线规划',subtitle:'航线让无人机视野覆盖目标区域'};
+const DEV_DEFAULT_CODE=[
+  '// 智飞航线规划 · 页面配置（可直接维护在你的前端代码里）',
+  '// 修改后即时应用到本页与右侧预览；也可复制到宿主页面调用 OttoPlexDronePlanner.init()',
+  'const config = {',
+  "  accent: '#4459f5',        // 主题色",
+  "  ink: '#172b59',           // 文字色",
+  "  bg: '#f7f9fd',            // 页面背景色",
+  "  font: '',                 // 字体族，留空为系统默认",
+  '  size: 14,                 // 基础字号 px',
+  '  sceneH: 520,              // 画布高度 px（尺寸）',
+  "  title: '智飞航线规划',     // 主标题文案",
+  "  subtitle: '航线让无人机视野覆盖目标区域'",
+  '};'
+].join('\n');
+let devCfg={...DEV_DEFAULTS};
+const devFrame=document.getElementById('previewFrame');
+function devBase(){return location.origin+location.pathname;}
+function devB64(obj){
+  const bytes=new TextEncoder().encode(JSON.stringify(obj)),bin=String.fromCharCode(...bytes);
+  return btoa(bin).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+}
+function devStatus(text,bad){const el=document.getElementById('cfgStatus');el.textContent=text;el.className=bad?'bad':'';}
+function devSend(){if(devFrame&&devFrame.contentWindow)devFrame.contentWindow.postMessage({type:'otp:config',cfg:devCfg},'*');}
+function devSnippets(){
+  const embed=devBase(),url=embed+'?tab=planner&cfg='+devB64(devCfg);
+  document.getElementById('codeInstall').textContent='# 方式一：Harness 插件市场安装\n#   设置 → 插件 → 插件市场，搜索「智飞航线规划」\n\n# 方式二：命令行从 GitHub 安装\ndsh plugin --profile <profile> add github:unhurriedly/dsh-drone-planner\n\n# 方式三：本地克隆后安装\nplugin_manager install_bundle /绝对路径/dsh-drone-planner\n\n# 自检\ncurl -I '+embed;
+  document.getElementById('codeIframe').textContent='<iframe\n  src="'+url+'"\n  width="100%" height="900"\n  style="border:0"\n  title="智飞航线规划"></iframe>';
+  const S='<'+'script', E='<'+'/'+'script>';
+  document.getElementById('codeApi').textContent='<div id="drone"></div>\n'+S+' src="'+embed.replace(/[^/]*$/,'api.js')+'">'+E+'\n'+S+'>\n  var app = OttoPlexDronePlanner.mount("#drone", '+JSON.stringify(devCfg,null,2).replace(/\n/g,'\n  ')+');\n  app.apply({ title: "新的标题" }); // 不重载即可热更新\n'+E;
+  document.getElementById('openOfficial').href=embed+'?tab=planner';
+  if(devFrame)devFrame.title='航线规划预览';
+}
+function devApply(){
+  const text=document.getElementById('cfgCode').value;
+  try{
+    const m=text.match(/\{[\s\S]*\}/);
+    if(!m)throw new Error('未找到配置对象 { … }');
+    const parsed=new Function('"use strict";return ('+m[0]+');')();
+    if(!parsed||typeof parsed!=='object'||Array.isArray(parsed))throw new Error('配置需要是一个对象');
+    devCfg={...DEV_DEFAULTS,...parsed};
+    applyCfg(devCfg);      // 本页立即生效（切到「航线规划」即是新样式）
+    devSend();             // 右侧预览同步
+    devSnippets();
+    devStatus('已应用 · '+new Date().toLocaleTimeString('zh-CN',{hour12:false}));
+    return true;
+  }catch(error){
+    devStatus('解析失败：'+error.message+'（预览与页面保持上一次有效配置）',true);
+    return false;
+  }
+}
+function copyText(text){
+  const done=()=>toast('已复制到剪贴板');
+  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(text).then(done,fallback);}else fallback();
+  function fallback(){const ta=document.createElement('textarea');ta.value=text;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();try{document.execCommand('copy');done();}catch(error){toast('复制失败，请手动选择');}document.body.removeChild(ta);}
+}
+(function devBoot(){
+  const code=document.getElementById('cfgCode');
+  if(!code)return;
+  code.value=DEV_DEFAULT_CODE;
+  let timer=null;
+  code.addEventListener('input',()=>{clearTimeout(timer);timer=setTimeout(devApply,350);});
+  document.getElementById('resetConfig').addEventListener('click',()=>{code.value=DEV_DEFAULT_CODE;devApply();});
+  document.getElementById('copyConfig').addEventListener('click',()=>copyText(code.value));
+  document.getElementById('reloadPreview').addEventListener('click',()=>{devFrame.src=devBase()+'?tab=planner&cfg='+devB64(devCfg)+'&t='+Date.now();});
+  document.querySelectorAll('.devices button').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      document.querySelectorAll('.devices button').forEach(x=>x.classList.remove('active'));
+      btn.classList.add('active');
+      const w=+btn.dataset.w;
+      devFrame.style.width=w>=1100?'100%':w+'px';
+      devFrame.style.maxWidth='100%';
+    });
+  });
+  document.addEventListener('click',event=>{
+    const btn=event.target.closest('[data-copy]');
+    if(btn)copyText(document.getElementById(btn.dataset.copy).textContent);
+  });
+  devFrame.addEventListener('load',()=>devSend());
+  goPage(readTab());
+  devSnippets();
+  window.OttoPlexDev={getConfig:()=>devCfg,setCode(code2){code.value=code2;devApply();},apply:devApply};
+})();
+
 // Expose deterministic geometry for local validation; no network or device control.
 window.PlannerDemo={state,config,basis,fov,geometry,geometrySlope,insideFov,area,convexIntersection,spacingAllowed,validateTarget,samples,generate,setTarget,recalc,directionOK,effYawTarget,segYawOf,toLatLon,slopeAB,groundZfn,riskInfo,ACTION_DEFS,NO_STAY_OK,cylinderOf,spiralWaypoints,lineWaypoints,greedyWaypoints,scanWaypoints,fillGaps};
 syncControls();setTarget(state.target);generate();
