@@ -167,7 +167,8 @@ const assert=require('node:assert/strict');
  }
  await page.waitForTimeout(400);
  const warnAfter=await page.locator('.plan-warn').allTextContents();
- check('Restoring a take-off point clears its warning',await page.evaluate(()=>PlannerDemo.state.plan.homes.filter(h=>h.lat==null).length===1)&&warnAfter.some(t=>/D3/.test(t))&&!warnAfter.some(t=>/D2/.test(t)));
+ const missWarnAfter=warnAfter.find(t=>/未提供起飞点/.test(t))||'';   // 只看“缺起飞点”那条，别被“超限”提示里的机号干扰
+ check('Restoring a take-off point clears its warning',await page.evaluate(()=>PlannerDemo.state.plan.homes.filter(h=>h.lat==null).length===1)&&/D3/.test(missWarnAfter)&&!/D2/.test(missWarnAfter));
 
  check('Plan routes are drawn on the canvas',await page.evaluate(()=>{
    const cv=document.getElementById('scene'),d=cv.getContext('2d').getImageData(0,0,cv.width,cv.height).data;

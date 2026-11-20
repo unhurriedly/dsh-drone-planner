@@ -12,10 +12,10 @@ const context = { document: {}, console, setTimeout };
 vm.createContext(context);
 vm.runInContext(
   source.split('let screen=')[0] +
-    '\nglobalThis.api={fov,geometry,basis,insideFov,validateTarget,directionOK,effYawTarget,segYawOf,toLatLon,state,area,spacingAllowed,slopeAB,groundZfn,riskInfo,ACTION_DEFS,NO_STAY_OK,samples,cylinderOf,spiralWaypoints,lineWaypoints,greedyWaypoints,scanWaypoints,fillGaps,simRoute,simPose,simReset,planResume,planMulti,homeLocal};',
+    '\nglobalThis.api={fov,geometry,basis,insideFov,validateTarget,directionOK,effYawTarget,segYawOf,toLatLon,state,area,spacingAllowed,slopeAB,groundZfn,riskInfo,ACTION_DEFS,NO_STAY_OK,samples,cylinderOf,spiralWaypoints,lineWaypoints,greedyWaypoints	,scanWaypoints,fillGaps,simRoute,simPose,simReset,planResume,planMulti,homeLocal};',
   context,
 );
-const { fov, geometry, basis, insideFov, validateTarget, directionOK, effYawTarget, segYawOf, toLatLon, state, area, spacingAllowed, slopeAB, groundZfn, riskInfo, ACTION_DEFS, NO_STAY_OK, samples, cylinderOf, spiralWaypoints, lineWaypoints, scanWaypoints, simRoute, simPose, planResume, planMulti, homeLocal } = context.api;
+const { fov, geometry, basis, insideFov, validateTarget, directionOK, effYawTarget, segYawOf, toLatLon, state, area, spacingAllowed, slopeAB, groundZfn, riskInfo, ACTION_DEFS, NO_STAY_OK, samples, cylinderOf, spiralWaypoints, lineWaypoints, scanWaypoints, fillGaps, simRoute, simPose, planResume, planMulti, homeLocal } = context.api;
 
 let checks = 0;
 function test(name, fn) { fn(); checks++; console.log('PASS ' + name); }
@@ -218,28 +218,38 @@ test('Line waypoints distributed along the route, not offset', () => {
   }
 });
 
-test('Scan pattern is boustrophedon across the target bbox', () => {
+test('Scan pattern is boustrophedon and covers the target bbox', () => {
   state.config = { type: 'area', height: 110, zoom: 1, distance: 210, spacing: 0, pitch: -60 };
   state.target = [[-160, -110], [170, -110], [205, 40], [90, 140], [-150, 115]];
   const pts = scanWaypoints(state.config);
-  assert.ok(pts.length >= 8, 'expected several scan waypoints');
+  assert.ok(pts.length >= 4, 'expected several scan waypoints');
   const rows = new Map();
   for (const p of pts) {
     const key = p.y.toFixed(3);
     if (!rows.has(key)) rows.set(key, []);
     rows.get(key).push(p);
   }
-  assert.ok(rows.size >= 3, 'expected at least 3 rows');
+  assert.ok(rows.size >= 2, 'expected at least 2 rows');
   const dirs = [...rows.values()].map(xs => xs[0].x < xs[1].x ? 1 : -1);
   assert.ok(dirs.includes(1) && dirs.includes(-1), 'rows must alternate direction (boustrophedon)');
-  for (const xs of rows.values()) {
-    assert.ok(Math.abs(xs[0].x - Math.min(...xs.map(p => p.x))) < 1e-9 || Math.abs(xs[0].x - Math.max(...xs.map(p => p.x))) < 1e-9,
-      'each row must start at a bbox edge');
-    assert.ok(xs.every(p => p.heading === p.yaw), 'scan waypoints carry their leg heading');
-  }
-  const xs = pts.map(p => p.x), ys = pts.map(p => p.y);
-  assert.ok(Math.min(...xs) === -160 && Math.max(...xs) === 205, 'scan spans bbox in x');
-  assert.ok(Math.min(...ys) === -110 && Math.max(...ys) === 140, 'scan spans bbox in y');
+  // 相机不必站在包围盒边上（视域向前伸），但扫描视域必须几何上盖住全部采样
+  state.samples = samples(state.config);
+  const ss = state.samples;
+  const covOf = list => ss.filter(p => list.some(w => insideFov(p, w, state.config, basis(w, state.config)))).length;
+  const scanCov = covOf(pts);
+  // 稀疏扫描本身会漏掉少量边角，其余的由补点补齐；这里确认扫描已是主覆盖来源
+  assert.ok(scanCov / ss.length > 0.85, `scan should cover most of the target: ${scanCov}/${ss.length}`);
+  const filled = pts.concat(fillGaps(state.config, pts));
+  assert.equal(covOf(filled), ss.length, 'scan + gap fill must cover every sample');
+  // 行方向要跨满包围盒（梯形视域的宽边靠这个保证）
+  const ys = pts.map(p => p.y);
+  assert.ok(Math.min(...ys) <= -110 && Math.max(...ys) >= 140, 'scan rows must span the bbox');
+  // 每个航点带着自己的设计航向
+  assert.ok(pts.every(p => p.heading === p.yaw));
+  // 固定机身姿态时，所有扫描航点都服从该航向（此前会被锁死成 ±90 导致覆盖归零）
+  const fixed = { ...state.config, yawMode: 'fixed', bodyYaw: 30 };
+  const fp = scanWaypoints(fixed);
+  assert.ok(fp.length > 0 && fp.every(p => Math.abs(p.yaw - 30) < 1e-9), 'fixed heading must be respected');
 });
 
 test('Cylinder default height is 200 m when unset', () => {
