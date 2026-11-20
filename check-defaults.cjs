@@ -141,6 +141,34 @@ const assert=require('node:assert/strict');
  await page.locator('[data-home="0"][data-key="lat"]').dispatchEvent('change');
  await page.waitForTimeout(350);
  check('Editing a take-off point is kept',await page.evaluate(v=>PlannerDemo.state.plan.homes[0].lat===v,39.95)&&latBefore!==39.95);
+ // 起飞点缺失：提示哪些能飞、哪些飞不完
+ for (const i of [1,2]) for (const key of ['lat','lon']) {
+   const loc=page.locator(`[data-home="${i}"][data-key="${key}"]`);
+   await loc.fill('');await loc.dispatchEvent('change');
+ }
+ await page.waitForTimeout(400);
+ const missing=await page.evaluate(()=>({
+   warn:(document.querySelector('.plan-warn')||{}).textContent||'',
+   status:[...document.querySelectorAll('.plan-table tbody tr td:last-child')].map(td=>td.textContent.trim()),
+   nulls:PlannerDemo.state.plan.homes.filter(h=>h.lat==null).length,
+ }));
+ check('Empty take-off points mark partitions as unflyable',missing.nulls===2&&missing.status.length===3&&missing.status.filter(t=>t==='缺起飞点').length===2);
+ check('Warning names which drones cannot complete their area',/D2、D3|D3、D2/.test(missing.warn)&&/飞不完/.test(missing.warn));
+ check('Summary reports the usable take-off points',/当前 <|当前 1\/3/.test(await page.locator('.plan-summary').innerHTML()));
+ check('Summary states the minimum fleet for the route',/按续航至少需要/.test(await page.locator('.plan-summary').innerText()));
+ check('Missing take-off partitions are drawn as a warning on canvas',await page.evaluate(()=>{
+   const cv=document.getElementById('scene'),d=cv.getContext('2d').getImageData(0,0,cv.width,cv.height).data;
+   for(let i=0;i<d.length;i+=4)if(Math.abs(d[i]-192)<14&&Math.abs(d[i+1]-50)<14&&Math.abs(d[i+2]-77)<14)return true;
+   return false;
+ }));
+ for (const key of ['lat','lon']) {
+   const loc=page.locator(`[data-home="1"][data-key="${key}"]`);
+   await loc.fill('0');await loc.dispatchEvent('change');
+ }
+ await page.waitForTimeout(400);
+ const warnAfter=await page.locator('.plan-warn').allTextContents();
+ check('Restoring a take-off point clears its warning',await page.evaluate(()=>PlannerDemo.state.plan.homes.filter(h=>h.lat==null).length===1)&&warnAfter.some(t=>/D3/.test(t))&&!warnAfter.some(t=>/D2/.test(t)));
+
  check('Plan routes are drawn on the canvas',await page.evaluate(()=>{
    const cv=document.getElementById('scene'),d=cv.getContext('2d').getImageData(0,0,cv.width,cv.height).data;
    const targets=[[220,139,39],[21,155,121],[168,85,206],[215,78,102]];

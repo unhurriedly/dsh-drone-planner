@@ -60,6 +60,8 @@
 .plan-table input{width:104px;padding:4px 6px;border:1px solid var(--line);border-radius:5px;font-size:11px}
 .plan-bad{color:#c0324d;font-weight:600}
 .plan-ok{color:#159b79;font-weight:600}
+.plan-warn{margin:0 0 10px;padding:8px 10px;border-radius:7px;background:#fff1f4;border:1px solid #f4b8c6;color:#a3283f;font-size:11.5px;line-height:1.7}
+.plan-warn b{color:#8d1f34}
 .plan-count{display:inline-flex;align-items:center;gap:6px;font-size:11.5px}
 .plan-count input{width:58px;padding:4px 6px;border:1px solid var(--line);border-radius:5px}
 @media(max-width:1080px){.dev-layout{grid-template-columns:1fr}}
@@ -195,7 +197,7 @@
 </label>
 </div>
 <details>
-<summary>坐标与换算</summary>
+<summary>无人机起飞点</summary>
 <div class="pair">
 <label class="field">
 <span>起飞点纬度 / °<i class="fi" tabindex="0" data-tip="经纬度换算原点（等距圆柱近似）；画布绘制与坐标输入仍使用局部米制。">!</i></span>
@@ -595,18 +597,27 @@ function renderPlan(){const panel=$('planPanel'),body=$('planBody'),c=state.conf
    const k=Math.max(2,Math.min(6,+p.count||2));
    if(p.homes.length!==k)ensurePlanHomes(k);
    const res=planMulti(c,budget,k,p.homes);p.result={kind:'multi',...res};
-   $('planHint').textContent='每台无人机有各自的起飞点与分区航线；改经纬度即时重算';
-   const rows=res.drones.map((d,i)=>{const h=p.homes[i]||{lat:0,lon:0};
-     const st=d.feasible?'<span class="plan-ok">满足</span>':'<span class="plan-bad">超限</span>';
-     return '<tr><td><i style="display:inline-block;width:9px;height:9px;border-radius:2px;background:'+d.color+';margin-right:6px"></i>D'+d.id+'</td>'
-      +'<td><input data-home="'+i+'" data-key="lat" type="number" step="0.000001" value="'+h.lat+'"> / <input data-home="'+i+'" data-key="lon" type="number" step="0.000001" value="'+h.lon+'"></td>'
+   $('planHint').textContent='每台无人机有各自的起飞点与分区航线；起飞点留空表示该机不可用';
+   const needK=Math.max(1,Math.ceil(r.time/budget));
+   const needLabel=needK>6?'≥6 台（已达分区上限）':needK+' 台';
+   const have=res.drones.filter(d=>d.hasHome), miss=res.drones.filter(d=>!d.hasHome), over=res.drones.filter(d=>d.hasHome&&!d.feasible);
+   const rows=res.drones.map((d,i)=>{const h=p.homes[i]||{lat:null,lon:null};
+     const st=!d.hasHome?'<span class="plan-bad">缺起飞点</span>':(d.feasible?'<span class="plan-ok">满足</span>':'<span class="plan-bad">超限</span>');
+     const cls=d.feasible?'':(d.hasHome?'':' style="background:#fff7f9"');
+     const lat=Number.isFinite(+h.lat)?h.lat:'',lon=Number.isFinite(+h.lon)?h.lon:'';
+     return '<tr'+cls+'><td><i style="display:inline-block;width:9px;height:9px;border-radius:2px;background:'+d.color+';margin-right:6px"></i>D'+d.id+'</td>'
+      +'<td><input data-home="'+i+'" data-key="lat" type="number" step="0.000001" value="'+lat+'" placeholder="留空" aria-label="D'+d.id+' 起飞点纬度"> / <input data-home="'+i+'" data-key="lon" type="number" step="0.000001" value="'+lon+'" placeholder="留空" aria-label="D'+d.id+' 起飞点经度"></td>'
       +'<td>'+d.idx.length+' 个</td><td>'+format(d.dist,0)+' m</td><td>'+format(d.time/60,1)+' min</td><td>'+st+'</td></tr>';}).join('');
+   const warnMiss=miss.length?('<div class="plan-warn">⚠ '+miss.map(d=>'D'+d.id).join('、')+' 未提供起飞点，对应分区当前<b>飞不完</b>：补齐经纬度、增派无人机，或改用策略 1 断点续飞。</div>'):'';
+   const warnOver=over.length?('<div class="plan-warn">⚠ '+over.map(d=>'D'+d.id).join('、')+' 的分区航程超出单架次续航，需增加机队数量或提高续航。</div>'):'';
    body.innerHTML='<p class="plan-summary">把任务区域拆成 <b>'+res.drones.length+'</b> 台无人机的分区航线，各自从自己的起飞点出动。'
+    +'按续航至少需要 <b>'+needLabel+'</b>，当前 <b>'+have.length+'/'+res.drones.length+'</b> 个分区有可用起飞点。'
     +'<span class="plan-count">机队数量 <input id="planDroneCount" type="number" min="2" max="6" step="1" value="'+k+'"></span></p>'
-    +'<table class="plan-table"><thead><tr><th>无人机</th><th>起飞点纬度 / 经度</th><th>负责航点</th><th>航程</th><th>预计用时</th><th>状态</th></tr></thead><tbody>'+rows+'</tbody></table>';
+    +warnMiss+warnOver
+    +'<table class="plan-table"><thead><tr><th>无人机</th><th>起飞点纬度 / 经度</th><th>负责航点</th><th>航程</th><th>预计用时</th><th>能否飞完</th></tr></thead><tbody>'+rows+'</tbody></table>';
  }
 }
-function drawPlan(ctx,c,gnd){const res=state.plan&&state.plan.result;if(!res||!state.points.length)return;
+   function drawPlan(ctx,c,gnd){const res=state.plan&&state.plan.result;if(!res||!state.points.length)return;
  const three=state.view==='3d',z=q=>three?gnd(q.x,q.y)+(q.height??c.height):gnd(q.x,q.y);
  const leg=(pts,color,home)=>{
   const homePt=[home.x,home.y,gnd(home.x,home.y)];
@@ -620,7 +631,11 @@ function drawPlan(ctx,c,gnd){const res=state.plan&&state.plan.result;if(!res||!s
   res.sorties.forEach((so,i)=>leg(so.idx.map(k=>state.points[k]),PLAN_COLORS[i%PLAN_COLORS.length],{x:0,y:0}));
   home({x:0,y:0},PLAN_COLORS[0],'H');
  }else{
-  res.drones.forEach(d=>{leg(d.idx.map(k=>state.points[k]),d.color,d.local);home(d.local,d.color,'D'+d.id);});
+  res.drones.forEach(d=>{const qs=d.idx.map(k=>state.points[k]);
+   if(d.hasHome){leg(qs,d.color,d.local);home(d.local,d.color,'D'+d.id);return;}
+   if(!qs.length)return;
+   path(ctx,qs.map(q=>[q.x,q.y,z(q)]),false);ctx.setLineDash([6,5]);ctx.lineWidth=2;ctx.strokeStyle='#c0324d';ctx.stroke();ctx.setLineDash([]);
+   const q0=qs[0],xy=projection(q0.x,q0.y,z(q0));ctx.font='9px -apple-system,sans-serif';ctx.fillStyle='#c0324d';ctx.fillText('D'+d.id+' 缺起飞点',xy[0]+8,xy[1]-8);});
  }
 }
 function riskInfo(c,endMin=25,safePct=80){const waits=state.points.reduce((s,w)=>s+(w.actions||[]).reduce((t,a)=>t+(a.type==='wait'&&a.params&&Number.isFinite(+a.params.sec)?Math.max(0,+a.params.sec):0),0),0);const v=Math.max(.1,c.speed);const travel=routeLength()/v;const ret=c.endAction==='rth'&&state.points.length?Math.hypot(state.points[state.points.length-1].x,state.points[state.points.length-1].y)/v:0;const time=travel+waits+ret;const budget=endMin*60*(safePct/100);return {waits,travel,ret,time,budget,over:time>budget};}
@@ -710,13 +725,15 @@ function planMulti(c,budget,count,homes){const pts=state.points,v=Math.max(.1,c.
    const members=pts.map((p,i)=>({p,i})).filter(o=>assign[o.i]===ci);
    if(!members.length)continue;
    const home=(homes&&homes[ci])||null;
-   const H=home?homeLocal(home):{x:cents[ci].x,y:cents[ci].y};
+   const hasHome=!!(home&&home.lat!=null&&home.lon!=null&&Number.isFinite(+home.lat)&&Number.isFinite(+home.lon));
+   const H=hasHome?homeLocal(home):{x:cents[ci].x,y:cents[ci].y};
    const rest=members.slice(),order=[];let cur=H;
    while(rest.length){let bi=0,bd=Infinity;rest.forEach((o,j)=>{const d=Math.hypot(o.p.x-cur.x,o.p.y-cur.y);if(d<bd){bd=d;bi=j;}});const o=rest.splice(bi,1)[0];order.push(o);cur=o.p;}
    let out=0;let prev=H;for(const o of order){out+=Math.hypot(o.p.x-prev.x,o.p.y-prev.y);prev=o.p;}
    const lastP=order[order.length-1].p,back=c.endAction==='rth'?Math.hypot(lastP.x-H.x,lastP.y-H.y):0;
    const waits=order.reduce((t,o)=>t+waitSecOf(o.p),0),time=(out+back)/v+waits;
-   drones.push({id:drones.length+1,color:PLAN_COLORS[drones.length%PLAN_COLORS.length],local:H,idx:order.map(o=>o.i),dist:out+back,time,feasible:time<=budget+1e-6});
+   const feasible=hasHome&&time<=budget+1e-6;
+   drones.push({id:drones.length+1,color:PLAN_COLORS[drones.length%PLAN_COLORS.length],local:H,hasHome,idx:order.map(o=>o.i),dist:out+back,time,feasible,reason:!hasHome?'缺起飞点':(time>budget+1e-6?'超限':'')});
  }
  return {drones,k};}
 
@@ -771,7 +788,7 @@ $('simStop').onclick=()=>{simReset();draw();};
 document.querySelectorAll('.plan-tabs button').forEach(b=>{b.onclick=()=>{state.plan.strategy=b.dataset.strategy;state.plan.result=null;renderPlan();draw();};});
 $('planBody').addEventListener('change',e=>{const t=e.target;
  if(t.id==='planDroneCount'){const k=Math.max(2,Math.min(6,+t.value||2));state.plan.count=k;state.plan.homes=[];state.plan.result=null;renderPlan();draw();return;}
- if(t.dataset.home!=null){const i=+t.dataset.home,key=t.dataset.key;const h=state.plan.homes[i]||{lat:0,lon:0};h[key]=+t.value;state.plan.homes[i]=h;state.plan.result=null;renderPlan();draw();}});
+ if(t.dataset.home!=null){const i=+t.dataset.home,key=t.dataset.key;const h=state.plan.homes[i]||{lat:null,lon:null};const v=t.value.trim();h[key]=v===''?null:+v;state.plan.homes[i]=h;state.plan.result=null;renderPlan();draw();}});
 const fieldTip=document.createElement('div');fieldTip.id='fieldTip';document.body.appendChild(fieldTip);
 function showTip(t){const r=t.getBoundingClientRect();fieldTip.textContent=t.dataset.tip;fieldTip.classList.add('show');const w=fieldTip.offsetWidth,h=fieldTip.offsetHeight;let x=r.left+r.width/2-w/2;x=Math.max(8,Math.min(x,window.innerWidth-w-8));let y=r.top-h-8;if(y<8)y=r.bottom+8;fieldTip.style.left=x+'px';fieldTip.style.top=y+'px';}
 function hideTip(){fieldTip.classList.remove('show');}

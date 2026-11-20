@@ -348,4 +348,23 @@ test('Drone take-off coordinates round-trip lat/lon to local metres', () => {
   state.config = null;
 });
 
+test('Multi-drone marks partitions without a take-off point as unflyable', () => {
+  state.config = { height: 110, speed: 5, endAction: 'hover', home: { lat: 0, lon: 0 } };
+  state.points = Array.from({ length: 12 }, (_, i) => ({ x: (i % 4) * 150 - 225, y: Math.floor(i / 4) * 150 - 150, yaw: 0, pitch: -60, zoom: 1, height: 110, actions: [] }));
+  const homes = [{ lat: 0.001, lon: 0.001 }, { lat: null, lon: null }, { lat: null, lon: null }];
+  const res = planMulti(state.config, 600, 3, homes);
+  assert.equal(res.drones.length, 3);
+  const missing = res.drones.filter(d => !d.hasHome);
+  assert.equal(missing.length, 2, 'two drones have no take-off point');
+  for (const d of missing) { assert.equal(d.feasible, false); assert.equal(d.reason, '缺起飞点'); }
+  assert.ok(res.drones[0].hasHome === true);
+  // coverage is still complete: the area split exists even when a drone is missing
+  const all = res.drones.flatMap(d => d.idx).sort((a, b) => a - b);
+  assert.equal(new Set(all).size, 12);
+  // an all-empty fleet must not crash and must report nothing flyable
+  const none = planMulti(state.config, 600, 3, [{ lat: null, lon: null }, { lat: null, lon: null }, { lat: null, lon: null }]);
+  assert.ok(none.drones.every(d => !d.hasHome && !d.feasible));
+  state.points = [];
+});
+
 console.log(`${checks} redesign checks passed.`);
